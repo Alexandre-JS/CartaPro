@@ -89,9 +89,19 @@ class EntitlementService
 
         if (! $paid) {
             $questions = array_values(array_filter($questions, fn ($question) => ! ($question['bloqueado'] ?? false)));
+
+            /*
+             * Uma prova é inteira ou não é servida. Antes filtravam-se as
+             * perguntas bloqueadas dentro de cada prova, o que entregava ao
+             * aluno gratuito exames mutilados — 11 de 30 perguntas, com a nota
+             * de passagem calculada sobre 30 — em vez de exames fechados.
+             */
             $exams = array_values(array_map(function (array $exam) {
-                $exam['perguntas'] = array_values(array_filter($exam['perguntas'] ?? [], fn ($question) => ! ($question['bloqueado'] ?? false)));
-                $exam['bloqueadoPorPlano'] = count($exam['perguntas']) === 0;
+                $bloqueada = ($exam['bloqueado'] ?? false)
+                    || collect($exam['perguntas'] ?? [])->contains(fn ($question) => $question['bloqueado'] ?? false);
+
+                $exam['perguntas'] = $bloqueada ? [] : ($exam['perguntas'] ?? []);
+                $exam['bloqueadoPorPlano'] = $bloqueada;
 
                 return $exam;
             }, $exams));
@@ -119,31 +129,34 @@ class EntitlementService
      */
     public function filterStudy(array $estudo, bool $paid): array
     {
-        $licoes = $estudo['licoes'] ?? [];
-        $sinais = $estudo['sinais'] ?? [];
+        /*
+         * Os artigos e o glossário juntaram-se aqui: eram as duas únicas
+         * frentes que seguiam inteiras para o plano gratuito, não por decisão
+         * mas por não existir sequer campo para as marcar.
+         */
+        $frentes = [
+            'sinais' => 'sinaisBloqueados',
+            'licoes' => 'licoesBloqueadas',
+            'artigos' => 'artigosBloqueados',
+            'glossario' => 'glossarioBloqueado',
+        ];
 
-        $licoesBloqueadas = 0;
-        $sinaisBloqueados = 0;
+        foreach ($frentes as $chave => $contador) {
+            $itens = $estudo[$chave] ?? [];
+            $bloqueados = 0;
 
-        foreach ($licoes as $licao) {
-            if ($licao['bloqueado'] ?? false) {
-                $licoesBloqueadas++;
+            foreach ($itens as $item) {
+                if ($item['bloqueado'] ?? false) {
+                    $bloqueados++;
+                }
             }
-        }
 
-        foreach ($sinais as $sinal) {
-            if ($sinal['bloqueado'] ?? false) {
-                $sinaisBloqueados++;
+            if (! $paid) {
+                $estudo[$chave] = array_values(array_filter($itens, fn ($item) => ! ($item['bloqueado'] ?? false)));
             }
-        }
 
-        if (! $paid) {
-            $estudo['licoes'] = array_values(array_filter($licoes, fn ($licao) => ! ($licao['bloqueado'] ?? false)));
-            $estudo['sinais'] = array_values(array_filter($sinais, fn ($sinal) => ! ($sinal['bloqueado'] ?? false)));
+            $estudo[$contador] = $paid ? 0 : $bloqueados;
         }
-
-        $estudo['licoesBloqueadas'] = $paid ? 0 : $licoesBloqueadas;
-        $estudo['sinaisBloqueados'] = $paid ? 0 : $sinaisBloqueados;
 
         return $estudo;
     }

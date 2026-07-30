@@ -192,6 +192,7 @@ class PackagePublisher
             'percentagemPassagem' => Grading::passPercentage($category),
             'valoresPassagem' => Grading::passValues($category),
             'minutos' => $exam->duration_minutes ?: Grading::durationMinutes($category),
+            'bloqueado' => (bool) $exam->is_locked,
             'perguntas' => $exam->questions->map(fn (Question $question) => $question->toPackageArray())->values()->all(),
         ];
     }

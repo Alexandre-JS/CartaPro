@@ -5,6 +5,8 @@ use App\Http\Controllers\Api\V1\ContentController;
 use App\Http\Controllers\Api\V1\ExamSessionController;
 use App\Http\Controllers\Api\V1\ManagementController;
 use App\Http\Controllers\Api\V1\MobileController;
+use App\Http\Controllers\Api\V1\PaymentController;
+use App\Http\Controllers\Api\V1\PaySuiteWebhookController;
 use App\Http\Controllers\Api\V1\UnlockController;
 use Illuminate\Support\Facades\Route;
 
@@ -18,6 +20,15 @@ Route::prefix('v1')->group(function () {
     Route::post('/mobile/register', [MobileController::class, 'register'])->middleware('throttle:10,1');
     Route::post('/mobile/login', [MobileController::class, 'login'])->middleware('throttle:10,1');
     Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
+
+    /*
+     * Webhook da PaySuite (confirmação da e-Mola). Público por necessidade — é
+     * o fornecedor que chama —, pelo que a assinatura HMAC é a única coisa que
+     * separa uma confirmação legítima de alguém a oferecer-se o plano completo.
+     */
+    Route::post('/webhooks/paysuite', PaySuiteWebhookController::class)
+        ->name('webhooks.paysuite')
+        ->middleware('throttle:60,1');
 
     // Prova da escola: o ecrã de entrada só mostra o estado da sessão.
     // A pauta da turma deixou de ser exposta e a submissão exige bilhete.
@@ -45,9 +56,17 @@ Route::prefix('v1')->group(function () {
             Route::get('/exams/{exam}', [MobileController::class, 'exam'])->whereNumber('exam');
 
             // Desbloqueio ligado à conta, com prova de posse do número.
+            // Continua a servir os pagamentos que o apoio ao cliente regista à
+            // mão; num pagamento C2B o PIN já prova a posse e o OTP é dispensado.
             Route::get('/unlock', [UnlockController::class, 'status']);
             Route::post('/unlock/request', [UnlockController::class, 'requestCode'])->middleware('throttle:5,10');
             Route::post('/unlock/confirm', [UnlockController::class, 'confirmCode'])->middleware('throttle:10,10');
+
+            // Pagamento dentro do app. O limite no POST é apertado de propósito:
+            // cada tentativa faz aparecer um pedido de PIN no telemóvel do aluno.
+            Route::get('/payments/plans', [PaymentController::class, 'plans']);
+            Route::post('/payments', [PaymentController::class, 'store'])->middleware('throttle:5,10');
+            Route::get('/payments/{payment}', [PaymentController::class, 'show'])->whereNumber('payment');
         });
 
         Route::get('/topics', [ContentController::class, 'topics']);

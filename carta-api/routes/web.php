@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AmostraController;
 use App\Http\Controllers\Admin\ApprovalController;
 use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\ClassroomController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\Admin\SchoolController;
 use App\Http\Controllers\Admin\SignController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\TopicController;
+use App\Http\Controllers\Admin\PaymentAdminController;
 use App\Http\Controllers\Admin\UnlockController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
@@ -83,6 +85,10 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         Route::resource('categories', LicenseCategoryController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::patch('/exams/{exam}/publish', [ExamController::class, 'publish'])->name('exams.publish');
         Route::patch('/exams/{exam}/archive', [ExamController::class, 'archive'])->name('exams.archive');
+        // O que o plano gratuito mostra. Marcar item a item existia desde o
+        // início; o que faltava era poder fazê-lo à escala do catálogo.
+        Route::get('/amostra', [AmostraController::class, 'index'])->name('amostra.index');
+        Route::post('/amostra', [AmostraController::class, 'store'])->name('amostra.store');
         Route::get('/publications', [PublicationController::class, 'index'])->name('publications.index');
         Route::post('/publications', [PublicationController::class, 'publish'])->name('publications.publish');
         Route::patch('/publications/{package}/restore', [PublicationController::class, 'restore'])->name('publications.restore');
@@ -90,6 +96,9 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/publications/{package}', [DetailController::class, 'publication'])->whereNumber('package')->name('publications.show');
         Route::resource('unlocks', UnlockController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::patch('/unlocks/{unlock}/associar', [UnlockController::class, 'bind'])->name('unlocks.bind');
+        // Devolução em 7 dias: retira o acesso ao mesmo tempo que se devolve o
+        // dinheiro na carteira, que continua a ser um passo manual.
+        Route::patch('/pagamentos/{payment}/devolver', [PaymentAdminController::class, 'refund'])->name('pagamentos.devolver');
         Route::get('/unlocks/{unlock}', [DetailController::class, 'unlock'])->whereNumber('unlock')->name('unlocks.show');
     });
     Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');

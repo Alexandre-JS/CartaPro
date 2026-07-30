@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['school_id', 'created_by', 'name', 'license_category', 'license_categories', 'type', 'selection_mode', 'blueprint', 'topic_ids', 'question_count', 'pass_score', 'duration_minutes', 'is_active', 'is_public', 'publication_status', 'published_at'])]
+#[Fillable(['school_id', 'created_by', 'name', 'license_category', 'license_categories', 'type', 'selection_mode', 'blueprint', 'topic_ids', 'question_count', 'pass_score', 'duration_minutes', 'is_active', 'is_public', 'is_locked', 'publication_status', 'published_at'])]
 class Exam extends Model
 {
     protected function casts(): array
