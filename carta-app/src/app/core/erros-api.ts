@@ -41,21 +41,21 @@ export function mensagensDeErro(erro: any): string[] {
 }
 
 /** Uma única frase, para onde só há espaço para uma linha. */
-export function mensagemDeErro(erro: any, alternativa = 'Ocorreu um erro. Tente novamente.'): string {
+export function mensagemDeErro(erro: any, alternativa = 'Ocorreu um erro. Tenta novamente.'): string {
     if (erro?.status === 0) {
-        return 'Sem ligação à internet. Verifique a rede e tente novamente.';
+        return 'Sem ligação à internet. Verifica a rede e tenta novamente.';
     }
 
     if (erro?.status === 401) {
-        return 'A sessão expirou. Entre novamente.';
+        return 'A sessão expirou. Entra novamente.';
     }
 
     if (erro?.status === 429) {
-        return 'Demasiadas tentativas. Aguarde um momento e tente novamente.';
+        return 'Demasiadas tentativas. Espera um momento e tenta novamente.';
     }
 
     if (erro?.status >= 500) {
-        return 'O servidor está com problemas. Tente novamente dentro de alguns minutos.';
+        return 'O servidor está com problemas. Tenta novamente dentro de alguns minutos.';
     }
 
     const mensagens = mensagensDeErro(erro);

@@ -2,12 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { IonContent, IonIcon, IonSearchbar } from '@ionic/angular/standalone';
+import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
 import { addIcons } from 'ionicons';
-import {
-    arrowBackOutline, bookOutline, carOutline, checkmarkCircle, chevronForwardOutline, constructOutline,
-    createOutline, documentTextOutline, home, libraryOutline, lockClosedOutline, medkitOutline,
-    personOutline, statsChartOutline, timeOutline, warningOutline,
-} from 'ionicons/icons';
+import { arrowBackOutline, bookOutline, carOutline, checkmarkCircle, chevronForwardOutline, constructOutline, documentTextOutline, libraryOutline, lockClosedOutline, medkitOutline, timeOutline, warningOutline } from 'ionicons/icons';
 import { AcessoService } from '../../core/acesso.service';
 import { MaterialEstudoService } from '../../core/material-estudo.service';
 import { normalizarTexto } from '../../core/texto';
@@ -28,7 +25,7 @@ interface GrupoComLicoes extends TaxonomiaItem {
 @Component({
     standalone: true,
     selector: 'app-licoes',
-    imports: [FormsModule, RouterLink, IonContent, IonIcon, IonSearchbar],
+    imports: [FormsModule, RouterLink, IonContent, IonIcon, IonSearchbar, SkeletonComponent],
     templateUrl: './licoes.page.html',
     styleUrls: ['./licoes.page.scss'],
 })
@@ -46,11 +43,7 @@ export class LicoesPage implements OnInit {
         private readonly material: MaterialEstudoService,
         private readonly acesso: AcessoService,
     ) {
-        addIcons({
-            arrowBackOutline, bookOutline, carOutline, checkmarkCircle, chevronForwardOutline, constructOutline,
-            createOutline, documentTextOutline, home, libraryOutline, lockClosedOutline, medkitOutline,
-            personOutline, statsChartOutline, timeOutline, warningOutline,
-        });
+        addIcons({ arrowBackOutline, bookOutline, carOutline, checkmarkCircle, chevronForwardOutline, constructOutline, documentTextOutline, libraryOutline, lockClosedOutline, medkitOutline, timeOutline, warningOutline });
     }
 
     async ngOnInit(): Promise<void> {

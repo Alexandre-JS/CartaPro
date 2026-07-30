@@ -4,15 +4,27 @@
       <button type="button" (click)="voltarInicio()" aria-label="Voltar ao início">
         <ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>
       </button>
-      <div class="celebration" aria-hidden="true">{{ aprovado ? '🏆' : '📚' }}</div>
+      <!-- Enquanto o resultado guardado não chegava, `resumo` era {0,0} e o
+           ecrã anunciava "Continua a praticar" com um 0% e o carimbo
+           "Reprovado" a um aluno que podia ter passado. -->
+      <div class="celebration" aria-hidden="true">{{ carregando ? '⏳' : (aprovado ? '🏆' : '📚') }}</div>
       <div>
-        <h1>{{ aprovado ? 'Parabéns!' : 'Continue a praticar!' }} <span aria-hidden="true">{{ aprovado ? '🎉' : '💪' }}</span></h1>
-        <p>{{ aprovado ? 'Exame concluído com sucesso.' : 'Está cada vez mais perto de conseguir.' }}</p>
+        @if (carregando) {
+          <h1>A corrigir o teu exame…</h1>
+          <p>Um momento enquanto contamos as respostas.</p>
+        } @else {
+          <h1>{{ aprovado ? 'Parabéns!' : 'Continua a praticar!' }} <span aria-hidden="true">{{ aprovado ? '🎉' : '💪' }}</span></h1>
+          <p>{{ aprovado ? 'Exame concluído com sucesso.' : 'Estás cada vez mais perto.' }}</p>
+        }
       </div>
       <span class="confetti" aria-hidden="true">✦ · ✧ · ✦</span>
     </header>
 
     <section class="result-content">
+      @if (carregando) {
+        <app-skeleton variante="cartao" [quantidade]="1" etiqueta="A corrigir o exame"></app-skeleton>
+        <app-skeleton variante="lista" [quantidade]="3"></app-skeleton>
+      } @else {
       <article class="score-card">
         <div class="score-ring" [style.--score]="percentagem" [class.failed]="!aprovado">
           <div>
@@ -21,13 +33,14 @@
           </div>
         </div>
 
+        <!-- "Erros" saiu: era `total - acertos - não respondidas`, e a lista de
+             correções logo abaixo enumera-os um a um. -->
         <dl>
-          <div><dt>Acertos</dt><dd class="correct-value">{{ resumo.acertos }}</dd></div>
-          <div><dt>Erros</dt><dd class="error-value">{{ erros }}</dd></div>
+          <div><dt>Acertos</dt><dd class="correct-value">{{ resumo.acertos }} de {{ resumo.total }}</dd></div>
+          <div><dt>Mínimo para passar</dt><dd>{{ notaPassagem }} de {{ resumo.total }}</dd></div>
           <div><dt>Não respondidas</dt><dd>{{ naoRespondidas }}</dd></div>
           <div><dt>Tempo total</dt><dd>{{ tempoFormatado }}</dd></div>
           <div><dt>Nota</dt><dd>{{ valores }} valores</dd></div>
-          <div><dt>Mínimo para passar</dt><dd>{{ notaPassagem }}/{{ resumo.total }}</dd></div>
         </dl>
       </article>
 
@@ -58,7 +71,7 @@
                 <span class="correction-number">{{ indice + 1 }}</span>
                 <div>
                   <h3>{{ detalhe.pergunta.enunciado }}</h3>
-                  <p>A sua resposta: <strong>{{ respostaEscolhida(detalhe) }}</strong></p>
+                  <p>A tua resposta: <strong>{{ respostaEscolhida(detalhe) }}</strong></p>
                   @if (detalhe.escolhida !== detalhe.pergunta.correta) {
                     <p class="right-answer">Correta: {{ detalhe.pergunta.opcoes[detalhe.pergunta.correta] }}</p>
                   }
@@ -75,19 +88,9 @@
           <div><span>Desempenho</span><h2>Análise por tema</h2></div>
         </div>
 
-        @if (fortes.length) {
-          <div class="theme-group">
-            <h3><ion-icon name="trending-up-outline" aria-hidden="true"></ion-icon> Pontos fortes</h3>
-            @for (tema of fortes; track tema.tema) {
-              <div class="theme-row">
-                <span>{{ nomeTema(tema.tema) }}</span>
-                <span class="theme-bar"><i [style.width.%]="tema.taxaRecente * 100"></i></span>
-                <strong>{{ tema.taxaRecente * 100 | number:'1.0-0' }}%</strong>
-              </div>
-            }
-          </div>
-        }
-
+        <!-- Só o que é accionável aqui. "Pontos fortes" e "ainda por praticar"
+             não pedem nada ao aluno logo a seguir a um exame e já estão no
+             separador Desempenho, que é onde se vê o retrato completo. -->
         @if (fracos.length) {
           <div class="theme-group weaknesses">
             <h3><ion-icon name="school-outline" aria-hidden="true"></ion-icon> Precisa de reforço</h3>
@@ -102,25 +105,12 @@
           </div>
         }
 
-        <!-- Nunca praticado deixou de ser confundido com fraco: antes o ecrã
-             listava como "fracos" todos os temas que o aluno nem tinha visto. -->
-        @if (naoPraticados.length) {
-          <div class="theme-group untouched">
-            <h3><ion-icon name="book-outline" aria-hidden="true"></ion-icon> Ainda por praticar</h3>
-            @for (tema of naoPraticados; track tema.tema) {
-              <div class="theme-row"><span>{{ nomeTema(tema.tema) }}</span><strong>—</strong></div>
-            }
-          </div>
+        @if (!fracos.length) {
+          <p class="hint">Nenhum tema abaixo do limiar de reforço. Vê o retrato completo em <a routerLink="/desempenho">Desempenho</a>.</p>
         }
       </section>
+      }
     </section>
 
-    <nav class="bottom-nav" aria-label="Navegação principal">
-      <a routerLink="/inicio" class="active"><ion-icon name="home" aria-hidden="true"></ion-icon><span>Início</span></a>
-      <a routerLink="/exames"><ion-icon name="create-outline" aria-hidden="true"></ion-icon><span>Exames</span></a>
-      <a routerLink="/estudos"><ion-icon name="book-outline" aria-hidden="true"></ion-icon><span>Estudos</span></a>
-      <a routerLink="/desempenho"><ion-icon name="stats-chart-outline" aria-hidden="true"></ion-icon><span>Desempenho</span></a>
-      <a routerLink="/perfil"><ion-icon name="person-outline" aria-hidden="true"></ion-icon><span>Perfil</span></a>
-    </nav>
   </main>
 </ion-content>

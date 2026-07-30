@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
+import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
 import { addIcons } from 'ionicons';
 import {
     arrowBackOutline, bookOutline, checkmarkCircle, checkmarkCircleOutline, chevronBackOutline,
@@ -20,7 +21,7 @@ import { ArtigoCodigoEstrada, BlocoTexto, LicaoEstudo, SinalTransito } from '../
 @Component({
     standalone: true,
     selector: 'app-licao',
-    imports: [RouterLink, IonContent, IonIcon],
+    imports: [RouterLink, IonContent, IonIcon, SkeletonComponent],
     templateUrl: './licao.page.html',
     styleUrls: ['./licao.page.scss'],
 })

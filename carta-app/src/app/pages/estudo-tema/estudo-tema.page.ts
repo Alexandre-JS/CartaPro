@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
+import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline, arrowForwardOutline, bookOutline, readerOutline, ribbonOutline } from 'ionicons/icons';
 import { PerguntaCardComponent } from '../../components/pergunta-card/pergunta-card.component';
@@ -15,7 +16,7 @@ import { ProgressoTema } from '../../models/progresso.model';
 @Component({
     standalone: true,
     selector: 'app-estudo-tema',
-    imports: [RouterLink, IonContent, IonIcon, PerguntaCardComponent],
+    imports: [RouterLink, IonContent, IonIcon, PerguntaCardComponent, SkeletonComponent],
     templateUrl: './estudo-tema.page.html',
     styleUrls: ['./estudo-tema.page.scss'],
 })
@@ -30,6 +31,7 @@ export class EstudoTemaPage implements OnInit {
     concluida = false;
     acertosSessao = 0;
     modoRevisao = false;
+    carregando = true;
     /** Instante em que a pergunta atual apareceu — base da telemetria. */
     private mostradaEm = Date.now();
 
@@ -63,6 +65,8 @@ export class EstudoTemaPage implements OnInit {
         }
 
         await this.atualizarProgresso();
+
+        this.carregando = false;
     }
 
     get perguntaAtual(): Pergunta | null {

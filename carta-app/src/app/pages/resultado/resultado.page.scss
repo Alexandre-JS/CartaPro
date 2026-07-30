@@ -63,13 +63,8 @@
 .weaknesses .theme-bar i { background: var(--app-color-yellow); }
 .weaknesses button { display: flex; width: 100%; align-items: center; justify-content: center; gap: 7px; height: 40px; margin-top: 16px; border: 1px solid var(--app-color-green); border-radius: 8px; color: var(--app-color-green-dark); background: #fff; font: inherit; font-size: .68rem; font-weight: 600; cursor: pointer; }
 
-.bottom-nav { position: fixed; z-index: 20; bottom: 0; left: 50%; display: grid; grid-template-columns: repeat(5, 1fr); width: min(100%, 560px); min-height: calc(67px + env(safe-area-inset-bottom)); padding: 8px 5px env(safe-area-inset-bottom); border-top: 1px solid #e7e9e7; background: rgb(255 255 255 / 96%); box-shadow: 0 -4px 18px rgb(32 33 36 / 8%); backdrop-filter: blur(12px); transform: translateX(-50%); }
-.bottom-nav a, .bottom-nav button { display: flex; min-width: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; padding: 0; border: 0; color: var(--app-color-road-gray); background: transparent; font: inherit; text-decoration: none; cursor: pointer; }
-.bottom-nav ion-icon { font-size: 1.25rem; }
-.bottom-nav span { font-size: .54rem; }
-.bottom-nav .active { color: var(--app-color-green-dark); font-weight: 600; }
 
-@media (min-width: 700px) { .result-shell { min-height: calc(100vh - 48px); margin-block: 24px; border-radius: 28px; } .bottom-nav { bottom: 24px; border-radius: 0 0 28px 28px; } }
+@media (min-width: 700px) { .result-shell { min-height: calc(100vh - 48px); margin-block: 24px; border-radius: 28px; } }
 @media (max-width: 380px) { .score-card { grid-template-columns: 112px 1fr; gap: 12px; padding: 15px; } .score-ring { width: 106px; height: 106px; } .score-ring::before { width: 80px; height: 80px; } .theme-row { grid-template-columns: 95px 1fr 30px; } }
 
 /* Aviso de acertos rápidos (possível adivinhação) e temas por praticar. */

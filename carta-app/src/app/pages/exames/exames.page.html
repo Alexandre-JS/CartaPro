@@ -4,21 +4,19 @@
       <div>
         <span>Preparação para o INATRO</span>
         <h1>Exames</h1>
-        <p>Escolha um exame e avalie os seus conhecimentos para os exames de condução do INATRO.</p>
+        <p>Provas completas e cronometradas, como no dia.</p>
       </div>
       <span class="hero-icon" aria-hidden="true"><ion-icon name="school-outline"></ion-icon></span>
     </header>
 
+    <!-- O cabeçalho de secção dizia outra vez o que o hero já dizia
+         ("escolha o seu exame"), e o switch grelha/lista era decoração: a
+         lista é sempre a mesma informação. -->
     <section class="exams-content">
-      <div class="section-heading">
-        <div><span>Exames INATRO</span><h2>Escolha o seu exame</h2></div>
-        <div class="view-switch" role="group" aria-label="Modo de visualização">
-          <button type="button" [class.active]="visualizacao === 'grelha'" (click)="visualizacao = 'grelha'" aria-label="Visualizar em grelha"><ion-icon name="grid-outline" aria-hidden="true"></ion-icon></button>
-          <button type="button" [class.active]="visualizacao === 'lista'" (click)="visualizacao = 'lista'" aria-label="Visualizar em lista"><ion-icon name="list-outline" aria-hidden="true"></ion-icon></button>
-        </div>
-      </div>
-
-      <section class="exam-list" [class.list-view]="visualizacao === 'lista'" aria-label="Lista de exames">
+      @if (carregando) {
+        <app-skeleton variante="cartao" [quantidade]="4" etiqueta="A carregar as provas"></app-skeleton>
+      } @else {
+      <section class="exam-list" aria-label="Lista de exames">
         @for (exame of exames; track exame.numero) {
           <article class="exam-item" [class]="estadoExame(exame)">
             <div class="exam-card">
@@ -56,15 +54,28 @@
           </article>
         }
       </section>
-      @if (!exames.length) { <div class="empty-state"><ion-icon name="document-text-outline"></ion-icon><strong>Nenhuma prova pública disponível</strong><p>{{ mensagemErro || 'A equipa ainda não publicou provas para o app.' }}</p></div> }
+      <!-- Falhar a carregar oferece nova tentativa; não haver provas é um facto
+           e não tem botão. Antes eram a mesma mensagem. -->
+      @if (mensagemErro) {
+        <div class="empty-state">
+          <ion-icon name="cloud-offline-outline" aria-hidden="true"></ion-icon>
+          <strong>Não foi possível carregar as provas</strong>
+          <p>{{ mensagemErro }}</p>
+          <button type="button" class="primary-button" (click)="carregar()">
+            <ion-icon name="refresh-outline" aria-hidden="true"></ion-icon>
+            Tentar de novo
+          </button>
+        </div>
+      } @else if (!exames.length) {
+        <div class="empty-state">
+          <ion-icon name="document-text-outline" aria-hidden="true"></ion-icon>
+          <strong>Nenhuma prova publicada</strong>
+          <p>A equipa ainda não publicou provas para o app. Entretanto podes estudar o material.</p>
+        </div>
+      }
+      }
     </section>
 
-    <nav class="bottom-nav" aria-label="Navegação principal">
-      <a routerLink="/inicio"><ion-icon name="home-outline" aria-hidden="true"></ion-icon><span>Início</span></a>
-      <a routerLink="/exames" class="active"><ion-icon name="document-text-outline" aria-hidden="true"></ion-icon><span>Exames</span></a>
-      <a routerLink="/estudos"><ion-icon name="book-outline" aria-hidden="true"></ion-icon><span>Estudos</span></a>
-      <a routerLink="/desempenho"><ion-icon name="stats-chart-outline" aria-hidden="true"></ion-icon><span>Desempenho</span></a>
-      <a routerLink="/perfil"><ion-icon name="person-outline" aria-hidden="true"></ion-icon><span>Perfil</span></a>
-    </nav>
+    <app-bottom-nav ativo="exames"></app-bottom-nav>
   </main>
 </ion-content>

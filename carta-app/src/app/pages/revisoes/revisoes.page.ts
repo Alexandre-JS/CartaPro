@@ -1,8 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
+import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
 import { addIcons } from 'ionicons';
-import { arrowForwardOutline, bookOutline, checkmarkCircleOutline, createOutline, home, personOutline, refreshOutline, statsChartOutline, timeOutline } from 'ionicons/icons';
+import { arrowForwardOutline, bookOutline, checkmarkCircleOutline, refreshOutline, timeOutline } from 'ionicons/icons';
 import { PerguntaCardComponent } from '../../components/pergunta-card/pergunta-card.component';
 import { ContentService } from '../../core/content.service';
 import { ProgressoService } from '../../core/progresso.service';
@@ -21,7 +22,7 @@ import { CategoriaCarta, Pergunta } from '../../models/pergunta.model';
 @Component({
     standalone: true,
     selector: 'app-revisoes',
-    imports: [RouterLink, IonContent, IonIcon, PerguntaCardComponent],
+    imports: [RouterLink, IonContent, IonIcon, PerguntaCardComponent, SkeletonComponent],
     templateUrl: './revisoes.page.html',
     styleUrls: ['./revisoes.page.scss'],
 })
@@ -45,7 +46,7 @@ export class RevisoesPage implements OnInit, OnDestroy {
         private readonly content: ContentService,
         private readonly temasService: TemasService,
     ) {
-        addIcons({ arrowForwardOutline, bookOutline, checkmarkCircleOutline, createOutline, home, personOutline, refreshOutline, statsChartOutline, timeOutline });
+        addIcons({ arrowForwardOutline, bookOutline, checkmarkCircleOutline, refreshOutline, timeOutline });
     }
 
     async ngOnInit(): Promise<void> {

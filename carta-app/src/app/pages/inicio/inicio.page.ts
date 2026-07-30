@@ -2,8 +2,10 @@ import { DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
+import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
+import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
 import { addIcons } from 'ionicons';
-import { arrowForwardOutline, bookOutline, bulbOutline, chevronForwardOutline, createOutline, documentTextOutline, home, lockClosedOutline, notificationsOutline, personOutline, statsChartOutline, timeOutline } from 'ionicons/icons';
+import { bulbOutline, chevronForwardOutline, documentTextOutline, lockClosedOutline, timeOutline, warningOutline } from 'ionicons/icons';
 import { AcessoService } from '../../core/acesso.service';
 import { ContentService } from '../../core/content.service';
 import { ProgressoService } from '../../core/progresso.service';
@@ -11,13 +13,24 @@ import { PerfilService } from '../../core/perfil.service';
 import { RegrasService } from '../../core/regras.service';
 import { StorageService } from '../../core/storage.service';
 import { TemasService } from '../../core/temas.service';
+import { TreinoSinaisService } from '../../core/treino-sinais.service';
 import { CategoriaCarta } from '../../models/pergunta.model';
-import { HistoricoExame, ProgressoTema, RecomendacaoEstudo } from '../../models/progresso.model';
+import { HistoricoExame, ProgressoTema } from '../../models/progresso.model';
+
+/** Uma tarefa concreta que o aluno pode abrir agora. */
+interface PassoEstudo {
+    titulo: string;
+    motivo: string;
+    icone: string;
+    accao: string;
+    rota: unknown[];
+    query?: Record<string, unknown>;
+}
 
 @Component({
     standalone: true,
     selector: 'app-inicio',
-    imports: [DatePipe, RouterLink, IonContent, IonIcon],
+    imports: [DatePipe, RouterLink, IonContent, IonIcon, BottomNavComponent, SkeletonComponent],
     templateUrl: './inicio.page.html',
     styleUrls: ['./inicio.page.scss'],
 })
@@ -25,11 +38,10 @@ export class InicioPage implements OnInit {
     categoria: CategoriaCarta = 'ligeiro';
     temas: ProgressoTema[] = [];
     historico: HistoricoExame[] = [];
-    totalRespondidas = 0;
-    taxaAcerto = 0;
-    recomendacao: RecomendacaoEstudo | null = null;
     primeiroNome = 'Estudante';
-    revisoesPendentes = 0;
+    carregando = true;
+    /** Fila de tarefas por ordem de urgência; só a cabeça vai a destaque. */
+    passos: PassoEstudo[] = [];
     /** Perguntas por trás do cadeado (0 quando o plano é completo). */
     bloqueadas = 0;
     plano: 'gratis' | 'pago' = 'gratis';
@@ -42,8 +54,9 @@ export class InicioPage implements OnInit {
         private readonly temasService: TemasService,
         private readonly regras: RegrasService,
         private readonly acesso: AcessoService,
+        private readonly treino: TreinoSinaisService,
     ) {
-        addIcons({ arrowForwardOutline, bookOutline, bulbOutline, chevronForwardOutline, createOutline, documentTextOutline, home, lockClosedOutline, notificationsOutline, personOutline, statsChartOutline, timeOutline });
+        addIcons({ bulbOutline, chevronForwardOutline, documentTextOutline, lockClosedOutline, timeOutline, warningOutline });
     }
 
     async ngOnInit(): Promise<void> {
@@ -57,39 +70,87 @@ export class InicioPage implements OnInit {
         await this.acesso.revalidarSeNecessario();
         await Promise.all([this.temasService.carregar(), this.regras.carregar()]);
 
-        const [nomesTemas, respostas, historico, revisoes, perfil, bloqueado] = await Promise.all([
+        const [nomesTemas, historico, revisoes, perfil, bloqueado, sinaisPorReforcar] = await Promise.all([
             this.content.listarTemas(),
-            this.storage.listarRespostas(),
             this.storage.listarExames(),
             this.storage.listarRevisoesPendentes(),
             this.perfil.obter(),
             this.acesso.conteudoBloqueado(),
+            this.treino.totalParaReforcar(),
         ]);
 
         this.primeiroNome = perfil.nome.trim().split(/\s+/)[0] || 'Estudante';
-        this.revisoesPendentes = revisoes.length;
         this.bloqueadas = bloqueado.total;
         this.plano = (await this.storage.obterEstadoAcesso()).plano;
-
-        this.temas = await this.progresso.estatisticasPorTema(nomesTemas);
-        this.recomendacao = this.progresso.recomendarEstudo(this.temas, 5, revisoes[0]?.tema);
-
-        if (this.recomendacao) {
-            const perguntas = await this.content.listarPerguntas({
-                tema: this.recomendacao.tema,
-                categoria: this.categoria,
-            });
-            this.recomendacao = { ...this.recomendacao, totalPerguntas: Math.min(5, perguntas.length) };
-        }
-
         this.historico = historico;
-        this.totalRespondidas = respostas.length;
-        const acertos = respostas.filter((resposta) => resposta.acertou).length;
-        this.taxaAcerto = respostas.length ? Math.round((acertos / respostas.length) * 100) : 0;
+        this.temas = await this.progresso.estatisticasPorTema(nomesTemas);
+
+        await this.montarFila(revisoes.length, revisoes[0]?.tema, sinaisPorReforcar);
+
+        this.carregando = false;
     }
 
-    get examesRealizados(): number {
-        return this.historico.length;
+    get passoPrincipal(): PassoEstudo | null {
+        return this.passos[0] || null;
+    }
+
+    get outrosPassos(): PassoEstudo[] {
+        return this.passos.slice(1);
+    }
+
+    /**
+     * Ordena as tarefas por urgência real: primeiro o que a memória está prestes
+     * a perder (revisões), depois o tema mais fraco, depois os sinais falhados.
+     */
+    private async montarFila(revisoesPendentes: number, temaEmRevisao: string | undefined, sinaisPorReforcar: number): Promise<void> {
+        const fila: PassoEstudo[] = [];
+
+        if (revisoesPendentes) {
+            fila.push({
+                titulo: `${revisoesPendentes} ${revisoesPendentes === 1 ? 'pergunta a rever' : 'perguntas a rever'}`,
+                motivo: 'Revê agora, enquanto a memória ainda está fresca.',
+                icone: 'time-outline',
+                accao: 'Revisar',
+                rota: ['/revisoes'],
+            });
+        }
+
+        const recomendacao = this.progresso.recomendarEstudo(this.temas, 5, temaEmRevisao);
+        // Com revisões pendentes, `recomendarEstudo` devolve o mesmo tema com
+        // acção "revisar" — seria a mesma tarefa por outra rota.
+        if (recomendacao && !(revisoesPendentes && recomendacao.acao === 'revisar')) {
+            fila.push({
+                titulo: this.nomeTema(recomendacao.tema),
+                motivo: recomendacao.motivo,
+                icone: 'bulb-outline',
+                accao: recomendacao.acao === 'reforcar' ? 'Reforçar' : 'Estudar',
+                rota: ['/estudo', recomendacao.tema],
+                query: { categoria: this.categoria },
+            });
+        }
+
+        if (sinaisPorReforcar) {
+            fila.push({
+                titulo: `${sinaisPorReforcar} ${sinaisPorReforcar === 1 ? 'sinal a reforçar' : 'sinais a reforçar'}`,
+                motivo: 'Sinais que já falhaste no treino de reconhecimento.',
+                icone: 'warning-outline',
+                accao: 'Treinar',
+                rota: ['/treino-sinais'],
+                query: { modo: 'reforco' },
+            });
+        }
+
+        if (!this.historico.length) {
+            fila.push({
+                titulo: 'Fazer o primeiro exame',
+                motivo: 'Um exame completo mostra onde estás antes do INATRO.',
+                icone: 'document-text-outline',
+                accao: 'Começar',
+                rota: ['/exames'],
+            });
+        }
+
+        this.passos = fila;
     }
 
     get ultimoExame(): HistoricoExame | null {

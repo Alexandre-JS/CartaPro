@@ -17,7 +17,6 @@
 .progress-bar { display: block; height: 6px; overflow: hidden; border-radius: 6px; background: #e4e8e5; }
 .progress-bar i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--app-color-green-dark), var(--app-color-green)); }
 
-.train-actions { display: grid; gap: 8px; margin-top: 12px; }
 .primary-button, .outline-button { display: flex; min-height: 48px; align-items: center; justify-content: center; gap: 8px; border-radius: 12px; font-size: .78rem; font-weight: 700; text-decoration: none; }
 .primary-button { color: #fff; background: linear-gradient(135deg, var(--app-color-green-dark), var(--app-color-green)); }
 .outline-button { border: 1px solid #e7ce7d; color: #7a5600; background: #fff9e8; }
@@ -51,13 +50,12 @@
 .empty-state h2 { margin: 14px 0 6px; font-size: 1.05rem; }
 .empty-state p { max-width: 300px; margin: 0; color: var(--app-color-text-muted); font-size: .76rem; line-height: 1.55; }
 
-.bottom-nav { position: fixed; z-index: 20; bottom: 0; left: 50%; display: grid; grid-template-columns: repeat(5, 1fr); width: min(100%, 560px); min-height: calc(67px + env(safe-area-inset-bottom)); padding: 8px 5px env(safe-area-inset-bottom); border-top: 1px solid #e7e9e7; background: rgb(255 255 255 / 96%); box-shadow: 0 -4px 18px rgb(32 33 36 / 8%); backdrop-filter: blur(12px); transform: translateX(-50%); }
-.bottom-nav a { display: flex; min-width: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; color: var(--app-color-road-gray); text-decoration: none; }
-.bottom-nav ion-icon { font-size: 1.25rem; }
-.bottom-nav span { font-size: .54rem; }
-.bottom-nav .active { color: var(--app-color-green-dark); font-weight: 600; }
 
 @media (min-width: 700px) {
   .signs-shell { min-height: calc(100vh - 48px); margin-block: 24px; border-radius: 28px; }
-  .bottom-nav { bottom: 24px; border-radius: 0 0 28px 28px; }
 }
+
+/* Progresso reduzido a uma linha e o treino junto aos resultados que filtra. */
+.progress-card.slim { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 12px; }
+.progress-card.slim strong { white-space: nowrap; }
+.train-cta { margin-bottom: 14px; }

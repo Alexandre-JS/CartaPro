@@ -1,0 +1,41 @@
+<div class="skeleton" [class]="variante" role="status" [attr.aria-label]="etiqueta" aria-live="polite" aria-busy="true">
+  @switch (variante) {
+    @case ('grelha') {
+      @for (bloco of blocos; track bloco) {
+        <div class="tile">
+          <i class="shape thumb"></i>
+          <i class="shape line"></i>
+          <i class="shape line short"></i>
+        </div>
+      }
+    }
+    @case ('cartao') {
+      @for (bloco of blocos; track bloco) {
+        <div class="card">
+          <i class="shape avatar"></i>
+          <div class="copy">
+            <i class="shape line"></i>
+            <i class="shape line short"></i>
+          </div>
+        </div>
+      }
+    }
+    @case ('texto') {
+      @for (bloco of blocos; track bloco) {
+        <i class="shape line"></i>
+      }
+      <i class="shape line short"></i>
+    }
+    @default {
+      @for (bloco of blocos; track bloco) {
+        <div class="row">
+          <i class="shape avatar"></i>
+          <div class="copy">
+            <i class="shape line"></i>
+            <i class="shape line short"></i>
+          </div>
+        </div>
+      }
+    }
+  }
+</div>

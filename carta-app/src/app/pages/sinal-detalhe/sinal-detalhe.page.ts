@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
+import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
 import { addIcons } from 'ionicons';
 import {
     albumsOutline, arrowBackOutline, arrowForwardCircleOutline, bookOutline, checkmarkCircle, chevronBackOutline,
@@ -20,7 +21,7 @@ import { ArtigoCodigoEstrada, BlocoTexto, LicaoEstudo, SinalTransito, TaxonomiaI
 @Component({
     standalone: true,
     selector: 'app-sinal-detalhe',
-    imports: [RouterLink, IonContent, IonIcon],
+    imports: [RouterLink, IonContent, IonIcon, SkeletonComponent],
     templateUrl: './sinal-detalhe.page.html',
     styleUrls: ['./sinal-detalhe.page.scss'],
 })

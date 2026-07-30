@@ -11,33 +11,22 @@
       <span class="header-count">{{ sinais.length }}</span>
     </header>
 
+    <!-- O total dos sinais aparecia três vezes antes do primeiro sinal — no
+         contador do cabeçalho, no cartão de progresso e no chip "Todos" — e
+         havia dois botões de treino. O reforço dos sinais falhados passou para
+         a fila do Início, onde as tarefas pendentes vivem todas juntas. -->
     <section class="signs-content">
       @if (sinais.length) {
-        <article class="progress-card">
-          <div>
-            <strong>{{ totalVistos }} de {{ sinais.length }} estudados</strong>
-            <small>Abre um sinal para o marcar como estudado.</small>
-          </div>
+        <article class="progress-card slim">
+          <strong>{{ totalVistos }} estudados</strong>
           <span class="progress-bar"><i [style.width.%]="percentagemVista"></i></span>
         </article>
-
-        <div class="train-actions">
-          <a class="primary-button" routerLink="/treino-sinais" [queryParams]="{ categoria: categoriaAtiva || null }">
-            <ion-icon name="school-outline" aria-hidden="true"></ion-icon>
-            Treinar {{ categoriaAtiva ? nomeCategoria(categoriaAtiva).toLowerCase() : 'sinais' }}
-          </a>
-          @if (paraReforcar) {
-            <a class="outline-button" routerLink="/treino-sinais" [queryParams]="{ modo: 'reforco' }">
-              Reforçar {{ paraReforcar }} sinal(is) que falhaste
-            </a>
-          }
-        </div>
       }
 
       @if (plano === 'gratis' && bloqueados > 0) {
         <a class="locked-notice" routerLink="/desbloquear">
           <ion-icon name="lock-closed-outline" aria-hidden="true"></ion-icon>
-          <span><strong>{{ bloqueados }} sinais bloqueados</strong><small>Ativa o plano completo para estudar toda a sinalização.</small></span>
+          <span><strong>{{ bloqueados }} sinais bloqueados</strong><small>Ativa o plano completo para estudares toda a sinalização.</small></span>
         </a>
       }
 
@@ -51,7 +40,7 @@
       @if (categorias.length) {
         <div class="category-chips" role="tablist" aria-label="Categorias de sinalização">
           <button type="button" role="tab" [attr.aria-selected]="!categoriaAtiva" [class.active]="!categoriaAtiva" (click)="categoriaAtiva = ''">
-            Todos ({{ sinais.length }})
+            Todos
           </button>
           @for (categoria of categorias; track categoria.slug) {
             <button type="button" role="tab" [attr.aria-selected]="categoriaAtiva === categoria.slug" [class.active]="categoriaAtiva === categoria.slug" (click)="filtrar(categoria.slug)">
@@ -61,16 +50,19 @@
         </div>
       }
 
-      @if (categoriaAtiva) {
-        @for (categoria of categorias; track categoria.slug) {
-          @if (categoria.slug === categoriaAtiva && categoria.descricao) {
-            <p class="category-hint">{{ categoria.descricao }}</p>
-          }
-        }
+      @if (descricaoCategoriaAtiva) {
+        <p class="category-hint">{{ descricaoCategoriaAtiva }}</p>
+      }
+
+      @if (sinais.length) {
+        <a class="primary-button train-cta" routerLink="/treino-sinais" [queryParams]="{ categoria: categoriaAtiva || null }">
+          <ion-icon name="school-outline" aria-hidden="true"></ion-icon>
+          Treinar {{ categoriaAtiva ? nomeCategoria(categoriaAtiva).toLowerCase() : 'sinais' }}
+        </a>
       }
 
       @if (carregando) {
-        <p class="empty-hint">A carregar sinalização…</p>
+        <app-skeleton variante="grelha" [quantidade]="9" etiqueta="A carregar a sinalização"></app-skeleton>
       } @else if (!sinaisVisiveis.length) {
         <section class="empty-state">
           <ion-icon name="warning-outline" aria-hidden="true"></ion-icon>
@@ -99,12 +91,5 @@
       }
     </section>
 
-    <nav class="bottom-nav" aria-label="Navegação principal">
-      <a routerLink="/inicio"><ion-icon name="home" aria-hidden="true"></ion-icon><span>Início</span></a>
-      <a routerLink="/exames"><ion-icon name="create-outline" aria-hidden="true"></ion-icon><span>Exames</span></a>
-      <a routerLink="/estudos" class="active"><ion-icon name="book-outline" aria-hidden="true"></ion-icon><span>Estudos</span></a>
-      <a routerLink="/desempenho"><ion-icon name="stats-chart-outline" aria-hidden="true"></ion-icon><span>Desempenho</span></a>
-      <a routerLink="/perfil"><ion-icon name="person-outline" aria-hidden="true"></ion-icon><span>Perfil</span></a>
-    </nav>
   </main>
 </ion-content>

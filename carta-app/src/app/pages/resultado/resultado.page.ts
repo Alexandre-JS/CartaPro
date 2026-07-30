@@ -2,8 +2,9 @@ import { DecimalPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
+import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
 import { addIcons } from 'ionicons';
-import { arrowBackOutline, arrowForwardOutline, bookOutline, checkmarkCircle, closeCircle, createOutline, home, personOutline, schoolOutline, statsChartOutline, trendingUpOutline } from 'ionicons/icons';
+import { arrowBackOutline, arrowForwardOutline, bookOutline, checkmarkCircle, closeCircle, schoolOutline, trendingUpOutline } from 'ionicons/icons';
 import { ContentService } from '../../core/content.service';
 import { ProgressoService } from '../../core/progresso.service';
 import { RegrasService } from '../../core/regras.service';
@@ -20,18 +21,17 @@ interface DetalheApresentado {
 @Component({
     standalone: true,
     selector: 'app-resultado',
-    imports: [DecimalPipe, RouterLink, IonContent, IonIcon],
+    imports: [DecimalPipe, RouterLink, IonContent, IonIcon, SkeletonComponent],
     templateUrl: './resultado.page.html',
     styleUrls: ['./resultado.page.scss'],
 })
 export class ResultadoPage implements OnInit {
     resumo: ResultadoResumo = { total: 0, acertos: 0 };
-    fortes: ProgressoTema[] = [];
     fracos: ProgressoTema[] = [];
-    naoPraticados: ProgressoTema[] = [];
     detalhes: DetalheApresentado[] = [];
     tempoSegundos = 0;
     mostrarCorrecoes = false;
+    carregando = true;
     notaPassagem = 0;
     valores = 0;
     /** Acertos muito rápidos: provável adivinhação, não domínio. */
@@ -45,7 +45,7 @@ export class ResultadoPage implements OnInit {
         private readonly regras: RegrasService,
         private readonly temasService: TemasService,
     ) {
-        addIcons({ arrowBackOutline, arrowForwardOutline, bookOutline, checkmarkCircle, closeCircle, createOutline, home, personOutline, schoolOutline, statsChartOutline, trendingUpOutline });
+        addIcons({ arrowBackOutline, arrowForwardOutline, bookOutline, checkmarkCircle, closeCircle, schoolOutline, trendingUpOutline });
     }
 
     async ngOnInit(): Promise<void> {
@@ -72,17 +72,17 @@ export class ResultadoPage implements OnInit {
         this.valores = this.regras.valores(this.resumo.acertos, this.resumo.total);
 
         const estatisticas = await this.progresso.estatisticasPorTema(await this.content.listarTemas());
-        this.fortes = this.progresso.temasFortes(estatisticas);
         /*
          * "Fracos" já não inclui os temas nunca praticados — antes o ecrã
          * listava dezenas de temas que o aluno nem tinha visto, o que tornava
-         * o diagnóstico inútil. Ficam numa secção própria.
+         * o diagnóstico inútil. Esses passaram para o separador Desempenho.
          */
         this.fracos = this.progresso.temasFracos(estatisticas);
-        this.naoPraticados = this.progresso.temasNaoPraticados(estatisticas);
 
         const diagnostico = await this.progresso.diagnosticoAvancado();
         this.acertosSuspeitos = diagnostico.acertosSuspeitos;
+
+        this.carregando = false;
     }
 
     get percentagem(): number {
@@ -95,10 +95,6 @@ export class ResultadoPage implements OnInit {
 
     get naoRespondidas(): number {
         return this.detalhes.filter((detalhe) => detalhe.escolhida === null).length;
-    }
-
-    get erros(): number {
-        return Math.max(0, this.resumo.total - this.resumo.acertos - this.naoRespondidas);
     }
 
     get tempoFormatado(): string {

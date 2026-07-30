@@ -14,7 +14,7 @@
     </header>
 
     @if (carregando) {
-      <p class="review-hint">A preparar as tuas revisões…</p>
+      <app-skeleton variante="cartao" [quantidade]="1" etiqueta="A preparar as tuas revisões"></app-skeleton>
     } @else if (!total) {
       <section class="empty-state">
         <ion-icon name="checkmark-circle-outline" aria-hidden="true"></ion-icon>
@@ -60,12 +60,5 @@
       </footer>
     }
 
-    <nav class="bottom-nav" aria-label="Navegação principal">
-      <a routerLink="/inicio"><ion-icon name="home" aria-hidden="true"></ion-icon><span>Início</span></a>
-      <a routerLink="/exames"><ion-icon name="create-outline" aria-hidden="true"></ion-icon><span>Exames</span></a>
-      <a routerLink="/estudos" class="active"><ion-icon name="book-outline" aria-hidden="true"></ion-icon><span>Estudos</span></a>
-      <a routerLink="/desempenho"><ion-icon name="stats-chart-outline" aria-hidden="true"></ion-icon><span>Desempenho</span></a>
-      <a routerLink="/perfil"><ion-icon name="person-outline" aria-hidden="true"></ion-icon><span>Perfil</span></a>
-    </nav>
   </main>
 </ion-content>

@@ -11,11 +11,6 @@
 .identity span { display: inline-flex; padding: 4px 8px; border-radius: 20px; color: #fff; background: rgb(255 255 255 / 14%); font-size: .55rem; font-weight: 600; }
 .identity span.premium { color: #554000; background: var(--app-color-yellow); }
 .profile-content { position: relative; margin-top: -31px; padding: 0 16px 28px; }
-.stats-card { display: grid; grid-template-columns: 1fr 1px 1fr 1px 1fr; align-items: center; padding: 16px 8px; border-radius: 13px; background: #fff; box-shadow: 0 8px 22px rgb(32 33 36 / 10%); }
-.stats-card div { display: grid; gap: 3px; text-align: center; }
-.stats-card strong { color: var(--app-color-green-dark); font-size: 1rem; }
-.stats-card span { color: var(--app-color-text-muted); font-size: .55rem; }
-.stats-card i { width: 1px; height: 31px; background: #e5e9e6; }
 .profile-section { margin-top: 27px; }
 .section-heading { margin-bottom: 11px; }
 .section-heading span { color: var(--app-color-green-dark); font-size: .56rem; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; }
@@ -27,20 +22,17 @@
 .form-field > ion-icon { margin-right: 12px; color: var(--app-color-green-dark); }
 ion-note { display: block; margin: 4px; font-size: .65rem; }
 .save-button { display: flex; width: 100%; height: 46px; align-items: center; justify-content: center; gap: 7px; margin-top: 13px; border: 0; border-radius: 9px; color: #fff; background: linear-gradient(135deg, var(--app-color-green-dark), var(--app-color-green)); font: inherit; font-size: .7rem; font-weight: 600; cursor: pointer; }
-.settings-list { overflow: hidden; border-radius: 11px; background: #fff; box-shadow: 0 3px 12px rgb(32 33 36 / 5%); }
-.setting-row, .settings-list > button { display: grid; grid-template-columns: 38px 1fr auto; width: 100%; align-items: center; gap: 10px; min-height: 65px; padding: 9px 12px; border: 0; border-bottom: 1px solid #edf0ee; color: var(--app-color-text); background: #fff; font: inherit; text-align: left; }
-.settings-list > button { cursor: pointer; }
-.settings-list > :last-child { border-bottom: 0; }
 .setting-icon { display: grid; width: 36px; height: 39px; place-items: center; border-radius: 8px; color: var(--app-color-green-dark); background: var(--app-color-green-light); font-size: 1rem; }
-.settings-list div { display: grid; gap: 4px; }
-.settings-list strong { font-size: .69rem; }
-.settings-list small { color: var(--app-color-text-muted); font-size: .56rem; }
-.settings-list > button > ion-icon { color: var(--app-color-text-muted); font-size: .9rem; }
-.setting-row ion-toggle { --track-background-checked: var(--app-color-green); transform: scale(.78); transform-origin: right; }
 .logout-button { display: flex; width: 100%; height: 45px; align-items: center; justify-content: center; gap: 8px; margin-top: 22px; border: 1px solid rgb(227 30 36 / 35%); border-radius: 9px; color: var(--app-color-red); background: #fff; font: inherit; font-size: .7rem; font-weight: 600; cursor: pointer; }
-.bottom-nav { position: fixed; z-index: 20; bottom: 0; left: 50%; display: grid; grid-template-columns: repeat(5, 1fr); width: min(100%, 560px); min-height: calc(67px + env(safe-area-inset-bottom)); padding: 8px 5px env(safe-area-inset-bottom); border-top: 1px solid #e7e9e7; background: rgb(255 255 255 / 96%); box-shadow: 0 -4px 18px rgb(32 33 36 / 8%); backdrop-filter: blur(12px); transform: translateX(-50%); }
-.bottom-nav a, .bottom-nav button { display: flex; min-width: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; padding: 0; border: 0; color: var(--app-color-road-gray); background: transparent; font: inherit; text-decoration: none; cursor: pointer; }
-.bottom-nav ion-icon { font-size: 1.25rem; }
-.bottom-nav span { font-size: .54rem; }
-.bottom-nav .active { color: var(--app-color-green-dark); font-weight: 600; }
-@media (min-width: 700px) { .profile-shell { min-height: calc(100vh - 48px); margin-block: 24px; border-radius: 28px; } .bottom-nav { bottom: 24px; border-radius: 0 0 28px 28px; } }
+@media (min-width: 700px) { .profile-shell { min-height: calc(100vh - 48px); margin-block: 24px; border-radius: 28px; } }
+
+/* Entrada para o plano completo: substitui as linhas de definições que não
+   estavam ligadas a nada. */
+.plan-row { display: grid; grid-template-columns: 38px minmax(0, 1fr) 14px; align-items: center; gap: 12px; margin-top: 16px; padding: 13px; border-radius: 12px; color: var(--app-color-text); background: #fff; box-shadow: 0 3px 11px rgb(32 33 36 / 5%); text-decoration: none; }
+.plan-row div { display: grid; min-width: 0; gap: 3px; }
+.plan-row strong { font-size: .68rem; }
+.plan-row small { color: var(--app-color-text-muted); font-size: .54rem; }
+.plan-row > ion-icon:last-child { color: var(--app-color-green-dark); font-size: .85rem; }
+
+/* Blocos de espera sobre o verde do hero: cinzento sobre verde não se lia. */
+.identity-loading { --skeleton-shape: rgb(255 255 255 / 24%); --skeleton-brilho: rgb(255 255 255 / 34%); align-self: center; }

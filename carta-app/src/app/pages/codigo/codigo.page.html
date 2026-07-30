@@ -31,7 +31,7 @@
       }
 
       @if (carregando) {
-        <p class="hint">A carregar o Código…</p>
+        <app-skeleton variante="lista" [quantidade]="5" etiqueta="A carregar o Código da Estrada"></app-skeleton>
       } @else if (!total) {
         <section class="empty-state">
           <ion-icon name="document-text-outline" aria-hidden="true"></ion-icon>
@@ -141,12 +141,5 @@
       }
     </section>
 
-    <nav class="bottom-nav" aria-label="Navegação principal">
-      <a routerLink="/inicio"><ion-icon name="home" aria-hidden="true"></ion-icon><span>Início</span></a>
-      <a routerLink="/exames"><ion-icon name="create-outline" aria-hidden="true"></ion-icon><span>Exames</span></a>
-      <a routerLink="/estudos" class="active"><ion-icon name="book-outline" aria-hidden="true"></ion-icon><span>Estudos</span></a>
-      <a routerLink="/desempenho"><ion-icon name="stats-chart-outline" aria-hidden="true"></ion-icon><span>Desempenho</span></a>
-      <a routerLink="/perfil"><ion-icon name="person-outline" aria-hidden="true"></ion-icon><span>Perfil</span></a>
-    </nav>
   </main>
 </ion-content>

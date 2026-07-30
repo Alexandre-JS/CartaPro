@@ -2,19 +2,22 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
+import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
+import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
 import { addIcons } from 'ionicons';
-import { bookOutline, calendarOutline, chevronForwardOutline, documentTextOutline, homeOutline, personOutline, ribbonOutline, statsChartOutline, timeOutline, trendingUpOutline } from 'ionicons/icons';
+import { calendarOutline, documentTextOutline, ribbonOutline, statsChartOutline, timeOutline, trendingUpOutline } from 'ionicons/icons';
 import { ContentService } from '../../core/content.service';
 import { ProgressoService } from '../../core/progresso.service';
 import { RegrasService } from '../../core/regras.service';
 import { StorageService } from '../../core/storage.service';
 import { TemasService } from '../../core/temas.service';
+import { CategoriaCarta } from '../../models/pergunta.model';
 import { HistoricoExame, ProgressoTema } from '../../models/progresso.model';
 
 @Component({
     standalone: true,
     selector: 'app-desempenho',
-    imports: [DatePipe, DecimalPipe, RouterLink, IonContent, IonIcon],
+    imports: [DatePipe, DecimalPipe, RouterLink, IonContent, IonIcon, BottomNavComponent, SkeletonComponent],
     templateUrl: './desempenho.page.html',
     styleUrls: ['./desempenho.page.scss'],
 })
@@ -23,6 +26,8 @@ export class DesempenhoPage implements OnInit {
     temas: ProgressoTema[] = [];
     totalQuestoes = 0;
     taxaGeral = 0;
+    categoria: CategoriaCarta = 'ligeiro';
+    carregando = true;
 
     constructor(
         private readonly storage: StorageService,
@@ -31,22 +36,25 @@ export class DesempenhoPage implements OnInit {
         private readonly temasService: TemasService,
         private readonly regras: RegrasService,
     ) {
-        addIcons({ bookOutline, calendarOutline, chevronForwardOutline, documentTextOutline, homeOutline, personOutline, ribbonOutline, statsChartOutline, timeOutline, trendingUpOutline });
+        addIcons({ calendarOutline, documentTextOutline, ribbonOutline, statsChartOutline, timeOutline, trendingUpOutline });
     }
 
     async ngOnInit(): Promise<void> {
         await Promise.all([this.temasService.carregar(), this.regras.carregar()]);
 
-        const [historico, respostas, nomesTemas] = await Promise.all([
+        const [historico, respostas, nomesTemas, categoriaGuardada] = await Promise.all([
             this.storage.listarExames(),
             this.storage.listarRespostas(),
             this.content.listarTemas(),
+            this.storage.obterCategoria(),
         ]);
+        this.categoria = (categoriaGuardada || 'ligeiro') as CategoriaCarta;
         this.historico = historico;
         this.temas = await this.progresso.estatisticasPorTema(nomesTemas);
         this.totalQuestoes = respostas.length;
         const acertos = respostas.filter((resposta) => resposta.acertou).length;
         this.taxaGeral = respostas.length ? Math.round((acertos / respostas.length) * 100) : 0;
+        this.carregando = false;
     }
 
     get mediaExames(): number {
@@ -68,25 +76,25 @@ export class DesempenhoPage implements OnInit {
         return this.formatarTempo(total);
     }
 
-    /**
-     * Tema prioritário = pior tema **com dados**. Antes ordenava por
-     * `taxaAcerto` sobre todos os temas, pelo que o "prioritário" era sempre
-     * um tema nunca praticado (taxa 0), independentemente do desempenho real.
-     */
-    get temaPrioritario(): ProgressoTema | null {
-        const fracos = this.progresso.temasFracos(this.temas);
-        if (fracos.length) {
-            return [...fracos].sort((a, b) => a.taxaRecente - b.taxaRecente)[0];
-        }
-        return this.progresso.temasNaoPraticados(this.temas)[0] || null;
-    }
-
     get temasComDados(): ProgressoTema[] {
         return this.temas.filter((tema) => tema.respondidas > 0);
     }
 
+    get temasPorPraticar(): ProgressoTema[] {
+        return this.progresso.temasNaoPraticados(this.temas);
+    }
+
+    get nomesPorPraticar(): string {
+        return this.temasPorPraticar.map((tema) => this.nomeTema(tema.tema)).join(', ');
+    }
+
     percentagem(exame: HistoricoExame): number {
         return exame.total ? Math.round((exame.acertos / exame.total) * 100) : 0;
+    }
+
+    /** A nota de passagem vem das regras do painel, não de um 80% fixo. */
+    aprovado(exame: HistoricoExame): boolean {
+        return this.regras.aprovado(exame.acertos, exame.total, this.categoria);
     }
 
     formatarTempo(segundos: number): string {
