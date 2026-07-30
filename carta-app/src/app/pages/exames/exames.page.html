@@ -18,7 +18,7 @@
       } @else {
       <section class="exam-list" aria-label="Lista de exames">
         @for (exame of exames; track exame.numero) {
-          <article class="exam-item" [class]="estadoExame(exame)">
+          <article class="exam-item" [class]="estadoExame(exame)" [class.locked]="exame.bloqueado">
             <div class="exam-card">
               <span class="exam-number"><small>Exame</small><strong>{{ numeroFormatado(exame.numero) }}</strong></span>
               <span class="exam-copy">
@@ -30,10 +30,20 @@
                   <span class="status-label">{{ rotuloEstado(exame) }}</span>
                 }
               </span>
-              <a class="start-action" [routerLink]="['/simulado']" [queryParams]="{ exame: exame.numero }">
-                <ion-icon [name]="exame.historico.length ? 'refresh-outline' : 'chevron-forward-outline'" aria-hidden="true"></ion-icon>
-                {{ exame.historico.length ? 'Refazer' : 'Iniciar' }}
-              </a>
+              <!-- A prova fechada mostra-se, mas leva ao desbloqueio: antes
+                   aparecia como qualquer outra e o aluno só descobria ao tentar
+                   entrar. Uma prova é servida inteira ou não é servida. -->
+              @if (exame.bloqueado) {
+                <a class="start-action locked" routerLink="/desbloquear">
+                  <ion-icon name="lock-closed" aria-hidden="true"></ion-icon>
+                  Desbloquear
+                </a>
+              } @else {
+                <a class="start-action" [routerLink]="['/simulado']" [queryParams]="{ exame: exame.numero }">
+                  <ion-icon [name]="exame.historico.length ? 'refresh-outline' : 'chevron-forward-outline'" aria-hidden="true"></ion-icon>
+                  {{ exame.historico.length ? 'Refazer' : 'Iniciar' }}
+                </a>
+              }
             </div>
             @if (exame.historico.length) {
               <button type="button" class="history-toggle" (click)="historicoAberto = historicoAberto === exame.numero ? undefined : exame.numero">

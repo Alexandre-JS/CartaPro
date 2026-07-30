@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import { IonContent, IonIcon, IonSearchbar } from '@ionic/angular/standalone';
 import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
 import { addIcons } from 'ionicons';
-import { arrowBackOutline, bookOutline, chevronDownOutline, chevronForwardOutline, documentTextOutline, textOutline } from 'ionicons/icons';
+import { arrowBackOutline, bookOutline, chevronDownOutline, lockClosed, chevronForwardOutline, documentTextOutline, textOutline } from 'ionicons/icons';
 import { MaterialEstudoService } from '../../core/material-estudo.service';
 import { normalizarTexto } from '../../core/texto';
 import { TermoGlossario } from '../../models/material-estudo.model';
@@ -35,7 +35,7 @@ export class GlossarioPage implements OnInit {
     carregando = true;
 
     constructor(private readonly material: MaterialEstudoService) {
-        addIcons({ arrowBackOutline, bookOutline, chevronDownOutline, chevronForwardOutline, documentTextOutline, textOutline });
+        addIcons({ arrowBackOutline, bookOutline, chevronDownOutline, lockClosed, chevronForwardOutline, documentTextOutline, textOutline });
     }
 
     async ngOnInit(): Promise<void> {

@@ -52,3 +52,7 @@
 @media (min-width: 700px) {
   .lessons-shell { min-height: calc(100vh - 48px); margin-block: 24px; border-radius: 28px; }
 }
+
+.lesson-card.locked { opacity: .72; }
+.lesson-card.locked strong { color: var(--app-color-text-muted); }
+.lock-badge { color: #8a6000; font-size: 1.15rem; }

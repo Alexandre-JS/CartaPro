@@ -56,3 +56,8 @@
 @media (min-width: 700px) {
   .code-shell { min-height: calc(100vh - 48px); margin-block: 24px; border-radius: 28px; }
 }
+
+.article-card button.locked strong, .article-card button.locked small { color: var(--app-color-text-muted); }
+.lock-badge { color: #8a6000; font-size: 1.15rem; }
+.locked-body { display: flex; align-items: center; gap: 9px; padding: 13px 15px; color: #8a5b00; background: #fff7e4; font-size: .64rem; line-height: 1.45; text-decoration: none; }
+.locked-body ion-icon { flex: none; font-size: 1.1rem; }

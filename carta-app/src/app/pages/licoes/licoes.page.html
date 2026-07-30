@@ -68,7 +68,10 @@
             </header>
 
             @for (licao of grupo.licoes; track licao.slug) {
-              <a class="lesson-card" [routerLink]="['/licao', licao.slug]">
+              <!-- A ficha bloqueada mostra título e resumo; o corpo não vem do
+                   servidor. Retirá-la da lista tornava o cadeado invisível. -->
+              <a class="lesson-card" [class.locked]="licao.bloqueado"
+                 [routerLink]="licao.bloqueado ? '/desbloquear' : ['/licao', licao.slug]">
                 <span class="lesson-main">
                   <strong>{{ licao.titulo }}</strong>
                   @if (licao.resumo) {
@@ -84,7 +87,9 @@
                     }
                   </span>
                 </span>
-                @if (lida(licao)) {
+                @if (licao.bloqueado) {
+                  <ion-icon class="lock-badge" name="lock-closed" aria-label="Bloqueada"></ion-icon>
+                } @else if (lida(licao)) {
                   <ion-icon class="read-badge" name="checkmark-circle" aria-label="Lida"></ion-icon>
                 } @else {
                   <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>

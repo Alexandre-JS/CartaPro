@@ -59,3 +59,10 @@
 .progress-card.slim { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 12px; }
 .progress-card.slim strong { white-space: nowrap; }
 .train-cta { margin-bottom: 14px; }
+
+/* Bloqueado: reconhece-se de relance sem parecer avariado. */
+.sign-card.locked { opacity: .78; }
+.sign-card.locked .sign-image img { filter: grayscale(1); opacity: .55; }
+.sign-card.locked strong { color: var(--app-color-text-muted); }
+.lock-badge { position: absolute; right: 4px; bottom: 4px; color: #8a6000; background: #fff; border-radius: 50%; font-size: 1rem; }
+.locked-hint { color: var(--app-color-green-dark); font-weight: 700; }

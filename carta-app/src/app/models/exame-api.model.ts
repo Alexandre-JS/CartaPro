@@ -8,6 +8,8 @@ export interface ExameApiResumo {
     perguntas: number;
     notaPassagem: number;
     minutos: number;
+    /** Prova fechada para este plano — o servidor não a entrega. */
+    bloqueado?: boolean;
 }
 
 export interface ExameApiDetalhe {

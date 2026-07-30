@@ -78,9 +78,12 @@ describe('TreinoSinaisService', () => {
             const origem = biblioteca.find((item) => item.slug === slug);
 
             expect(origem).toBeDefined();
+            // Só sinais completos geram perguntas: os bloqueados chegam sem
+            // significado e nunca entram num treino.
+            expect(origem!.significado).toBeDefined();
             // O índice `correta` tem de apontar para o significado do sinal
             // mostrado — é o defeito clássico ao embaralhar opções.
-            expect(pergunta.opcoes[pergunta.correta]).toBe(origem!.significado);
+            expect(pergunta.opcoes[pergunta.correta]).toBe(origem!.significado!);
             expect(pergunta.imagem).toBe(origem!.imagem);
         }
     });

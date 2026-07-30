@@ -13,7 +13,8 @@ export interface SinalTransito {
     categoria: string;
     tema?: string | null;
     /** Frase curta — é a resposta certa no treino. */
-    significado: string;
+    /** Ausente nos bloqueados: não sai do servidor. */
+    significado?: string;
     /** Texto de estudo mais longo. */
     descricao?: string | null;
     artigoRef?: number | null;
@@ -27,7 +28,8 @@ export interface LicaoEstudo {
     slug: string;
     titulo: string;
     resumo?: string | null;
-    corpo: string;
+    /** Ausente nos bloqueados: não sai do servidor. */
+    corpo?: string;
     grupo: GrupoLicao;
     tema?: string | null;
     categoriasCarta: string[];
@@ -41,10 +43,13 @@ export interface LicaoEstudo {
 
 export interface ArtigoCodigoEstrada {
     numero: number;
+    /** Verdadeiro nos que só chegam como montra, sem texto. */
+    bloqueado?: boolean;
     capitulo?: number | null;
     capituloTitulo?: string | null;
     titulo: string;
-    texto: string;
+    /** Ausente nos bloqueados: não sai do servidor. */
+    texto?: string;
 }
 
 export interface CapituloCodigo {
@@ -56,7 +61,10 @@ export interface CapituloCodigo {
 export interface TermoGlossario {
     slug: string;
     termo: string;
-    definicao: string;
+    /** Verdadeiro nos que só chegam como montra, sem definição. */
+    bloqueado?: boolean;
+    /** Ausente nos bloqueados: não sai do servidor. */
+    definicao?: string;
     artigoRef?: number | null;
 }
 

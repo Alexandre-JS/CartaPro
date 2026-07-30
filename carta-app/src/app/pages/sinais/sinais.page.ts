@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import { IonContent, IonIcon, IonSearchbar } from '@ionic/angular/standalone';
 import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
 import { addIcons } from 'ionicons';
-import { albumsOutline, arrowBackOutline, arrowForwardCircleOutline, bookOutline, checkmarkCircle, closeCircleOutline, handLeftOutline, informationCircleOutline, lockClosedOutline, removeOutline, schoolOutline, stopCircleOutline, swapHorizontalOutline, warningOutline } from 'ionicons/icons';
+import { albumsOutline, arrowBackOutline, arrowForwardCircleOutline, bookOutline, checkmarkCircle, lockClosed, closeCircleOutline, handLeftOutline, informationCircleOutline, lockClosedOutline, removeOutline, schoolOutline, stopCircleOutline, swapHorizontalOutline, warningOutline } from 'ionicons/icons';
 import { AcessoService } from '../../core/acesso.service';
 import { MaterialEstudoService } from '../../core/material-estudo.service';
 import { normalizarTexto } from '../../core/texto';
@@ -37,7 +37,7 @@ export class SinaisPage implements OnInit {
         private readonly material: MaterialEstudoService,
         private readonly acesso: AcessoService,
     ) {
-        addIcons({ albumsOutline, arrowBackOutline, arrowForwardCircleOutline, bookOutline, checkmarkCircle, closeCircleOutline, handLeftOutline, informationCircleOutline, lockClosedOutline, removeOutline, schoolOutline, stopCircleOutline, swapHorizontalOutline, warningOutline });
+        addIcons({ albumsOutline, arrowBackOutline, arrowForwardCircleOutline, bookOutline, checkmarkCircle, lockClosed, closeCircleOutline, handLeftOutline, informationCircleOutline, lockClosedOutline, removeOutline, schoolOutline, stopCircleOutline, swapHorizontalOutline, warningOutline });
     }
 
     async ngOnInit(): Promise<void> {
@@ -61,7 +61,7 @@ export class SinaisPage implements OnInit {
 
         return this.sinais.filter((sinal) => {
             const categoriaOk = !this.categoriaAtiva || sinal.categoria === this.categoriaAtiva;
-            const termoOk = !termo || this.normalizar(`${sinal.nome} ${sinal.significado}`).includes(termo);
+            const termoOk = !termo || this.normalizar(`${sinal.nome} ${sinal.significado ?? ''}`).includes(termo);
             return categoriaOk && termoOk;
         });
     }

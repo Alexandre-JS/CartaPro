@@ -39,11 +39,20 @@
             <h2>{{ grupo.letra }}</h2>
             @for (termo of grupo.termos; track termo.slug) {
               <article class="term-card">
-                <button type="button" (click)="alternar(termo.slug)" [attr.aria-expanded]="aberto === termo.slug">
+                <button type="button" [class.locked]="termo.bloqueado" (click)="alternar(termo.slug)" [attr.aria-expanded]="aberto === termo.slug">
                   <span>{{ termo.termo }}</span>
-                  <ion-icon [name]="aberto === termo.slug ? 'chevron-down-outline' : 'chevron-forward-outline'" aria-hidden="true"></ion-icon>
+                  @if (termo.bloqueado) {
+                    <ion-icon class="lock-badge" name="lock-closed" aria-label="Bloqueado"></ion-icon>
+                  } @else {
+                    <ion-icon [name]="aberto === termo.slug ? 'chevron-down-outline' : 'chevron-forward-outline'" aria-hidden="true"></ion-icon>
+                  }
                 </button>
-                @if (aberto === termo.slug) {
+                @if (aberto === termo.slug && termo.bloqueado) {
+                  <a class="locked-body" routerLink="/desbloquear">
+                    <ion-icon name="lock-closed" aria-hidden="true"></ion-icon>
+                    <span>Definição disponível no plano completo.</span>
+                  </a>
+                } @else if (aberto === termo.slug) {
                   <div class="term-body">
                     <p>{{ termo.definicao }}</p>
                     @if (termo.artigoRef) {

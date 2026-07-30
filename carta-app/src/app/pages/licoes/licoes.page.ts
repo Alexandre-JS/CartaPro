@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import { IonContent, IonIcon, IonSearchbar } from '@ionic/angular/standalone';
 import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
 import { addIcons } from 'ionicons';
-import { arrowBackOutline, bookOutline, carOutline, checkmarkCircle, chevronForwardOutline, constructOutline, documentTextOutline, libraryOutline, lockClosedOutline, medkitOutline, timeOutline, warningOutline } from 'ionicons/icons';
+import { arrowBackOutline, bookOutline, carOutline, checkmarkCircle, lockClosed, chevronForwardOutline, constructOutline, documentTextOutline, libraryOutline, lockClosedOutline, medkitOutline, timeOutline, warningOutline } from 'ionicons/icons';
 import { AcessoService } from '../../core/acesso.service';
 import { MaterialEstudoService } from '../../core/material-estudo.service';
 import { normalizarTexto } from '../../core/texto';
@@ -43,7 +43,7 @@ export class LicoesPage implements OnInit {
         private readonly material: MaterialEstudoService,
         private readonly acesso: AcessoService,
     ) {
-        addIcons({ arrowBackOutline, bookOutline, carOutline, checkmarkCircle, chevronForwardOutline, constructOutline, documentTextOutline, libraryOutline, lockClosedOutline, medkitOutline, timeOutline, warningOutline });
+        addIcons({ arrowBackOutline, bookOutline, carOutline, checkmarkCircle, lockClosed, chevronForwardOutline, constructOutline, documentTextOutline, libraryOutline, lockClosedOutline, medkitOutline, timeOutline, warningOutline });
     }
 
     async ngOnInit(): Promise<void> {

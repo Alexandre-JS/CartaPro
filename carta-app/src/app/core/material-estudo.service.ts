@@ -132,12 +132,14 @@ export class MaterialEstudoService {
 
     /** Fichas que referem um sinal — mostra-se no detalhe do sinal. */
     async licoesComSinal(slug: string): Promise<LicaoEstudo[]> {
-        return (await this.carregar()).licoes.filter((licao) => licao.sinais.includes(slug));
+        // Uma ficha bloqueada pode chegar sem referências: `undefined.includes`
+        // deixava a página do sinal presa a carregar.
+        return (await this.carregar()).licoes.filter((licao) => (licao.sinais ?? []).includes(slug));
     }
 
     /** Fichas que citam um artigo do Código. */
     async licoesComArtigo(numero: number): Promise<LicaoEstudo[]> {
-        return (await this.carregar()).licoes.filter((licao) => licao.artigos.includes(numero));
+        return (await this.carregar()).licoes.filter((licao) => (licao.artigos ?? []).includes(numero));
     }
 
     // ----------------------------------------------------------------- artigos
@@ -235,7 +237,12 @@ export class MaterialEstudoService {
      * Evita `innerHTML` — o conteúdo é escrito no painel e nunca é injetado
      * como HTML no app.
      */
-    formatar(texto: string): BlocoTexto[] {
+    formatar(texto?: string | null): BlocoTexto[] {
+        // Conteúdo bloqueado chega sem corpo: não há blocos para formatar.
+        if (!texto) {
+            return [];
+        }
+
         const blocos: BlocoTexto[] = [];
         let listaAtual: string[] = [];
 

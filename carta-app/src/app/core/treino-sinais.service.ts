@@ -18,6 +18,9 @@ const OPCOES_POR_PERGUNTA = 4;
  * As perguntas geradas usam ids com o prefixo `sinal:` para não colidirem com
  * as do banco, e alimentam o mesmo motor de progresso e de repetição espaçada.
  */
+/** Sinal completo: tem imagem e significado, logo pode virar pergunta. */
+type SinalTreinavel = SinalTransito & { significado: string; imagem: string };
+
 @Injectable({ providedIn: 'root' })
 export class TreinoSinaisService {
     private readonly material = inject(MaterialEstudoService);
@@ -37,6 +40,17 @@ export class TreinoSinaisService {
     }
 
     /**
+     * Sinal com o que é preciso para gerar uma pergunta.
+     *
+     * Os bloqueados chegam ao app apenas com nome e imagem — o significado não
+     * sai do servidor —, pelo que nunca podem entrar num treino. O filtro já
+     * era este; o tipo passa a dizê-lo, para o compilador o garantir.
+     */
+    private treinavel(sinal: SinalTransito): sinal is SinalTreinavel {
+        return !!sinal.imagem && !!sinal.significado;
+    }
+
+    /**
      * Monta uma sessão de treino.
      *
      * @param categoria  limita a uma categoria de sinalização (opcional)
@@ -45,7 +59,7 @@ export class TreinoSinaisService {
     async montarSessao(categoria?: string, tamanho = 10): Promise<Pergunta[]> {
         const todos = await this.material.sinais();
         const elegiveis = (categoria ? todos.filter((sinal) => sinal.categoria === categoria) : todos)
-            .filter((sinal) => sinal.imagem && sinal.significado);
+            .filter((sinal): sinal is SinalTreinavel => this.treinavel(sinal));
 
         // Precisa de pelo menos duas opções distintas para haver pergunta.
         if (elegiveis.length < 2) {
@@ -62,7 +76,7 @@ export class TreinoSinaisService {
     /** Sessão focada nos sinais que o aluno ainda não acertou. */
     async montarSessaoDeReforco(tamanho = 10): Promise<Pergunta[]> {
         const todos = await this.material.sinais();
-        const elegiveis = todos.filter((sinal) => sinal.imagem && sinal.significado);
+        const elegiveis = todos.filter((sinal): sinal is SinalTreinavel => this.treinavel(sinal));
         const falhados = await this.slugsFalhados();
 
         const alvo = elegiveis.filter((sinal) => falhados.has(sinal.slug));
@@ -93,7 +107,7 @@ export class TreinoSinaisService {
         const todos = await this.material.sinais();
         const sinal = todos.find((item) => item.slug === TreinoSinaisService.slugDaPergunta(perguntaId));
 
-        if (!sinal || !sinal.significado || todos.length < 2) {
+        if (!sinal || !this.treinavel(sinal) || todos.length < 2) {
             return undefined;
         }
 
@@ -107,7 +121,7 @@ export class TreinoSinaisService {
      * triângulo de perigo pode ser confundido com uma proibição circular não
      * treina nada — o que engana é o sinal parecido.
      */
-    private criarPergunta(sinal: SinalTransito, universo: SinalTransito[]): Pergunta {
+    private criarPergunta(sinal: SinalTreinavel, universo: SinalTransito[]): Pergunta {
         const distratores = this.escolherDistratores(sinal, universo);
         const opcoes = embaralhar([sinal.significado, ...distratores.map((item) => item.significado)]);
 
@@ -128,15 +142,16 @@ export class TreinoSinaisService {
         };
     }
 
-    private escolherDistratores(sinal: SinalTransito, universo: SinalTransito[]): SinalTransito[] {
+    private escolherDistratores(sinal: SinalTreinavel, universo: SinalTransito[]): SinalTreinavel[] {
         const outros = universo.filter(
-            (item) => item.slug !== sinal.slug && item.significado && item.significado !== sinal.significado,
+            (item): item is SinalTreinavel =>
+                item.slug !== sinal.slug && this.treinavel(item) && item.significado !== sinal.significado,
         );
 
         const mesmaCategoria = embaralhar(outros.filter((item) => item.categoria === sinal.categoria));
         const restantes = embaralhar(outros.filter((item) => item.categoria !== sinal.categoria));
 
-        const escolhidos: SinalTransito[] = [];
+        const escolhidos: SinalTreinavel[] = [];
         const usados = new Set<string>();
 
         for (const candidato of [...mesmaCategoria, ...restantes]) {
@@ -157,7 +172,7 @@ export class TreinoSinaisService {
     /**
      * Ordena os sinais dando prioridade aos nunca vistos e aos falhados.
      */
-    private async priorizarPorDesempenho(sinais: SinalTransito[]): Promise<SinalTransito[]> {
+    private async priorizarPorDesempenho<T extends SinalTransito>(sinais: T[]): Promise<T[]> {
         const respostas = await this.storage.listarRespostas();
 
         const acertos = new Map<string, number>();
@@ -174,7 +189,7 @@ export class TreinoSinaisService {
 
         // 0 = nunca visto, 1 = já falhou, 2 = já acertou. Ordena por prioridade
         // e embaralha dentro de cada grupo para não repetir a mesma sequência.
-        const grupos: SinalTransito[][] = [[], [], []];
+        const grupos: T[][] = [[], [], []];
 
         for (const sinal of sinais) {
             const errou = erros.get(sinal.slug) ?? 0;

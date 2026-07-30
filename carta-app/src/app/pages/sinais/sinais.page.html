@@ -71,20 +71,31 @@
         </section>
       } @else {
         <div class="signs-grid">
+          <!-- O sinal bloqueado aparece na grelha com nome e imagem, mas
+               fechado: retirá-lo por completo tornava o cadeado invisível e o
+               aluno nunca via o que lhe faltava. O significado não vem do
+               servidor. -->
           @for (sinal of sinaisVisiveis; track sinal.slug) {
-            <a class="sign-card" [routerLink]="['/sinal', sinal.slug]">
+            <a class="sign-card" [class.locked]="sinal.bloqueado"
+               [routerLink]="sinal.bloqueado ? '/desbloquear' : ['/sinal', sinal.slug]">
               <span class="sign-image">
                 @if (sinal.imagem) {
                   <img [src]="sinal.imagem" [alt]="sinal.nome" loading="lazy">
                 } @else {
                   <ion-icon [name]="iconeCategoria(sinal.categoria)" aria-hidden="true"></ion-icon>
                 }
-                @if (visto(sinal)) {
+                @if (sinal.bloqueado) {
+                  <ion-icon class="lock-badge" name="lock-closed" aria-label="Bloqueado"></ion-icon>
+                } @else if (visto(sinal)) {
                   <ion-icon class="seen-badge" name="checkmark-circle" aria-label="Já estudado"></ion-icon>
                 }
               </span>
               <strong>{{ sinal.nome }}</strong>
-              <small>{{ sinal.significado }}</small>
+              @if (sinal.bloqueado) {
+                <small class="locked-hint">Desbloquear</small>
+              } @else {
+                <small>{{ sinal.significado }}</small>
+              }
             </a>
           }
         </div>

@@ -127,6 +127,28 @@ class EntitlementService
      * gratuito — nem o corpo da ficha nem o significado do sinal. Enviam-se
      * apenas as contagens, que alimentam os cadeados no app.
      */
+    /**
+     * O que sobra de um item bloqueado: o suficiente para o aluno o ver na
+     * lista, nada do que lhe daria o conhecimento.
+     *
+     * Retirar os bloqueados por completo — como se fazia — tornava o cadeado
+     * invisível: o ecrã afirmava "mais 42 sinais" e não havia 42 sinais em
+     * lado nenhum, pelo que parecia que o cadeado não fazia nada. E o aluno
+     * nunca via o que estava a perder, que é o que faz querer desbloquear.
+     */
+    private const MONTRA = [
+        'sinais' => ['slug', 'nome', 'categoria', 'imagem'],
+        /*
+         * `sinais` e `artigos` são referências (slugs e números), não
+         * conhecimento — e sem eles as ligações cruzadas partiam-se: o ecrã do
+         * sinal faz `licao.sinais.includes(...)` e rebentava com TypeError
+         * numa ficha bloqueada, deixando a página presa a carregar.
+         */
+        'licoes' => ['slug', 'titulo', 'resumo', 'grupo', 'minutosLeitura', 'sinais', 'artigos'],
+        'artigos' => ['numero', 'capitulo', 'capituloTitulo', 'titulo'],
+        'glossario' => ['slug', 'termo'],
+    ];
+
     public function filterStudy(array $estudo, bool $paid): array
     {
         /*
@@ -152,12 +174,23 @@ class EntitlementService
             }
 
             if (! $paid) {
-                $estudo[$chave] = array_values(array_filter($itens, fn ($item) => ! ($item['bloqueado'] ?? false)));
+                $estudo[$chave] = array_values(array_map(
+                    fn (array $item) => ($item['bloqueado'] ?? false)
+                        ? $this->montra($item, self::MONTRA[$chave])
+                        : $item,
+                    $itens,
+                ));
             }
 
             $estudo[$contador] = $paid ? 0 : $bloqueados;
         }
 
         return $estudo;
+    }
+
+    /** Só os campos de identificação, mais a marca de bloqueado. */
+    private function montra(array $item, array $campos): array
+    {
+        return array_intersect_key($item, array_flip($campos)) + ['bloqueado' => true];
     }
 }

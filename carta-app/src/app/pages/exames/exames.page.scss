@@ -47,3 +47,9 @@
 .history-row small { color: var(--app-color-text-muted); font-size: .52rem; }
 @media (min-width: 700px) { .exams-shell { min-height: calc(100vh - 48px); margin-block: 24px; border-radius: 28px; } }
 @media (max-width: 430px) { .exam-card { grid-template-columns: 52px minmax(0, 1fr); } .start-action { grid-column: 1 / -1; width: 100%; } }
+
+/* Prova fechada: visível para o aluno saber que existe, sem parecer avariada. */
+.exam-item.locked { border-color: #e7ce7d; background: #fffdf7; }
+.exam-item.locked .exam-number { background: linear-gradient(145deg, #b9a05a, #d8bd6c); }
+.exam-item.locked .exam-copy > strong { color: var(--app-color-text-muted); }
+.start-action.locked { color: #8a6000; background: #fdf0d0; }

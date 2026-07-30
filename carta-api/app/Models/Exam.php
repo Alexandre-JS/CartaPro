@@ -11,9 +11,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[Fillable(['school_id', 'created_by', 'name', 'license_category', 'license_categories', 'type', 'selection_mode', 'blueprint', 'topic_ids', 'question_count', 'pass_score', 'duration_minutes', 'is_active', 'is_public', 'is_locked', 'publication_status', 'published_at'])]
 class Exam extends Model
 {
+    /** Preenchido pelas listagens; a prova em si não guarda isto. */
+    public bool $has_locked_questions = false;
+
     protected function casts(): array
     {
-        return ['topic_ids' => 'array', 'license_categories' => 'array', 'blueprint' => 'array', 'is_active' => 'boolean', 'is_public' => 'boolean', 'published_at' => 'datetime'];
+        return ['topic_ids' => 'array', 'license_categories' => 'array', 'blueprint' => 'array', 'is_active' => 'boolean', 'is_public' => 'boolean', 'is_locked' => 'boolean', 'published_at' => 'datetime'];
     }
 
     /** Categoria que governa a regra de classificação desta prova. */

@@ -75,10 +75,58 @@ class AmostraGratuita
                 continue;
             }
 
-            $plano[$frente] = $this->porGrupo($modelo::query(), $grupo, max(0, (int) $limites[$frente]));
+            $limite = max(0, (int) $limites[$frente]);
+
+            $plano[$frente] = $frente === 'exames'
+                ? $this->provasJogaveis($limite, $plano['perguntas']['ids'] ?? null)
+                : $this->porGrupo($modelo::query(), $grupo, $limite);
         }
 
         return $plano;
+    }
+
+    /**
+     * Provas que um aluno gratuito consegue mesmo fazer.
+     *
+     * Uma prova é servida inteira ou não é servida, pelo que basta uma pergunta
+     * bloqueada para a fechar. Abrir "as duas primeiras" por ordem de id daria
+     * duas provas que o aluno vê mas não consegue abrir — pior do que não as
+     * ter. Abrem-se as primeiras cujas perguntas estejam **todas** livres.
+     *
+     * `$perguntasLivres` vem do cálculo das perguntas, que corre antes desta
+     * frente: sem isso ler-se-ia o `is_locked` antigo e a conta saía errada na
+     * simulação.
+     */
+    private function provasJogaveis(int $limite, ?array $perguntasLivres): array
+    {
+        $provas = Exam::query()->orderBy('id')->with('questions:id')->get();
+        $livres = [];
+
+        foreach ($provas as $prova) {
+            if (count($livres) >= $limite) {
+                break;
+            }
+
+            $ids = $prova->questions->pluck('id');
+
+            $jogavel = $ids->isNotEmpty() && $ids->every(
+                fn (int $id) => $perguntasLivres === null
+                    ? ! Question::whereKey($id)->value('is_locked')
+                    : in_array($id, $perguntasLivres, true),
+            );
+
+            if ($jogavel) {
+                $livres[] = $prova->id;
+            }
+        }
+
+        return [
+            'total' => $provas->count(),
+            'livres' => count($livres),
+            'bloqueados' => $provas->count() - count($livres),
+            'grupos' => 1,
+            'ids' => $livres,
+        ];
     }
 
     /**

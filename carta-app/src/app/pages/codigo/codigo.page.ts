@@ -4,7 +4,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { IonContent, IonIcon, IonSearchbar } from '@ionic/angular/standalone';
 import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
 import { addIcons } from 'ionicons';
-import { arrowBackOutline, bookOutline, checkmarkCircle, checkmarkCircleOutline, chevronDownOutline, chevronForwardOutline, documentTextOutline, layersOutline } from 'ionicons/icons';
+import { arrowBackOutline, bookOutline, checkmarkCircle, lockClosed, checkmarkCircleOutline, chevronDownOutline, chevronForwardOutline, documentTextOutline, layersOutline } from 'ionicons/icons';
 import { MaterialEstudoService } from '../../core/material-estudo.service';
 import { ArtigoCodigoEstrada, BlocoTexto, CapituloCodigo, LicaoEstudo } from '../../models/material-estudo.model';
 
@@ -44,7 +44,7 @@ export class CodigoPage implements OnInit {
         private readonly route: ActivatedRoute,
         private readonly material: MaterialEstudoService,
     ) {
-        addIcons({ arrowBackOutline, bookOutline, checkmarkCircle, checkmarkCircleOutline, chevronDownOutline, chevronForwardOutline, documentTextOutline, layersOutline });
+        addIcons({ arrowBackOutline, bookOutline, checkmarkCircle, lockClosed, checkmarkCircleOutline, chevronDownOutline, chevronForwardOutline, documentTextOutline, layersOutline });
     }
 
     async ngOnInit(): Promise<void> {

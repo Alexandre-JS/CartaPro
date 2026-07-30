@@ -5,7 +5,7 @@ import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
 import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
 import { addIcons } from 'ionicons';
-import { bookOutline, checkmarkCircleOutline, chevronDownOutline, chevronForwardOutline, chevronUpOutline, cloudOfflineOutline, documentTextOutline, refreshOutline, schoolOutline, timeOutline } from 'ionicons/icons';
+import { bookOutline, checkmarkCircleOutline, lockClosed, chevronDownOutline, chevronForwardOutline, chevronUpOutline, cloudOfflineOutline, documentTextOutline, refreshOutline, schoolOutline, timeOutline } from 'ionicons/icons';
 import { RegrasService } from '../../core/regras.service';
 import { StorageService } from '../../core/storage.service';
 import { HistoricoExame } from '../../models/progresso.model';
@@ -13,6 +13,7 @@ import { ExameApiService } from '../../core/exame-api.service';
 import { ExameApiResumo } from '../../models/exame-api.model';
 
 interface ExameDisponivel {
+    bloqueado: boolean;
     id: number;
     nome: string;
     numero: number;
@@ -40,7 +41,7 @@ export class ExamesPage implements OnInit {
         private readonly examesApi: ExameApiService,
         private readonly regras: RegrasService,
     ) {
-        addIcons({ bookOutline, checkmarkCircleOutline, chevronDownOutline, chevronForwardOutline, chevronUpOutline, cloudOfflineOutline, documentTextOutline, refreshOutline, schoolOutline, timeOutline });
+        addIcons({ bookOutline, checkmarkCircleOutline, lockClosed, chevronDownOutline, chevronForwardOutline, chevronUpOutline, cloudOfflineOutline, documentTextOutline, refreshOutline, schoolOutline, timeOutline });
     }
 
     ngOnInit(): Promise<void> {
@@ -59,7 +60,7 @@ export class ExamesPage implements OnInit {
 
         try {
             const [catalogo, historico] = await Promise.all([this.examesApi.listar(), this.storage.listarExames()]);
-            this.exames = catalogo.map((exame: ExameApiResumo) => ({ id: exame.id, nome: exame.nome, numero: exame.id, perguntas: exame.perguntas, minutos: exame.minutos, notaPassagem: exame.notaPassagem, historico: historico.filter((tentativa) => tentativa.numero === exame.id) }));
+            this.exames = catalogo.map((exame: ExameApiResumo) => ({ id: exame.id, nome: exame.nome, numero: exame.id, perguntas: exame.perguntas, minutos: exame.minutos, notaPassagem: exame.notaPassagem, bloqueado: !!exame.bloqueado, historico: historico.filter((tentativa) => tentativa.numero === exame.id) }));
         } catch (error: any) {
             this.mensagemErro = error?.message || 'Não foi possível carregar as provas.';
         } finally {
