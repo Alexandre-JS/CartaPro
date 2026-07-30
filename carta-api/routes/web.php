@@ -46,7 +46,9 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/topics/{topic}', [DetailController::class, 'topic'])->whereNumber('topic')->name('topics.show');
     // Material de estudo: escolas leem, admin gere.
     Route::get('/lessons', [LessonController::class, 'index'])->name('lessons.index');
+    Route::get('/lessons/{lesson}', [DetailController::class, 'lesson'])->whereNumber('lesson')->name('lessons.show');
     Route::get('/glossary', [GlossaryController::class, 'index'])->name('glossary.index');
+    Route::get('/glossary/{term}', [DetailController::class, 'glossaryTerm'])->whereNumber('term')->name('glossary.show');
     Route::resource('classrooms', ClassroomController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::get('/classrooms/{classroom}', [DetailController::class, 'classroom'])->whereNumber('classroom')->name('classrooms.show');
     Route::post('/classrooms/{classroom}/students', [StudentController::class, 'store'])->name('students.store');

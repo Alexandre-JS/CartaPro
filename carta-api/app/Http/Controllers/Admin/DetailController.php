@@ -9,6 +9,8 @@ use App\Models\ContentPackage;
 use App\Models\Exam;
 use App\Models\ExamAttempt;
 use App\Models\ExamSession;
+use App\Models\GlossaryTerm;
+use App\Models\Lesson;
 use App\Models\Question;
 use App\Models\School;
 use App\Models\Sign;
@@ -48,6 +50,48 @@ class DetailController extends Controller
     public function article(Request $request, Article $article): View
     {
         return $this->detail('Artigo '.$article->number, $article->title, route('admin.articles.index'), ['Número' => $article->number, 'Título' => $article->title, 'Texto integral' => $article->text, 'Estado' => $article->is_active ? 'Ativo' : 'Inativo'], $request->user()->isAdmin() ? route('admin.articles.edit', $article) : null);
+    }
+
+    /**
+     * Ficha de estudo.
+     *
+     * As fichas eram o único conteúdo do painel sem página de detalhe: as
+     * escolas viam a lista mas nunca o corpo da ficha, e o URL `admin/lessons/2`
+     * — a forma que todos os outros recursos usam — respondia 405.
+     */
+    public function lesson(Request $request, Lesson $lesson): View
+    {
+        $lesson->load('topic', 'creator');
+
+        $sinais = Sign::whereIn('slug', $lesson->sign_slugs ?: [])->orderBy('name')->pluck('name', 'slug');
+        $artigos = Article::whereIn('number', $lesson->article_numbers ?: [])->orderBy('number')->get();
+
+        return $this->detail($lesson->title, $lesson->summary ?: 'Ficha de estudo.', route('admin.lessons.index'), [
+            'Identificador' => $lesson->slug,
+            'Área de estudo' => $lesson->grupoNome(),
+            'Tema' => $lesson->topic?->name ?? '—',
+            'Categorias de carta' => $lesson->license_categories ? implode(', ', $lesson->license_categories) : 'Todas',
+            'Tempo de leitura' => $lesson->reading_minutes.' min',
+            'Sinais ligados' => $sinais->isNotEmpty()
+                ? $sinais->map(fn (string $nome, string $slug) => $nome.' ('.$slug.')')->implode("\n")
+                : '—',
+            'Artigos ligados' => $artigos->isNotEmpty()
+                ? $artigos->map(fn (Article $artigo) => 'Artigo '.$artigo->number.' — '.$artigo->title)->implode("\n")
+                : '—',
+            'Texto da ficha' => $lesson->body,
+            'Criada por' => $lesson->creator?->name ?? '—',
+            'Estado' => ($lesson->is_active ? 'Ativa' : 'Inativa').($lesson->is_locked ? ' · só plano completo' : ''),
+        ], $request->user()->isAdmin() ? route('admin.lessons.edit', $lesson) : null);
+    }
+
+    public function glossaryTerm(Request $request, GlossaryTerm $term): View
+    {
+        return $this->detail($term->term, 'Termo do glossário.', route('admin.glossary.index'), [
+            'Identificador' => $term->slug,
+            'Definição' => $term->definition,
+            'Artigo de referência' => $term->article_ref ? 'Artigo '.$term->article_ref : '—',
+            'Estado' => $term->is_active ? 'Ativo' : 'Inativo',
+        ]);
     }
 
     public function school(School $school): View

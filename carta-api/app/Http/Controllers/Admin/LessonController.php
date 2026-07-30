@@ -102,7 +102,8 @@ class LessonController extends Controller
             'is_active' => ['nullable', 'boolean'],
         ]);
 
-        $data['slug'] = $data['slug'] ?: Str::slug($data['title']);
+        // `?? null` e não só `?:`: o campo é opcional e pode nem vir no pedido.
+        $data['slug'] = ($data['slug'] ?? null) ?: Str::slug($data['title']);
         $data['sort_order'] = (int) ($data['sort_order'] ?? 0);
         $data['is_active'] = $request->boolean('is_active');
         $data['is_locked'] = $request->boolean('is_locked');

@@ -50,11 +50,10 @@
                     @if($lesson->is_locked)<br><span class="status review">Plano completo</span>@endif
                 </td>
                 <td class="actions">
+                    <a class="btn light small" href="{{ route('admin.lessons.show', $lesson) }}">Ver</a>
                     @if(auth()->user()->isAdmin())
                         <a class="btn light small" href="{{ route('admin.lessons.edit', $lesson) }}">Editar</a>
                         <form method="POST" action="{{ route('admin.lessons.destroy', $lesson) }}" onsubmit="return confirm('Remover esta ficha?')">@csrf @method('DELETE')<button class="btn danger small">Remover</button></form>
-                    @else
-                        <small>Leitura</small>
                     @endif
                 </td>
             </tr>

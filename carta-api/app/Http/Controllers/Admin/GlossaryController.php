@@ -57,7 +57,7 @@ class GlossaryController extends Controller
             'is_active' => ['nullable', 'boolean'],
         ]);
 
-        $data['slug'] = $data['slug'] ?: Str::slug($data['term']);
+        $data['slug'] = ($data['slug'] ?? null) ?: Str::slug($data['term']);
         $data['sort_order'] = (int) ($data['sort_order'] ?? 0);
         $data['is_active'] = $request->boolean('is_active');
 

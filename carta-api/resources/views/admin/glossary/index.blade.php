@@ -22,7 +22,7 @@
 
         <section class="card table-card">
             <table class="data-table">
-                <thead><tr><th>Termo</th><th>Definição</th><th>Artigo</th><th>Estado</th>@if(auth()->user()->isAdmin())<th>Ações</th>@endif</tr></thead>
+                <thead><tr><th>Termo</th><th>Definição</th><th>Artigo</th><th>Estado</th><th>Ações</th></tr></thead>
                 <tbody>
                 @forelse($terms as $term)
                     <tr>
@@ -30,11 +30,12 @@
                         <td>{{ str($term->definition)->limit(160) }}</td>
                         <td>{{ $term->article_ref ? 'Art. '.$term->article_ref : '—' }}</td>
                         <td><span class="status {{ $term->is_active ? 'active' : 'inactive' }}">{{ $term->is_active ? 'Ativo' : 'Inativo' }}</span></td>
-                        @if(auth()->user()->isAdmin())
-                            <td class="actions">
+                        <td class="actions">
+                            <a class="btn light small" href="{{ route('admin.glossary.show', $term) }}">Ver</a>
+                            @if(auth()->user()->isAdmin())
                                 <form method="POST" action="{{ route('admin.glossary.destroy', $term) }}" onsubmit="return confirm('Remover este termo?')">@csrf @method('DELETE')<button class="btn danger small">Remover</button></form>
-                            </td>
-                        @endif
+                            @endif
+                        </td>
                     </tr>
                 @empty
                     <tr><td class="empty" colspan="5">Glossário vazio. Comece pelos termos que confundem mais os alunos.</td></tr>
