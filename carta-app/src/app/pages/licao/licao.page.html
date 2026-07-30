@@ -1,0 +1,146 @@
+<ion-content [fullscreen]="true" class="lesson-page">
+  <main class="lesson-shell">
+    <header class="lesson-header">
+      <a class="icon-button" routerLink="/licoes" aria-label="Voltar às fichas">
+        <ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>
+      </a>
+      <div>
+        <span>{{ grupoNome || 'Ficha de estudo' }}</span>
+        <h1>{{ licao?.titulo || 'Ficha' }}</h1>
+      </div>
+    </header>
+
+    @if (carregando) {
+      <section class="lesson-content"><p class="hint">A carregar ficha…</p></section>
+    } @else if (!licao) {
+      <section class="empty-state">
+        <ion-icon name="library-outline" aria-hidden="true"></ion-icon>
+        <h2>Ficha não encontrada</h2>
+        <p>Esta ficha pode ter sido despublicada ou exigir o plano completo.</p>
+        <a class="primary-button" routerLink="/licoes">Ver todas as fichas</a>
+      </section>
+    } @else {
+      <section class="lesson-content">
+        <div class="lesson-meta">
+          <span><ion-icon name="time-outline" aria-hidden="true"></ion-icon>{{ licao.minutosLeitura }} min</span>
+          @if (temaNome) {
+            <span><ion-icon name="school-outline" aria-hidden="true"></ion-icon>{{ temaNome }}</span>
+          }
+          @if (lida) {
+            <span class="read"><ion-icon name="checkmark-circle" aria-hidden="true"></ion-icon>Lida</span>
+          }
+        </div>
+
+        @if (licao.resumo) {
+          <p class="lesson-summary">{{ licao.resumo }}</p>
+        }
+
+        <article class="lesson-body">
+          @for (bloco of blocos; track $index) {
+            @if (bloco.tipo === 'lista') {
+              <ul>
+                @for (item of bloco.itens; track $index) {
+                  <li>{{ item }}</li>
+                }
+              </ul>
+            } @else {
+              <p>{{ bloco.texto }}</p>
+            }
+          }
+        </article>
+
+        @if (sinais.length) {
+          <section class="lesson-signs">
+            <h2>Sinais desta ficha</h2>
+            <div class="signs-row">
+              @for (sinal of sinais; track sinal.slug) {
+                <a class="sign-chip" [routerLink]="['/sinal', sinal.slug]">
+                  <span class="thumb">
+                    @if (sinal.imagem) {
+                      <img [src]="sinal.imagem" [alt]="sinal.nome" loading="lazy">
+                    } @else {
+                      <ion-icon name="warning-outline" aria-hidden="true"></ion-icon>
+                    }
+                  </span>
+                  <small>{{ sinal.nome }}</small>
+                </a>
+              }
+            </div>
+          </section>
+        }
+
+        @if (artigos.length) {
+          <section class="lesson-articles">
+            <h2>Base legal</h2>
+            @for (artigo of artigos; track artigo.numero) {
+              <article class="article-card">
+                <button type="button" class="article-toggle" (click)="alternarArtigo(artigo.numero)" [attr.aria-expanded]="artigoAberto === artigo.numero">
+                  <ion-icon name="document-text-outline" aria-hidden="true"></ion-icon>
+                  <span>
+                    <strong>Artigo {{ artigo.numero }}</strong>
+                    <small>{{ artigo.titulo }}</small>
+                  </span>
+                  <ion-icon [name]="artigoAberto === artigo.numero ? 'chevron-back-outline' : 'chevron-forward-outline'" aria-hidden="true"></ion-icon>
+                </button>
+                @if (artigoAberto === artigo.numero) {
+                  <div class="article-body">
+                    @for (bloco of blocosDoArtigo(artigo); track $index) {
+                      @if (bloco.tipo === 'lista') {
+                        <ul>
+                          @for (item of bloco.itens; track $index) {
+                            <li>{{ item }}</li>
+                          }
+                        </ul>
+                      } @else {
+                        <p>{{ bloco.texto }}</p>
+                      }
+                    }
+                  </div>
+                }
+              </article>
+            }
+          </section>
+        }
+
+        <div class="lesson-actions">
+          @if (!lida) {
+            <button type="button" class="primary-button" (click)="marcarLida()">
+              <ion-icon name="checkmark-circle-outline" aria-hidden="true"></ion-icon>
+              Marcar como lida
+            </button>
+          }
+          @if (licao.tema) {
+            <a class="outline-button" [routerLink]="['/estudo', licao.tema]">
+              <ion-icon name="school-outline" aria-hidden="true"></ion-icon>
+              Praticar perguntas deste tema
+            </a>
+          }
+          @if (sinais.length > 1) {
+            <a class="ghost-button" routerLink="/treino-sinais">Treinar reconhecimento de sinais</a>
+          }
+        </div>
+
+        @if (anterior || proxima) {
+          <nav class="sibling-nav" aria-label="Fichas do mesmo grupo">
+            @if (anterior) {
+              <a [routerLink]="['/licao', anterior.slug]">
+                <ion-icon name="chevron-back-outline" aria-hidden="true"></ion-icon>
+                <span>{{ anterior.titulo }}</span>
+              </a>
+            } @else {
+              <span></span>
+            }
+            @if (proxima) {
+              <a class="next" [routerLink]="['/licao', proxima.slug]">
+                <span>{{ proxima.titulo }}</span>
+                <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
+              </a>
+            } @else {
+              <span></span>
+            }
+          </nav>
+        }
+      </section>
+    }
+  </main>
+</ion-content>

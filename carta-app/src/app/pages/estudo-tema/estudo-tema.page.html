@@ -1,0 +1,49 @@
+<ion-content [fullscreen]="true" class="study-page">
+  <main class="study-shell">
+    <header class="study-header">
+      <a routerLink="/estudos" aria-label="Voltar aos estudos"><ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon></a>
+      <div><span>{{ modoRevisao ? 'Revisão pendente' : 'Estudo por tema' }}</span><h1>{{ nomeTema }}</h1></div>
+      <span class="header-icon"><ion-icon name="book-outline" aria-hidden="true"></ion-icon></span>
+    </header>
+
+    <section class="study-content">
+      @if (!iniciada && perguntaAtual) {
+        <article class="session-intro">
+          <span>{{ modoRevisao ? 'Revisão focada' : 'Sessão recomendada' }}</span>
+          <h2>{{ nomeTema }}</h2>
+          <p>{{ modoRevisao ? 'Estas são as questões que precisam de revisão. Responde sem consultar o material.' : 'Responde sem consultar o material. Depois de cada resposta, lê a explicação antes de continuar.' }}</p>
+          <div><strong>{{ perguntas.length }}</strong><small>perguntas</small><i></i><strong>{{ perguntas.length * 2 }}</strong><small>minutos</small></div>
+          <button type="button" (click)="iniciarSessao()">Começar</button>
+        </article>
+      } @else if (concluida) {
+        <article class="session-result">
+          <span class="result-icon"><ion-icon name="ribbon-outline" aria-hidden="true"></ion-icon></span>
+          <span>Sessão concluída</span>
+          <h2>{{ acertosSessao }} de {{ perguntas.length }} respostas corretas</h2>
+          <p>{{ percentagemSessao >= 80 ? (modoRevisao ? 'Revisão concluída. Estas questões voltarão no momento adequado.' : 'Bom trabalho. Continua a rever este tema para manter o conhecimento.') : 'Este tema ainda precisa de reforço. As próximas sessões voltarão a trabalhar estes conceitos.' }}</p>
+          <a routerLink="/estudos">Voltar ao plano de estudo</a>
+        </article>
+      } @else if (perguntaAtual; as pergunta) {
+        <div class="question-heading">
+          <span>Sessão em curso</span>
+          <strong>Passo {{ indice + 1 }} de {{ perguntas.length }}</strong>
+        </div>
+        <div class="progress-track"><span [style.width.%]="((indice + 1) / perguntas.length) * 100"></span></div>
+
+        <app-pergunta-card [pergunta]="pergunta" [respondida]="respondida" [escolhida]="escolhida" (escolha)="escolhida = $event"></app-pergunta-card>
+
+        <button class="action-button" type="button" [disabled]="escolhida === null" (click)="confirmarOuAvancar()">
+          {{ respondida ? (indice === perguntas.length - 1 ? 'Concluir sessão' : 'Continuar') : 'Confirmar resposta' }}
+          <ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon>
+        </button>
+      } @else {
+        <div class="empty-state">
+          <ion-icon name="reader-outline" aria-hidden="true"></ion-icon>
+          <h2>Nenhuma questão disponível</h2>
+          <p>{{ modoRevisao ? 'Não existem revisões pendentes neste tema.' : 'Este tema ainda não possui perguntas livres para a categoria selecionada.' }}</p>
+          <a routerLink="/estudos">Escolher outro tema</a>
+        </div>
+      }
+    </section>
+  </main>
+</ion-content>

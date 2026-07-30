@@ -1,0 +1,91 @@
+<ion-content [fullscreen]="true" class="home-page">
+  <main class="home-shell">
+    <header class="hero">
+      <div class="hero-top">
+        <div><p class="eyebrow">Olá, {{ primeiroNome }}! <span aria-hidden="true">👋</span></p><h1>Continua firme, o sucesso<br>está a caminho.</h1></div>
+        <a class="notification-button" routerLink="/revisoes" [attr.aria-label]="revisoesPendentes ? revisoesPendentes + ' revisões pendentes' : 'Revisões'"><ion-icon name="notifications-outline" aria-hidden="true"></ion-icon>@if (revisoesPendentes) {<span>{{ revisoesPendentes }}</span>}</a>
+      </div>
+      <div class="hero-shape" aria-hidden="true"></div>
+    </header>
+
+    <section class="dashboard">
+      <article class="summary-card">
+        <div class="summary-heading"><div><span>Visão geral</span><h2>O teu progresso</h2></div><a routerLink="/desempenho">Ver desempenho <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a></div>
+        <div class="summary-metrics">
+          <div class="progress-ring" [style.--progress]="taxaAcerto"><strong>{{ taxaAcerto }}%</strong><span>acerto geral</span></div>
+          <div><strong>{{ examesRealizados }}</strong><span>Exames concluídos</span></div>
+          <i></i>
+          <div><strong>{{ totalRespondidas }}</strong><span>Questões respondidas</span></div>
+        </div>
+      </article>
+
+      <section class="primary-actions">
+        <a routerLink="/estudos" class="study-action">
+          <span class="action-icon"><ion-icon name="book-outline" aria-hidden="true"></ion-icon></span>
+          <span><small>Material do Código da Estrada</small><strong>Continuar a estudar</strong></span>
+          <ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon>
+        </a>
+        <a routerLink="/exames" class="exam-action">
+          <span class="action-icon"><ion-icon name="document-text-outline" aria-hidden="true"></ion-icon></span>
+          <span><small>Preparação INATRO</small><strong>Iniciar um exame</strong></span>
+          <ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon>
+        </a>
+      </section>
+
+      @if (recomendacao; as plano) {
+        <section class="section-block recommendation-section">
+          <div class="section-heading"><div><span>Próxima atividade</span><h2>{{ plano.acao === 'revisar' ? 'Revisão pendente' : 'Plano de estudo' }}</h2></div></div>
+          <a class="recommendation-card" [routerLink]="['/estudo', plano.tema]" [queryParams]="{ categoria: categoria, modo: plano.acao === 'revisar' ? 'revisao' : null }">
+            <span class="recommend-icon"><ion-icon name="bulb-outline" aria-hidden="true"></ion-icon></span>
+            <span class="recommend-copy"><strong>{{ nomeTema(plano.tema) }}</strong><small>{{ plano.motivo }}</small></span>
+            <span class="recommend-action">{{ plano.acao === 'revisar' ? 'Revisar' : 'Estudar' }} <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></span>
+          </a>
+        </section>
+      }
+
+      @if (revisoesPendentes) {
+        <section class="section-block review-section">
+          <div class="section-heading"><div><span>Repetição espaçada</span><h2>Revisões de hoje</h2></div></div>
+          <a class="recommendation-card" routerLink="/revisoes">
+            <span class="recommend-icon"><ion-icon name="time-outline" aria-hidden="true"></ion-icon></span>
+            <span class="recommend-copy"><strong>{{ revisoesPendentes }} pergunta(s) a rever</strong><small>Revê agora enquanto a memória ainda está fresca.</small></span>
+            <span class="recommend-action">Revisar <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></span>
+          </a>
+        </section>
+      }
+
+      <!-- Cadeado real: o plano gratuito vê quanto conteúdo existe por trás,
+           mas o servidor nunca lhe envia essas perguntas. -->
+      @if (plano === 'gratis' && bloqueadas > 0) {
+        <section class="section-block locked-section">
+          <a class="recommendation-card locked" routerLink="/desbloquear">
+            <span class="recommend-icon"><ion-icon name="lock-closed-outline" aria-hidden="true"></ion-icon></span>
+            <span class="recommend-copy"><strong>{{ bloqueadas }} perguntas bloqueadas</strong><small>Ativa o plano completo para estudar todo o banco.</small></span>
+            <span class="recommend-action">Ativar <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></span>
+          </a>
+        </section>
+      }
+
+      <section class="section-block activity-section">
+        <div class="section-heading"><div><span>Atividade recente</span><h2>Último exame</h2></div><a routerLink="/desempenho">Ver histórico</a></div>
+        @if (ultimoExame; as exame) {
+          <article class="activity-card">
+            <span class="exam-number"><small>Exame</small><strong>{{ numeroExame(exame.numero) }}</strong></span>
+            <span class="activity-copy"><strong>{{ percentagemExame(exame) }}% de acerto</strong><small>{{ exame.acertos }} de {{ exame.total }} questões · {{ exame.data | date:'dd/MM/yyyy' }}</small></span>
+            <span class="activity-score" [class.good]="exameAprovado(exame)">{{ percentagemExame(exame) }}%</span>
+          </article>
+        } @else {
+          <a routerLink="/exames" class="empty-activity"><ion-icon name="document-text-outline" aria-hidden="true"></ion-icon><span><strong>Ainda não concluíste exames</strong><small>Escolhe um exame para começar a avaliar o teu progresso.</small></span><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>
+        }
+      </section>
+    </section>
+
+    <nav class="bottom-nav" aria-label="Navegação principal">
+      <a routerLink="/inicio" class="active"><ion-icon name="home" aria-hidden="true"></ion-icon><span>Início</span></a>
+      <a routerLink="/exames"><ion-icon name="create-outline" aria-hidden="true"></ion-icon><span>Exames</span></a>
+      <a routerLink="/estudos"><ion-icon name="book-outline" aria-hidden="true"></ion-icon><span>Estudos</span></a>
+      <a routerLink="/desempenho"><ion-icon name="stats-chart-outline" aria-hidden="true"></ion-icon><span>Desempenho</span></a>
+      <a routerLink="/perfil"><ion-icon name="person-outline" aria-hidden="true"></ion-icon><span>Perfil</span></a>
+    </nav>
+  </main>
+</ion-content>

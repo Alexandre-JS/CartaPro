@@ -1,0 +1,92 @@
+<ion-content [fullscreen]="true" class="login-page">
+  <main class="login-shell">
+    <section class="brand" aria-label="CartaPro">
+      <div class="brand-lockup">
+        <img src="assets/icon/icon CartaPro.png" alt="" class="brand-icon">
+        <div>
+          <div class="brand-name"><span>Carta</span><strong>Pro</strong></div>
+          <p>Prepare-se. Pratique. <em>Passe.</em></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="road-scene" aria-hidden="true">
+      <div class="sun"></div>
+      <div class="cloud cloud-one"></div>
+      <div class="cloud cloud-two"></div>
+      <div class="city city-back"></div>
+      <div class="city city-front"></div>
+      <div class="tree tree-one"><i></i></div>
+      <div class="tree tree-two"><i></i></div>
+      <div class="tree tree-three"><i></i></div>
+      <div class="road"><span></span></div>
+      <div class="car">🚙</div>
+    </section>
+
+    <section class="login-card">
+      <header>
+        <h1>Bem-vindo!</h1>
+        <p>Acede à tua conta para continuares<br>a preparação para o INATRO.</p>
+      </header>
+
+      <form [formGroup]="formulario" (ngSubmit)="entrar()" novalidate>
+        <div class="field-group">
+          <ion-item lines="none" class="form-field" [class.field-error]="submetido && formulario.controls.identificador.invalid">
+            <ion-icon name="mail-outline" slot="start" aria-hidden="true"></ion-icon>
+            <ion-input
+              formControlName="identificador"
+              type="text"
+              inputmode="email"
+              autocomplete="username"
+              placeholder="Email ou telemóvel"
+              aria-label="Email ou telemóvel">
+            </ion-input>
+          </ion-item>
+          @if (submetido && formulario.controls.identificador.invalid) {
+            <ion-note color="danger">Introduz o teu email ou telemóvel.</ion-note>
+          }
+        </div>
+
+        <div class="field-group">
+          <ion-item lines="none" class="form-field" [class.field-error]="submetido && formulario.controls.palavraPasse.invalid">
+            <ion-icon name="lock-closed-outline" slot="start" aria-hidden="true"></ion-icon>
+            <ion-input
+              formControlName="palavraPasse"
+              type="password"
+              autocomplete="current-password"
+              placeholder="Palavra-passe"
+              aria-label="Palavra-passe">
+              <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+            </ion-input>
+          </ion-item>
+          @if (submetido && formulario.controls.palavraPasse.invalid) {
+            <ion-note color="danger">Introduz uma palavra-passe válida.</ion-note>
+          }
+        </div>
+
+        <button class="forgot-password" type="button">Esqueceu a palavra-passe?</button>
+
+        @if (mensagemErro) {
+          <ion-note color="danger" class="login-error">
+            {{ mensagemErro }}
+            <a routerLink="/registo">Criar conta</a>
+          </ion-note>
+        }
+        <ion-button expand="block" type="submit" class="login-button" [disabled]="processando">
+          {{ processando ? 'A entrar…' : 'Entrar' }}
+        </ion-button>
+      </form>
+
+      <p class="register">Não tem conta? <button type="button" routerLink="/registo">Registe-se</button></p>
+
+      <div class="school-access">
+        <span></span>
+        <button type="button">
+          <ion-icon name="business-outline" aria-hidden="true"></ion-icon>
+          Entrar como Escola
+        </button>
+        <span></span>
+      </div>
+    </section>
+  </main>
+</ion-content>

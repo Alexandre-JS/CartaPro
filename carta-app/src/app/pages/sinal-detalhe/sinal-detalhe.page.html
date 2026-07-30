@@ -1,0 +1,134 @@
+<ion-content [fullscreen]="true" class="sign-page">
+  <main class="sign-shell">
+    <header class="sign-header">
+      <a class="icon-button" routerLink="/sinais" aria-label="Voltar aos sinais">
+        <ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>
+      </a>
+      <div>
+        <span>{{ categoria?.nome || 'Sinalização' }}</span>
+        <h1>{{ sinal?.nome || 'Sinal' }}</h1>
+      </div>
+    </header>
+
+    @if (carregando) {
+      <section class="sign-content"><p class="hint">A carregar…</p></section>
+    } @else if (!sinal) {
+      <section class="empty-state">
+        <ion-icon name="warning-outline" aria-hidden="true"></ion-icon>
+        <h2>Sinal não encontrado</h2>
+        <p>Este sinal pode ter sido removido do material publicado. Volta à biblioteca de sinalização.</p>
+        <a class="primary-button" routerLink="/sinais">Ver todos os sinais</a>
+      </section>
+    } @else {
+      <section class="sign-content">
+        <article class="sign-hero">
+          @if (sinal.imagem) {
+            <img [src]="sinal.imagem" [alt]="sinal.nome">
+          } @else {
+            <ion-icon [name]="categoria?.icone || 'albums-outline'" aria-hidden="true"></ion-icon>
+          }
+          <span class="studied-tag"><ion-icon name="checkmark-circle" aria-hidden="true"></ion-icon> Estudado</span>
+        </article>
+
+        <article class="meaning-card">
+          <span class="label">Significado</span>
+          <p>{{ sinal.significado }}</p>
+        </article>
+
+        @if (descricaoBlocos.length) {
+          <article class="text-card">
+            <h2>Como se aplica</h2>
+            @for (bloco of descricaoBlocos; track $index) {
+              @if (bloco.tipo === 'lista') {
+                <ul>
+                  @for (item of bloco.itens; track $index) {
+                    <li>{{ item }}</li>
+                  }
+                </ul>
+              } @else {
+                <p>{{ bloco.texto }}</p>
+              }
+            }
+          </article>
+        }
+
+        @if (artigo) {
+          <article class="article-card">
+            <button type="button" class="article-toggle" (click)="alternarArtigo()" [attr.aria-expanded]="artigoAberto">
+              <ion-icon name="document-text-outline" aria-hidden="true"></ion-icon>
+              <span>
+                <strong>Artigo {{ artigo.numero }}</strong>
+                <small>{{ artigo.titulo }}</small>
+              </span>
+              <ion-icon [name]="artigoAberto ? 'chevron-back-outline' : 'chevron-forward-outline'" aria-hidden="true"></ion-icon>
+            </button>
+            @if (artigoAberto) {
+              <div class="article-body">
+                @for (bloco of artigoBlocos; track $index) {
+                  @if (bloco.tipo === 'lista') {
+                    <ul>
+                      @for (item of bloco.itens; track $index) {
+                        <li>{{ item }}</li>
+                      }
+                    </ul>
+                  } @else {
+                    <p>{{ bloco.texto }}</p>
+                  }
+                }
+              </div>
+            }
+          </article>
+        }
+
+        @if (licoes.length) {
+          <section class="linked-lessons">
+            <h2>Fichas que explicam este sinal</h2>
+            @for (licao of licoes; track licao.slug) {
+              <a class="lesson-row" [routerLink]="['/licao', licao.slug]">
+                <ion-icon name="book-outline" aria-hidden="true"></ion-icon>
+                <span>
+                  <strong>{{ licao.titulo }}</strong>
+                  <small>{{ licao.minutosLeitura }} min de leitura</small>
+                </span>
+                <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
+              </a>
+            }
+          </section>
+        }
+
+        @if (!temConteudoDeEstudo) {
+          <p class="hint">
+            Ainda não há texto de estudo para este sinal. Treina o reconhecimento para o fixares pela imagem.
+          </p>
+        }
+
+        <a class="primary-button" routerLink="/treino-sinais" [queryParams]="{ categoria: sinal.categoria }">
+          <ion-icon name="school-outline" aria-hidden="true"></ion-icon>
+          Treinar {{ (categoria?.nome || 'estes sinais').toLowerCase() }}
+        </a>
+
+        @if (totalNaCategoria > 1) {
+          <nav class="sibling-nav" aria-label="Sinais da mesma categoria">
+            @if (anterior) {
+              <a [routerLink]="['/sinal', anterior.slug]">
+                <ion-icon name="chevron-back-outline" aria-hidden="true"></ion-icon>
+                <span>{{ anterior.nome }}</span>
+              </a>
+            } @else {
+              <span class="disabled"></span>
+            }
+            <em>{{ posicao }} / {{ totalNaCategoria }}</em>
+            @if (proximo) {
+              <a class="next" [routerLink]="['/sinal', proximo.slug]">
+                <span>{{ proximo.nome }}</span>
+                <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
+              </a>
+            } @else {
+              <span class="disabled"></span>
+            }
+          </nav>
+        }
+      </section>
+    }
+  </main>
+</ion-content>

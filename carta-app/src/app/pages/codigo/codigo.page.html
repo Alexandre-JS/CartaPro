@@ -1,0 +1,152 @@
+<ion-content [fullscreen]="true" class="code-page">
+  <main class="code-shell">
+    <header class="code-header">
+      <a class="icon-button" routerLink="/estudos" aria-label="Voltar aos estudos">
+        <ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>
+      </a>
+      <div>
+        <span>Legislação</span>
+        <h1>Código da Estrada</h1>
+      </div>
+      <span class="header-count">{{ total }}</span>
+    </header>
+
+    <section class="code-content">
+      @if (total) {
+        <article class="progress-card">
+          <div>
+            <strong>{{ totalLidos }} de {{ total }} artigos abertos</strong>
+            <small>{{ percentagem }}% do Código percorrido.</small>
+          </div>
+          <span class="progress-bar"><i [style.width.%]="percentagem"></i></span>
+        </article>
+
+        <ion-searchbar
+          [(ngModel)]="pesquisa"
+          (ionInput)="pesquisar()"
+          placeholder="Procurar artigo, número ou palavra"
+          mode="ios"
+          class="code-search">
+        </ion-searchbar>
+      }
+
+      @if (carregando) {
+        <p class="hint">A carregar o Código…</p>
+      } @else if (!total) {
+        <section class="empty-state">
+          <ion-icon name="document-text-outline" aria-hidden="true"></ion-icon>
+          <h2>Sem artigos publicados</h2>
+          <p>A CartaPro ainda não publicou o texto do Código. As fichas de estudo e os sinais já estão disponíveis.</p>
+          <a class="primary-button" routerLink="/licoes">Ver fichas de estudo</a>
+        </section>
+      } @else if (pesquisando) {
+        <h2 class="section-title">{{ resultados.length }} resultado(s) para "{{ pesquisa }}"</h2>
+        @if (!resultados.length) {
+          <p class="hint">Nenhum artigo contém esse termo. A pesquisa procura no número, no título e no texto.</p>
+        }
+        @for (artigo of resultados; track artigo.numero) {
+          <article class="article-card">
+            <button type="button" (click)="alternarArtigo(artigo)" [attr.aria-expanded]="artigoAberto === artigo.numero">
+              <span>
+                <strong>Artigo {{ artigo.numero }}</strong>
+                <small>{{ artigo.titulo }}</small>
+                @if (artigo.capituloTitulo) {
+                  <em>{{ artigo.capituloTitulo }}</em>
+                }
+              </span>
+              @if (lido(artigo.numero)) {
+                <ion-icon class="read-badge" name="checkmark-circle" aria-label="Já aberto"></ion-icon>
+              } @else {
+                <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
+              }
+            </button>
+            @if (artigoAberto === artigo.numero) {
+              <div class="article-body">
+                @for (bloco of blocos; track $index) {
+                  @if (bloco.tipo === 'lista') {
+                    <ul>
+                      @for (item of bloco.itens; track $index) {
+                        <li>{{ item }}</li>
+                      }
+                    </ul>
+                  } @else {
+                    <p>{{ bloco.texto }}</p>
+                  }
+                }
+                @for (licao of licoesDoArtigo; track licao.slug) {
+                  <a class="lesson-link" [routerLink]="['/licao', licao.slug]">
+                    <ion-icon name="book-outline" aria-hidden="true"></ion-icon>
+                    Ficha: {{ licao.titulo }}
+                  </a>
+                }
+              </div>
+            }
+          </article>
+        }
+      } @else {
+        @for (capitulo of capitulos; track capitulo.numero) {
+          <section class="chapter">
+            <button type="button" class="chapter-header" (click)="alternarCapitulo(capitulo.numero)" [attr.aria-expanded]="capituloAberto === capitulo.numero">
+              <ion-icon name="layers-outline" aria-hidden="true"></ion-icon>
+              <span>
+                <strong>{{ capitulo.numero ? 'Capítulo ' + capitulo.numero : capitulo.titulo }}</strong>
+                <small>{{ capitulo.numero ? capitulo.titulo : capitulo.lista.length + ' artigos' }}</small>
+              </span>
+              <em>{{ capitulo.lidos }}/{{ capitulo.lista.length }}</em>
+              <ion-icon [name]="capituloAberto === capitulo.numero ? 'chevron-down-outline' : 'chevron-forward-outline'" aria-hidden="true"></ion-icon>
+            </button>
+
+            @if (capituloAberto === capitulo.numero) {
+              <div class="chapter-body">
+                @for (artigo of capitulo.lista; track artigo.numero) {
+                  <article class="article-card">
+                    <button type="button" (click)="alternarArtigo(artigo)" [attr.aria-expanded]="artigoAberto === artigo.numero">
+                      <span>
+                        <strong>Artigo {{ artigo.numero }}</strong>
+                        <small>{{ artigo.titulo }}</small>
+                      </span>
+                      @if (lido(artigo.numero)) {
+                        <ion-icon class="read-badge" name="checkmark-circle" aria-label="Já aberto"></ion-icon>
+                      } @else {
+                        <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
+                      }
+                    </button>
+                    @if (artigoAberto === artigo.numero) {
+                      <div class="article-body">
+                        @for (bloco of blocos; track $index) {
+                          @if (bloco.tipo === 'lista') {
+                            <ul>
+                              @for (item of bloco.itens; track $index) {
+                                <li>{{ item }}</li>
+                              }
+                            </ul>
+                          } @else {
+                            <p>{{ bloco.texto }}</p>
+                          }
+                        }
+                        @for (licao of licoesDoArtigo; track licao.slug) {
+                          <a class="lesson-link" [routerLink]="['/licao', licao.slug]">
+                            <ion-icon name="book-outline" aria-hidden="true"></ion-icon>
+                            Ficha: {{ licao.titulo }}
+                          </a>
+                        }
+                      </div>
+                    }
+                  </article>
+                }
+              </div>
+            }
+          </section>
+        }
+      }
+    </section>
+
+    <nav class="bottom-nav" aria-label="Navegação principal">
+      <a routerLink="/inicio"><ion-icon name="home" aria-hidden="true"></ion-icon><span>Início</span></a>
+      <a routerLink="/exames"><ion-icon name="create-outline" aria-hidden="true"></ion-icon><span>Exames</span></a>
+      <a routerLink="/estudos" class="active"><ion-icon name="book-outline" aria-hidden="true"></ion-icon><span>Estudos</span></a>
+      <a routerLink="/desempenho"><ion-icon name="stats-chart-outline" aria-hidden="true"></ion-icon><span>Desempenho</span></a>
+      <a routerLink="/perfil"><ion-icon name="person-outline" aria-hidden="true"></ion-icon><span>Perfil</span></a>
+    </nav>
+  </main>
+</ion-content>

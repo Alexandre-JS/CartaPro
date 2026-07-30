@@ -1,0 +1,60 @@
+<ion-content [fullscreen]="true" class="test-page">
+  <main class="test-shell">
+    <header class="test-header">
+      <button type="button" class="icon-button" (click)="sair()" aria-label="Sair do exame">
+        <ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>
+      </button>
+      <div class="exam-title">
+        <strong>Questão {{ perguntas.length ? indice + 1 : 0 }} de {{ totalQuestoes }}</strong>
+      </div>
+      <div class="timer" [class.warning]="tempoUrgente" [class.critical]="tempoCritico" role="timer" aria-live="off" [attr.aria-label]="'Tempo restante: ' + tempoFormatado">
+        <ion-icon name="time-outline" aria-hidden="true"></ion-icon>
+        <strong>{{ tempoFormatado }}</strong>
+      </div>
+    </header>
+
+    <div class="progress-track" role="progressbar" aria-label="Progresso do exame" [attr.aria-valuenow]="progressoPercentagem" aria-valuemin="0" aria-valuemax="100">
+      <span [style.width.%]="progressoPercentagem"></span>
+    </div>
+
+    @if (retomado) {
+      <p class="resume-notice" role="status">Retomámos a prova onde a deixaste — o tempo continua a contar.</p>
+    }
+
+    @if (perguntaAtual; as pergunta) {
+      <section class="question-area">
+        <app-pergunta-card
+          [pergunta]="pergunta"
+          [respondida]="respondida"
+          [escolhida]="escolhida"
+          (escolha)="responder($event)">
+        </app-pergunta-card>
+      </section>
+
+      <!-- A correção aparece sempre, mesmo quando o aluno acerta: a explicação
+           e o artigo são o que faz aprender, e antes eram escondidos pelo
+           avanço automático em caso de acerto. -->
+      <footer class="test-controls">
+        @if (indice > 0) {
+          <button type="button" class="nav-button back" (click)="voltar()">
+            <ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>
+            Anterior
+          </button>
+        }
+        @if (respondida) {
+          <button type="button" class="nav-button next" (click)="avancar()">
+            {{ textoBotao }}
+            <ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon>
+          </button>
+        }
+      </footer>
+    } @else if (!carregando) {
+      <section class="empty-state">
+        <ion-icon name="document-text-outline" aria-hidden="true"></ion-icon>
+        <h1>Nenhuma questão disponível</h1>
+        <p>Não existem perguntas disponíveis para esta categoria neste momento.</p>
+        <ion-button routerLink="/inicio">Voltar ao início</ion-button>
+      </section>
+    }
+  </main>
+</ion-content>

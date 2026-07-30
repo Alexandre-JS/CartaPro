@@ -1,0 +1,105 @@
+<ion-content [fullscreen]="true" class="train-page">
+  <main class="train-shell">
+    <header class="train-header">
+      <button type="button" class="icon-button" (click)="sair()" aria-label="Sair do treino">
+        <ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>
+      </button>
+      <div>
+        <span>{{ concluido ? 'Resultado' : 'Reconhecimento de sinais' }}</span>
+        <h1>{{ tituloSessao }}</h1>
+      </div>
+      @if (!concluido && perguntas.length) {
+        <span class="header-count">{{ indice + 1 }}/{{ perguntas.length }}</span>
+      }
+    </header>
+
+    @if (!concluido && perguntas.length) {
+      <span class="progress-bar"><i [style.width.%]="progressoBarra"></i></span>
+    }
+
+    @if (carregando) {
+      <section class="train-content"><p class="hint">A preparar o treino…</p></section>
+    } @else if (!perguntas.length) {
+      <section class="empty-state">
+        <ion-icon name="warning-outline" aria-hidden="true"></ion-icon>
+        <h2>Sem sinais para treinar</h2>
+        <p>
+          É preciso pelo menos dois sinais com imagem e significado publicados para gerar perguntas.
+          Escolhe outra categoria ou volta à biblioteca.
+        </p>
+        <a class="primary-button" routerLink="/sinais">Ver a biblioteca</a>
+      </section>
+    } @else if (concluido) {
+      <section class="train-content">
+        <article class="score-card" [class.good]="percentagem >= 80">
+          <ion-icon [name]="percentagem >= 80 ? 'trophy-outline' : 'school-outline'" aria-hidden="true"></ion-icon>
+          <strong>{{ acertos }} de {{ perguntas.length }}</strong>
+          <span>{{ percentagem }}% de reconhecimento</span>
+          <p>
+            @if (percentagem >= 80) {
+              Reconhecimento sólido. Os sinais que falhaste voltam a aparecer nas revisões de hoje.
+            } @else {
+              Vale a pena rever os sinais errados antes de repetir — estão listados abaixo.
+            }
+          </p>
+        </article>
+
+        @if (falhados.length) {
+          <section class="missed">
+            <h2>Sinais a rever ({{ falhados.length }})</h2>
+            @for (sinal of falhados; track sinal.slug) {
+              <a class="missed-row" [routerLink]="['/sinal', sinal.slug]">
+                <span class="thumb">
+                  @if (sinal.imagem) {
+                    <img [src]="sinal.imagem" [alt]="sinal.nome" loading="lazy">
+                  } @else {
+                    <ion-icon name="warning-outline" aria-hidden="true"></ion-icon>
+                  }
+                </span>
+                <span>
+                  <strong>{{ sinal.nome }}</strong>
+                  <small>{{ sinal.significado }}</small>
+                </span>
+                <ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon>
+              </a>
+            }
+          </section>
+        }
+
+        <div class="final-actions">
+          @if (falhados.length) {
+            <button type="button" class="primary-button" (click)="repetirFalhados()">
+              <ion-icon name="refresh-outline" aria-hidden="true"></ion-icon>
+              Treinar só os que falhei
+            </button>
+          }
+          <button type="button" class="outline-button" (click)="repetir()">Nova sessão</button>
+          <a class="ghost-button" routerLink="/sinais">Voltar à biblioteca</a>
+        </div>
+      </section>
+    } @else if (perguntaAtual) {
+      <section class="train-content">
+        <app-pergunta-card
+          [pergunta]="perguntaAtual"
+          [respondida]="respondida"
+          [escolhida]="escolhida"
+          (escolha)="responder($event)">
+        </app-pergunta-card>
+
+        @if (respondida) {
+          <div class="answer-actions">
+            @if (sinalAtual) {
+              <a class="ghost-button" [routerLink]="['/sinal', sinalAtual]">Ver ficha do sinal</a>
+            }
+            <button type="button" class="primary-button" (click)="avancar()">
+              {{ ultima ? 'Ver resultado' : 'Próximo sinal' }}
+              <ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon>
+            </button>
+          </div>
+        } @else {
+          <p class="hint">Escolhe o significado correto. Não há tempo a contar — o objetivo é acertar.</p>
+        }
+      </section>
+    }
+  </main>
+</ion-content>

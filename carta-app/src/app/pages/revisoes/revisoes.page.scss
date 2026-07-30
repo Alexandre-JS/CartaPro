@@ -1,0 +1,38 @@
+:host { display: block; }
+
+.review-page { --background: #edf2ee; }
+.review-shell { width: min(100%, 560px); min-height: 100%; margin: 0 auto; padding-bottom: calc(88px + env(safe-area-inset-bottom)); overflow: hidden; background: var(--app-color-light-gray); box-shadow: 0 0 42px rgb(32 33 36 / 10%); }
+
+.review-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 118px; padding: max(28px, env(safe-area-inset-top)) 18px 24px; color: #fff; background: linear-gradient(145deg, var(--app-color-green-dark), var(--app-color-green)); }
+.review-header span { font-size: .58rem; text-transform: uppercase; letter-spacing: .07em; opacity: .85; }
+.review-header h1 { margin: 4px 0 0; font-size: 1.1rem; font-weight: 600; }
+.review-counter { display: flex; align-items: center; gap: 6px; padding: 7px 11px; border-radius: 10px; background: rgb(255 255 255 / 15%); }
+.review-counter ion-icon { font-size: .9rem; }
+.review-counter strong { font-size: .78rem; font-variant-numeric: tabular-nums; }
+
+.review-hint { margin: 16px 18px 0; color: var(--app-color-text-muted); font-size: .74rem; line-height: 1.5; }
+.review-hint strong { color: var(--app-color-green-dark); text-transform: capitalize; }
+
+.question-area { padding: 16px 18px 0; }
+
+.review-controls { display: flex; justify-content: flex-end; padding: 18px; }
+
+.primary-button, .outline-button { display: inline-flex; min-height: 47px; align-items: center; justify-content: center; gap: 8px; padding: 0 20px; border: 0; border-radius: 11px; font: inherit; font-size: .74rem; font-weight: 700; text-decoration: none; cursor: pointer; }
+.primary-button { color: #fff; background: linear-gradient(135deg, var(--app-color-green-dark), var(--app-color-green)); }
+.outline-button { margin-top: 10px; border: 1px solid var(--app-color-green); color: var(--app-color-green-dark); background: transparent; }
+
+.empty-state { display: grid; place-items: center; padding: 44px 28px; text-align: center; }
+.empty-state > ion-icon { color: var(--app-color-green-dark); font-size: 3rem; }
+.empty-state h2 { margin: 16px 0 7px; font-size: 1.15rem; }
+.empty-state p { max-width: 320px; margin: 0 0 20px; color: var(--app-color-text-muted); font-size: .78rem; line-height: 1.55; }
+
+.bottom-nav { position: fixed; z-index: 20; bottom: 0; left: 50%; display: grid; grid-template-columns: repeat(5, 1fr); width: min(100%, 560px); min-height: calc(67px + env(safe-area-inset-bottom)); padding: 8px 5px env(safe-area-inset-bottom); border-top: 1px solid #e7e9e7; background: rgb(255 255 255 / 96%); box-shadow: 0 -4px 18px rgb(32 33 36 / 8%); backdrop-filter: blur(12px); transform: translateX(-50%); }
+.bottom-nav a { display: flex; min-width: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; color: var(--app-color-road-gray); text-decoration: none; }
+.bottom-nav ion-icon { font-size: 1.25rem; }
+.bottom-nav span { font-size: .54rem; }
+.bottom-nav .active { color: var(--app-color-green-dark); font-weight: 600; }
+
+@media (min-width: 700px) {
+  .review-shell { min-height: calc(100vh - 48px); margin-block: 24px; border-radius: 28px; }
+  .bottom-nav { bottom: 24px; border-radius: 0 0 28px 28px; }
+}

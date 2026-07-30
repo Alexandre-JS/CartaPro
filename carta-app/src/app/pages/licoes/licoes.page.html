@@ -1,0 +1,107 @@
+<ion-content [fullscreen]="true" class="lessons-page">
+  <main class="lessons-shell">
+    <header class="lessons-header">
+      <a class="icon-button" routerLink="/estudos" aria-label="Voltar aos estudos">
+        <ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>
+      </a>
+      <div>
+        <span>Material de estudo</span>
+        <h1>Fichas por tema</h1>
+      </div>
+      <span class="header-count">{{ total }}</span>
+    </header>
+
+    <section class="lessons-content">
+      @if (total) {
+        <article class="progress-card">
+          <div>
+            <strong>{{ totalLidas }} de {{ total }} fichas lidas</strong>
+            <small>{{ percentagem }}% do material percorrido.</small>
+          </div>
+          <span class="progress-bar"><i [style.width.%]="percentagem"></i></span>
+        </article>
+      }
+
+      @if (plano === 'gratis' && bloqueadas > 0) {
+        <a class="locked-notice" routerLink="/desbloquear">
+          <ion-icon name="lock-closed-outline" aria-hidden="true"></ion-icon>
+          <span><strong>{{ bloqueadas }} fichas bloqueadas</strong><small>Ativa o plano completo para ler todo o material.</small></span>
+        </a>
+      }
+
+      @if (total) {
+        <ion-searchbar
+          [(ngModel)]="pesquisa"
+          placeholder="Procurar ficha"
+          mode="ios"
+          class="lessons-search">
+        </ion-searchbar>
+      }
+
+      @if (carregando) {
+        <p class="hint">A carregar fichas…</p>
+      } @else if (!gruposVisiveis.length) {
+        <section class="empty-state">
+          <ion-icon name="library-outline" aria-hidden="true"></ion-icon>
+          <h2>{{ total ? 'Nenhuma ficha encontrada' : 'Sem fichas publicadas' }}</h2>
+          <p>
+            {{ total
+              ? 'Tenta outro termo de pesquisa.'
+              : 'A CartaPro ainda não publicou fichas de estudo. Entretanto podes estudar os sinais e o Código.' }}
+          </p>
+          @if (!total) {
+            <a class="primary-button" routerLink="/sinais">Estudar sinais</a>
+          }
+        </section>
+      } @else {
+        @for (grupo of gruposVisiveis; track grupo.slug) {
+          <section class="group">
+            <header class="group-header">
+              <ion-icon [name]="grupo.icone || 'book-outline'" aria-hidden="true"></ion-icon>
+              <div>
+                <strong>{{ grupo.nome }}</strong>
+                @if (grupo.descricao) {
+                  <small>{{ grupo.descricao }}</small>
+                }
+              </div>
+              <em>{{ grupo.lidas }}/{{ grupo.licoes.length }}</em>
+            </header>
+
+            @for (licao of grupo.licoes; track licao.slug) {
+              <a class="lesson-card" [routerLink]="['/licao', licao.slug]">
+                <span class="lesson-main">
+                  <strong>{{ licao.titulo }}</strong>
+                  @if (licao.resumo) {
+                    <small>{{ licao.resumo }}</small>
+                  }
+                  <span class="meta">
+                    <ion-icon name="time-outline" aria-hidden="true"></ion-icon>{{ licao.minutosLeitura }} min
+                    @if (licao.sinais.length) {
+                      <ion-icon name="warning-outline" aria-hidden="true"></ion-icon>{{ licao.sinais.length }} sinais
+                    }
+                    @if (licao.artigos.length) {
+                      <ion-icon name="document-text-outline" aria-hidden="true"></ion-icon>{{ licao.artigos.length }} artigos
+                    }
+                  </span>
+                </span>
+                @if (lida(licao)) {
+                  <ion-icon class="read-badge" name="checkmark-circle" aria-label="Lida"></ion-icon>
+                } @else {
+                  <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
+                }
+              </a>
+            }
+          </section>
+        }
+      }
+    </section>
+
+    <nav class="bottom-nav" aria-label="Navegação principal">
+      <a routerLink="/inicio"><ion-icon name="home" aria-hidden="true"></ion-icon><span>Início</span></a>
+      <a routerLink="/exames"><ion-icon name="create-outline" aria-hidden="true"></ion-icon><span>Exames</span></a>
+      <a routerLink="/estudos" class="active"><ion-icon name="book-outline" aria-hidden="true"></ion-icon><span>Estudos</span></a>
+      <a routerLink="/desempenho"><ion-icon name="stats-chart-outline" aria-hidden="true"></ion-icon><span>Desempenho</span></a>
+      <a routerLink="/perfil"><ion-icon name="person-outline" aria-hidden="true"></ion-icon><span>Perfil</span></a>
+    </nav>
+  </main>
+</ion-content>

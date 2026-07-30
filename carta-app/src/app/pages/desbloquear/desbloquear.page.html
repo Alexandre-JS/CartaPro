@@ -1,0 +1,65 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Plano completo</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  @if (etapa === 'ativo') {
+    <section class="unlock-card active">
+      <h2>Plano completo ativo</h2>
+      <p>
+        Tens acesso a todo o conteúdo neste número.
+        @if (estado.expiraEm) {
+          Válido até {{ estado.expiraEm | slice:0:10 }}@if (estado.diasRestantes !== null && estado.diasRestantes !== undefined) { ({{ estado.diasRestantes }} dias){{ '' }}}.
+        }
+      </p>
+    </section>
+    <ion-button fill="clear" expand="block" routerLink="/inicio">Ir estudar</ion-button>
+  } @else {
+    <section class="unlock-card">
+      <h2>O que ganhas</h2>
+      <p>
+        @if (perguntasBloqueadas > 0) {
+          Mais {{ perguntasBloqueadas }} perguntas com explicação e artigo do Código, além dos exames completos.
+        } @else {
+          Acesso a todo o banco de perguntas, com explicação e artigo do Código em cada uma.
+        }
+      </p>
+    </section>
+
+    <section class="unlock-card">
+      <h2>Como pagar</h2>
+      <p>Faz o pagamento por <strong>M-Pesa</strong> ou <strong>e-Mola</strong> para o número indicado pela CartaPro e guarda a referência da transação.</p>
+      <p class="small">A ativação fica ligada ao número desta conta: <strong>{{ telefone || 'sem número definido' }}</strong>. Para mudar o número, atualiza o perfil primeiro.</p>
+    </section>
+
+    @if (etapa === 'estado') {
+      <ion-button expand="block" [disabled]="ocupado" (click)="pedirCodigo()">
+        {{ ocupado ? 'A verificar…' : 'Ativar o meu plano' }}
+      </ion-button>
+    } @else {
+      <ion-item>
+        <ion-label position="stacked">Código recebido por SMS</ion-label>
+        <ion-input type="tel" inputmode="numeric" maxlength="6" [(ngModel)]="codigo" placeholder="000000"></ion-input>
+      </ion-item>
+
+      <ion-button expand="block" [disabled]="codigo.trim().length !== 6 || ocupado" (click)="confirmar()">
+        {{ ocupado ? 'A confirmar…' : 'Confirmar código' }}
+      </ion-button>
+
+      <ion-button fill="clear" expand="block" [disabled]="ocupado" (click)="pedirCodigo()">Reenviar código</ion-button>
+    }
+  }
+
+  <ion-text color="success" *ngIf="mensagemInfo">
+    <p>{{ mensagemInfo }}</p>
+  </ion-text>
+
+  <ion-text color="danger" *ngIf="mensagemErro">
+    <p>{{ mensagemErro }}</p>
+  </ion-text>
+
+  <ion-button fill="clear" expand="block" routerLink="/inicio">Voltar ao início</ion-button>
+</ion-content>

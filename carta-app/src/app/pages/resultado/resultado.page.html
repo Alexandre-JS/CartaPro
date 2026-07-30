@@ -1,0 +1,126 @@
+<ion-content [fullscreen]="true" class="result-page">
+  <main class="result-shell">
+    <header class="result-hero" [class.failed]="!aprovado">
+      <button type="button" (click)="voltarInicio()" aria-label="Voltar ao início">
+        <ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>
+      </button>
+      <div class="celebration" aria-hidden="true">{{ aprovado ? '🏆' : '📚' }}</div>
+      <div>
+        <h1>{{ aprovado ? 'Parabéns!' : 'Continue a praticar!' }} <span aria-hidden="true">{{ aprovado ? '🎉' : '💪' }}</span></h1>
+        <p>{{ aprovado ? 'Exame concluído com sucesso.' : 'Está cada vez mais perto de conseguir.' }}</p>
+      </div>
+      <span class="confetti" aria-hidden="true">✦ · ✧ · ✦</span>
+    </header>
+
+    <section class="result-content">
+      <article class="score-card">
+        <div class="score-ring" [style.--score]="percentagem" [class.failed]="!aprovado">
+          <div>
+            <strong>{{ percentagem }}%</strong>
+            <span>{{ aprovado ? 'Aprovado' : 'Reprovado' }}</span>
+          </div>
+        </div>
+
+        <dl>
+          <div><dt>Acertos</dt><dd class="correct-value">{{ resumo.acertos }}</dd></div>
+          <div><dt>Erros</dt><dd class="error-value">{{ erros }}</dd></div>
+          <div><dt>Não respondidas</dt><dd>{{ naoRespondidas }}</dd></div>
+          <div><dt>Tempo total</dt><dd>{{ tempoFormatado }}</dd></div>
+          <div><dt>Nota</dt><dd>{{ valores }} valores</dd></div>
+          <div><dt>Mínimo para passar</dt><dd>{{ notaPassagem }}/{{ resumo.total }}</dd></div>
+        </dl>
+      </article>
+
+      @if (acertosSuspeitos > 0) {
+        <p class="guess-warning" role="status">
+          {{ acertosSuspeitos }} resposta(s) certa(s) foram dadas em menos de 3 segundos.
+          Se foi adivinhação, vale a pena rever a explicação dessas perguntas.
+        </p>
+      }
+
+      <div class="main-actions">
+        <button type="button" class="outline-button" [disabled]="!detalhes.length" (click)="mostrarCorrecoes = !mostrarCorrecoes">
+          {{ mostrarCorrecoes ? 'Ocultar correções' : 'Ver correções' }}
+        </button>
+        <button type="button" class="primary-button" (click)="novoExame()">Novo exame</button>
+      </div>
+
+      @if (mostrarCorrecoes) {
+        <section class="corrections-section">
+          <div class="section-heading">
+            <div><span>Revisão</span><h2>Correções do exame</h2></div>
+            <strong>{{ resumo.acertos }}/{{ resumo.total }}</strong>
+          </div>
+
+          <div class="correction-list">
+            @for (detalhe of detalhes; track detalhe.pergunta.id; let indice = $index) {
+              <article class="correction-card" [class.correct]="detalhe.escolhida === detalhe.pergunta.correta">
+                <span class="correction-number">{{ indice + 1 }}</span>
+                <div>
+                  <h3>{{ detalhe.pergunta.enunciado }}</h3>
+                  <p>A sua resposta: <strong>{{ respostaEscolhida(detalhe) }}</strong></p>
+                  @if (detalhe.escolhida !== detalhe.pergunta.correta) {
+                    <p class="right-answer">Correta: {{ detalhe.pergunta.opcoes[detalhe.pergunta.correta] }}</p>
+                  }
+                </div>
+                <ion-icon [name]="detalhe.escolhida === detalhe.pergunta.correta ? 'checkmark-circle' : 'close-circle'" aria-hidden="true"></ion-icon>
+              </article>
+            }
+          </div>
+        </section>
+      }
+
+      <section class="performance-section">
+        <div class="section-heading">
+          <div><span>Desempenho</span><h2>Análise por tema</h2></div>
+        </div>
+
+        @if (fortes.length) {
+          <div class="theme-group">
+            <h3><ion-icon name="trending-up-outline" aria-hidden="true"></ion-icon> Pontos fortes</h3>
+            @for (tema of fortes; track tema.tema) {
+              <div class="theme-row">
+                <span>{{ nomeTema(tema.tema) }}</span>
+                <span class="theme-bar"><i [style.width.%]="tema.taxaRecente * 100"></i></span>
+                <strong>{{ tema.taxaRecente * 100 | number:'1.0-0' }}%</strong>
+              </div>
+            }
+          </div>
+        }
+
+        @if (fracos.length) {
+          <div class="theme-group weaknesses">
+            <h3><ion-icon name="school-outline" aria-hidden="true"></ion-icon> Precisa de reforço</h3>
+            @for (tema of fracos; track tema.tema) {
+              <div class="theme-row">
+                <span>{{ nomeTema(tema.tema) }}</span>
+                <span class="theme-bar"><i [style.width.%]="tema.taxaRecente * 100"></i></span>
+                <strong>{{ tema.taxaRecente * 100 | number:'1.0-0' }}%</strong>
+              </div>
+            }
+            <button type="button" (click)="repetirAdaptativo()">Treinar pontos fracos <ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon></button>
+          </div>
+        }
+
+        <!-- Nunca praticado deixou de ser confundido com fraco: antes o ecrã
+             listava como "fracos" todos os temas que o aluno nem tinha visto. -->
+        @if (naoPraticados.length) {
+          <div class="theme-group untouched">
+            <h3><ion-icon name="book-outline" aria-hidden="true"></ion-icon> Ainda por praticar</h3>
+            @for (tema of naoPraticados; track tema.tema) {
+              <div class="theme-row"><span>{{ nomeTema(tema.tema) }}</span><strong>—</strong></div>
+            }
+          </div>
+        }
+      </section>
+    </section>
+
+    <nav class="bottom-nav" aria-label="Navegação principal">
+      <a routerLink="/inicio" class="active"><ion-icon name="home" aria-hidden="true"></ion-icon><span>Início</span></a>
+      <a routerLink="/exames"><ion-icon name="create-outline" aria-hidden="true"></ion-icon><span>Exames</span></a>
+      <a routerLink="/estudos"><ion-icon name="book-outline" aria-hidden="true"></ion-icon><span>Estudos</span></a>
+      <a routerLink="/desempenho"><ion-icon name="stats-chart-outline" aria-hidden="true"></ion-icon><span>Desempenho</span></a>
+      <a routerLink="/perfil"><ion-icon name="person-outline" aria-hidden="true"></ion-icon><span>Perfil</span></a>
+    </nav>
+  </main>
+</ion-content>

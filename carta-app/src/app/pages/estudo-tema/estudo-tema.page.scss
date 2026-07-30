@@ -1,0 +1,45 @@
+:host { display: block; }
+.study-page { --background: #edf2ee; }
+.study-shell { width: min(100%, 560px); min-height: 100%; margin: 0 auto; overflow: hidden; background: var(--app-color-light-gray); box-shadow: 0 0 42px rgb(32 33 36 / 10%); }
+.study-header { display: grid; grid-template-columns: 42px 1fr 48px; align-items: center; gap: 11px; min-height: 128px; padding: max(28px, env(safe-area-inset-top)) 18px 27px; color: #fff; background: linear-gradient(145deg, var(--app-color-green-dark), var(--app-color-green)); }
+.study-header > a { display: grid; width: 40px; height: 40px; place-items: center; border-radius: 50%; color: #fff; background: rgb(255 255 255 / 13%); text-decoration: none; }
+.study-header div { min-width: 0; }
+.study-header div span { font-size: .58rem; text-transform: uppercase; letter-spacing: .07em; opacity: .85; }
+.study-header h1 { overflow: hidden; margin: 4px 0 0; font-size: 1.03rem; font-weight: 600; text-overflow: ellipsis; text-transform: capitalize; white-space: nowrap; }
+.header-icon { display: grid; width: 46px; height: 46px; place-items: center; border-radius: 13px; background: rgb(255 255 255 / 14%); font-size: 1.35rem; }
+.study-content { padding: 0 18px 30px; }
+.session-intro, .session-result { margin-top: 22px; padding: 24px 20px; border: 1px solid #e1e7e2; border-radius: 16px; background: #fff; box-shadow: 0 8px 24px rgb(32 33 36 / 7%); }
+.session-intro > span, .session-result > span:not(.result-icon) { color: var(--app-color-green-dark); font-size: .59rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; }
+.session-intro h2, .session-result h2 { margin: 7px 0; font-size: 1.05rem; }
+.session-intro p, .session-result p { margin: 0; color: var(--app-color-text-muted); font-size: .7rem; line-height: 1.6; }
+.session-intro > div { display: flex; align-items: baseline; gap: 5px; margin: 20px 0; }
+.session-intro > div strong { color: var(--app-color-green-dark); font-size: .9rem; }
+.session-intro > div small { color: var(--app-color-text-muted); font-size: .61rem; }
+.session-intro > div i { width: 1px; height: 20px; margin: 0 8px; background: #dce2dd; }
+.session-intro button, .session-result a { display: flex; width: 100%; min-height: 47px; align-items: center; justify-content: center; border: 0; border-radius: 10px; color: #fff; background: linear-gradient(135deg, var(--app-color-green-dark), var(--app-color-green)); font: inherit; font-size: .72rem; font-weight: 700; text-decoration: none; cursor: pointer; }
+.session-result { margin-top: 38px; text-align: center; }
+.session-result .result-icon { display: grid; width: 58px; height: 58px; margin: 0 auto 16px; place-items: center; border-radius: 50%; color: var(--app-color-green-dark); background: var(--app-color-green-light); font-size: 1.55rem; }
+.session-result p { margin-bottom: 21px; }
+.progress-card { position: relative; display: grid; grid-template-columns: 1fr 72px; align-items: center; gap: 15px; margin-top: -14px; padding: 16px; border-radius: 13px; background: #fff; box-shadow: 0 7px 21px rgb(32 33 36 / 10%); }
+.progress-copy { display: grid; gap: 4px; }
+.progress-copy span { color: var(--app-color-green-dark); font-size: .58rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+.progress-copy strong { font-size: .85rem; }
+.progress-copy small { color: var(--app-color-text-muted); font-size: .62rem; }
+.progress-ring { --progress: 0; display: grid; width: 68px; height: 68px; place-items: center; border-radius: 50%; background: conic-gradient(var(--app-color-green-dark) calc(var(--progress) * 1%), #e4eae5 0); }
+.progress-ring::before { position: absolute; width: 51px; height: 51px; border-radius: 50%; background: #fff; content: ''; }
+.progress-ring strong { position: relative; color: var(--app-color-green-dark); font-size: .78rem; }
+.mastery { grid-column: 1 / -1; display: flex; align-items: center; gap: 5px; width: fit-content; padding: 5px 8px; border-radius: 20px; color: var(--app-color-green-dark); background: var(--app-color-green-light); font-size: .59rem; font-weight: 600; }
+.question-heading { display: flex; align-items: center; justify-content: space-between; margin: 25px 0 8px; }
+.question-heading span { color: var(--app-color-green-dark); font-size: .6rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+.question-heading strong { color: var(--app-color-text-muted); font-size: .65rem; }
+.progress-track { height: 4px; margin-bottom: 22px; overflow: hidden; border-radius: 5px; background: #e0e6e1; }
+.progress-track span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--app-color-green-dark), var(--app-color-green)); }
+app-pergunta-card { display: block; }
+.action-button { display: flex; width: 100%; height: 48px; align-items: center; justify-content: center; gap: 8px; margin-top: 20px; border: 0; border-radius: 9px; color: #fff; background: linear-gradient(135deg, var(--app-color-green-dark), var(--app-color-green)); box-shadow: 0 7px 16px rgb(33 139 56 / 18%); font: inherit; font-size: .72rem; font-weight: 600; cursor: pointer; }
+.action-button:disabled { color: #939a95; background: #e2e6e3; box-shadow: none; }
+.empty-state { display: grid; min-height: 420px; place-content: center; justify-items: center; text-align: center; }
+.empty-state > ion-icon { color: var(--app-color-green-dark); font-size: 2.7rem; }
+.empty-state h2 { margin: 15px 0 5px; font-size: 1rem; }
+.empty-state p { max-width: 300px; margin: 0; color: var(--app-color-text-muted); font-size: .7rem; line-height: 1.5; }
+.empty-state a { margin-top: 18px; color: var(--app-color-green-dark); font-size: .7rem; font-weight: 600; text-decoration: none; }
+@media (min-width: 700px) { .study-shell { min-height: calc(100vh - 48px); margin-block: 24px; border-radius: 28px; } }

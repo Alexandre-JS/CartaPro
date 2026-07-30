@@ -1,0 +1,70 @@
+<ion-content [fullscreen]="true" class="exams-page">
+  <main class="exams-shell">
+    <header class="exams-hero">
+      <div>
+        <span>Preparação para o INATRO</span>
+        <h1>Exames</h1>
+        <p>Escolha um exame e avalie os seus conhecimentos para os exames de condução do INATRO.</p>
+      </div>
+      <span class="hero-icon" aria-hidden="true"><ion-icon name="school-outline"></ion-icon></span>
+    </header>
+
+    <section class="exams-content">
+      <div class="section-heading">
+        <div><span>Exames INATRO</span><h2>Escolha o seu exame</h2></div>
+        <div class="view-switch" role="group" aria-label="Modo de visualização">
+          <button type="button" [class.active]="visualizacao === 'grelha'" (click)="visualizacao = 'grelha'" aria-label="Visualizar em grelha"><ion-icon name="grid-outline" aria-hidden="true"></ion-icon></button>
+          <button type="button" [class.active]="visualizacao === 'lista'" (click)="visualizacao = 'lista'" aria-label="Visualizar em lista"><ion-icon name="list-outline" aria-hidden="true"></ion-icon></button>
+        </div>
+      </div>
+
+      <section class="exam-list" [class.list-view]="visualizacao === 'lista'" aria-label="Lista de exames">
+        @for (exame of exames; track exame.numero) {
+          <article class="exam-item" [class]="estadoExame(exame)">
+            <div class="exam-card">
+              <span class="exam-number"><small>Exame</small><strong>{{ numeroFormatado(exame.numero) }}</strong></span>
+              <span class="exam-copy">
+                <strong>{{ exame.nome }}</strong>
+                <small><span>{{ exame.perguntas }} questões</span><i></i><span><ion-icon name="time-outline" aria-hidden="true"></ion-icon>{{ exame.minutos }} minutos</span></small>
+                @if (exame.historico[0]; as ultimo) {
+                  <span class="status-label"><ion-icon name="checkmark-circle-outline" aria-hidden="true"></ion-icon> {{ rotuloEstado(exame) }} · {{ percentagem(ultimo) }}%</span>
+                } @else {
+                  <span class="status-label">{{ rotuloEstado(exame) }}</span>
+                }
+              </span>
+              <a class="start-action" [routerLink]="['/simulado']" [queryParams]="{ exame: exame.numero }">
+                <ion-icon [name]="exame.historico.length ? 'refresh-outline' : 'chevron-forward-outline'" aria-hidden="true"></ion-icon>
+                {{ exame.historico.length ? 'Refazer' : 'Iniciar' }}
+              </a>
+            </div>
+            @if (exame.historico.length) {
+              <button type="button" class="history-toggle" (click)="historicoAberto = historicoAberto === exame.numero ? undefined : exame.numero">
+                Histórico · {{ exame.historico.length }} {{ exame.historico.length === 1 ? 'tentativa' : 'tentativas' }}
+                <ion-icon [name]="historicoAberto === exame.numero ? 'chevron-up-outline' : 'chevron-down-outline'" aria-hidden="true"></ion-icon>
+              </button>
+              @if (historicoAberto === exame.numero) {
+                <div class="history-list">
+                  @for (tentativa of exame.historico; track tentativa.id || tentativa.data; let i = $index) {
+                    <div class="history-row">
+                      <span><strong>{{ percentagem(tentativa) }}%</strong><small>{{ tentativa.acertos }}/{{ tentativa.total }} acertos</small></span>
+                      <span><strong>{{ formatarTempo(tentativa.tempoSegundos) }}</strong><small>{{ tentativa.data | date:'dd/MM/yyyy, HH:mm' }}</small></span>
+                    </div>
+                  }
+                </div>
+              }
+            }
+          </article>
+        }
+      </section>
+      @if (!exames.length) { <div class="empty-state"><ion-icon name="document-text-outline"></ion-icon><strong>Nenhuma prova pública disponível</strong><p>{{ mensagemErro || 'A equipa ainda não publicou provas para o app.' }}</p></div> }
+    </section>
+
+    <nav class="bottom-nav" aria-label="Navegação principal">
+      <a routerLink="/inicio"><ion-icon name="home-outline" aria-hidden="true"></ion-icon><span>Início</span></a>
+      <a routerLink="/exames" class="active"><ion-icon name="document-text-outline" aria-hidden="true"></ion-icon><span>Exames</span></a>
+      <a routerLink="/estudos"><ion-icon name="book-outline" aria-hidden="true"></ion-icon><span>Estudos</span></a>
+      <a routerLink="/desempenho"><ion-icon name="stats-chart-outline" aria-hidden="true"></ion-icon><span>Desempenho</span></a>
+      <a routerLink="/perfil"><ion-icon name="person-outline" aria-hidden="true"></ion-icon><span>Perfil</span></a>
+    </nav>
+  </main>
+</ion-content>

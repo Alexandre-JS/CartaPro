@@ -1,0 +1,72 @@
+<ion-content [fullscreen]="true" class="glossary-page">
+  <main class="glossary-shell">
+    <header class="glossary-header">
+      <a class="icon-button" routerLink="/estudos" aria-label="Voltar aos estudos">
+        <ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>
+      </a>
+      <div>
+        <span>Material de estudo</span>
+        <h1>Glossário</h1>
+      </div>
+      <span class="header-count">{{ termos.length }}</span>
+    </header>
+
+    <section class="glossary-content">
+      @if (termos.length) {
+        <ion-searchbar
+          [(ngModel)]="pesquisa"
+          placeholder="Procurar termo"
+          mode="ios"
+          class="glossary-search">
+        </ion-searchbar>
+      }
+
+      @if (carregando) {
+        <p class="hint">A carregar glossário…</p>
+      } @else if (!porLetra.length) {
+        <section class="empty-state">
+          <ion-icon name="text-outline" aria-hidden="true"></ion-icon>
+          <h2>{{ termos.length ? 'Nenhum termo encontrado' : 'Glossário vazio' }}</h2>
+          <p>
+            {{ termos.length
+              ? 'Tenta outra palavra — a pesquisa também procura dentro das definições.'
+              : 'A CartaPro ainda não publicou termos do glossário.' }}
+          </p>
+        </section>
+      } @else {
+        @for (grupo of porLetra; track grupo.letra) {
+          <section class="letter-group">
+            <h2>{{ grupo.letra }}</h2>
+            @for (termo of grupo.termos; track termo.slug) {
+              <article class="term-card">
+                <button type="button" (click)="alternar(termo.slug)" [attr.aria-expanded]="aberto === termo.slug">
+                  <span>{{ termo.termo }}</span>
+                  <ion-icon [name]="aberto === termo.slug ? 'chevron-down-outline' : 'chevron-forward-outline'" aria-hidden="true"></ion-icon>
+                </button>
+                @if (aberto === termo.slug) {
+                  <div class="term-body">
+                    <p>{{ termo.definicao }}</p>
+                    @if (termo.artigoRef) {
+                      <a class="article-link" [routerLink]="['/codigo']" [queryParams]="{ artigo: termo.artigoRef }">
+                        <ion-icon name="document-text-outline" aria-hidden="true"></ion-icon>
+                        Ver o artigo {{ termo.artigoRef }}
+                      </a>
+                    }
+                  </div>
+                }
+              </article>
+            }
+          </section>
+        }
+      }
+    </section>
+
+    <nav class="bottom-nav" aria-label="Navegação principal">
+      <a routerLink="/inicio"><ion-icon name="home" aria-hidden="true"></ion-icon><span>Início</span></a>
+      <a routerLink="/exames"><ion-icon name="create-outline" aria-hidden="true"></ion-icon><span>Exames</span></a>
+      <a routerLink="/estudos" class="active"><ion-icon name="book-outline" aria-hidden="true"></ion-icon><span>Estudos</span></a>
+      <a routerLink="/desempenho"><ion-icon name="stats-chart-outline" aria-hidden="true"></ion-icon><span>Desempenho</span></a>
+      <a routerLink="/perfil"><ion-icon name="person-outline" aria-hidden="true"></ion-icon><span>Perfil</span></a>
+    </nav>
+  </main>
+</ion-content>

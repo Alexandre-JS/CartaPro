@@ -1,0 +1,102 @@
+<ion-content [fullscreen]="true" class="register-page">
+  <main class="register-shell">
+    <header class="register-header">
+      <a routerLink="/" class="back-button" aria-label="Voltar ao login">
+        <ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>
+      </a>
+
+      <div class="brand-lockup" aria-label="CartaPro">
+        <img src="assets/icon/icon CartaPro.png" alt="" class="brand-icon">
+        <div>
+          <div class="brand-name"><span>Carta</span><strong>Pro</strong></div>
+          <p>Prepare-se. Pratique. <em>Passe.</em></p>
+        </div>
+      </div>
+
+      <div class="header-copy">
+        <h1>Crie a sua conta</h1>
+        <p>Comece hoje a preparar-se para os exames de condução do INATRO.</p>
+      </div>
+    </header>
+
+    <section class="register-card">
+      <form [formGroup]="formulario" (ngSubmit)="criarConta()" novalidate>
+        <div class="field-group">
+          <ion-item lines="none" class="form-field" [class.field-error]="submetido && formulario.controls.nome.invalid">
+            <ion-icon name="person-outline" slot="start" aria-hidden="true"></ion-icon>
+            <ion-input formControlName="nome" type="text" autocomplete="name" placeholder="Nome completo" aria-label="Nome completo"></ion-input>
+          </ion-item>
+          @if (submetido && formulario.controls.nome.invalid) {
+            <ion-note color="danger">Introduza o seu nome completo.</ion-note>
+          }
+        </div>
+
+        <div class="field-group">
+          <ion-item lines="none" class="form-field" [class.field-error]="submetido && formulario.controls.email.invalid">
+            <ion-icon name="mail-outline" slot="start" aria-hidden="true"></ion-icon>
+            <ion-input formControlName="email" type="email" inputmode="email" autocomplete="email" placeholder="Email" aria-label="Email"></ion-input>
+          </ion-item>
+          @if (submetido && formulario.controls.email.invalid) {
+            <ion-note color="danger">Introduza um email válido.</ion-note>
+          }
+        </div>
+
+        <div class="field-group">
+          <ion-item lines="none" class="form-field" [class.field-error]="submetido && formulario.controls.telefone.invalid">
+            <ion-icon name="call-outline" slot="start" aria-hidden="true"></ion-icon>
+            <ion-input formControlName="telefone" type="tel" inputmode="tel" autocomplete="tel" placeholder="Telemóvel" aria-label="Telemóvel"></ion-input>
+          </ion-item>
+          @if (submetido && formulario.controls.telefone.invalid) {
+            <ion-note color="danger">Introduza um número de telemóvel válido.</ion-note>
+          }
+        </div>
+
+        <div class="field-group">
+          <ion-item lines="none" class="form-field" [class.field-error]="submetido && formulario.controls.palavraPasse.invalid">
+            <ion-icon name="lock-closed-outline" slot="start" aria-hidden="true"></ion-icon>
+            <ion-input formControlName="palavraPasse" type="password" autocomplete="new-password" placeholder="Palavra-passe" aria-label="Palavra-passe">
+              <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+            </ion-input>
+          </ion-item>
+          @if (submetido && formulario.controls.palavraPasse.invalid) {
+            <ion-note color="danger">Use pelo menos 6 caracteres.</ion-note>
+          }
+        </div>
+
+        <div class="field-group">
+          <ion-item lines="none" class="form-field" [class.field-error]="submetido && (formulario.controls.confirmarPalavraPasse.invalid || formulario.hasError('palavrasPasseDiferentes'))">
+            <ion-icon name="lock-closed-outline" slot="start" aria-hidden="true"></ion-icon>
+            <ion-input formControlName="confirmarPalavraPasse" type="password" autocomplete="new-password" placeholder="Confirmar palavra-passe" aria-label="Confirmar palavra-passe">
+              <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+            </ion-input>
+          </ion-item>
+          @if (submetido && formulario.hasError('palavrasPasseDiferentes')) {
+            <ion-note color="danger">As palavras-passe não coincidem.</ion-note>
+          }
+        </div>
+
+        <div class="terms" [class.terms-error]="submetido && formulario.controls.termos.invalid">
+          <ion-checkbox formControlName="termos" aria-label="Aceitar termos e política de privacidade"></ion-checkbox>
+          <p>Li e aceito os <button type="button">Termos de Uso</button> e a <button type="button">Política de Privacidade</button>.</p>
+        </div>
+        @if (submetido && formulario.controls.termos.invalid) {
+          <ion-note color="danger" class="terms-note">É necessário aceitar os termos.</ion-note>
+        }
+
+        @if (errosApi.length) {
+          <div class="api-errors" role="alert">
+            @for (erro of errosApi; track erro) {
+              <ion-note color="danger">{{ erro }}</ion-note>
+            }
+            @if (sugerirEntrada) {
+              <a class="login-shortcut" routerLink="/">Já tenho conta — entrar</a>
+            }
+          </div>
+        }
+        <ion-button expand="block" type="submit" class="register-button" [disabled]="processando">{{ processando ? 'A criar conta…' : 'Criar conta' }}</ion-button>
+      </form>
+
+      <p class="login-link">Já tem uma conta? <a routerLink="/">Entrar</a></p>
+    </section>
+  </main>
+</ion-content>

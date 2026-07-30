@@ -1,0 +1,46 @@
+<section class="question-card">
+  <div class="question-prompt">
+    <!-- `imagem` já vem como URL absoluto do ContentService (absoluteAssetUrl).
+         O prefixo 'assets/sinais/' que aqui existia produzia caminhos como
+         `assets/sinais/http://.../sinal.svg` e nenhuma imagem carregava. -->
+    @if (pergunta.imagem) {
+      <div class="media-frame">
+        <img [src]="pergunta.imagem" [alt]="'Sinal da pergunta sobre ' + temaLegivel" loading="lazy">
+      </div>
+    }
+    <h1>{{ pergunta.enunciado }}</h1>
+  </div>
+
+  <div class="options" role="radiogroup" aria-label="Opções de resposta">
+    @for (opcao of pergunta.opcoes; track $index; let indice = $index) {
+      <button
+        type="button"
+        class="option"
+        [class.selected]="escolhida === indice"
+        [class.correct]="respondida && indice === pergunta.correta"
+        [class.incorrect]="respondida && escolhida === indice && indice !== pergunta.correta"
+        [disabled]="respondida"
+        role="radio"
+        [attr.aria-checked]="escolhida === indice"
+        (click)="escolha.emit(indice)">
+        <span class="option-letter">{{ letras[indice] }}</span>
+        <span class="option-text">{{ opcao }}</span>
+        @if (respondida && indice === pergunta.correta) {
+          <ion-icon name="checkmark-circle" aria-label="Resposta correta"></ion-icon>
+        } @else if (respondida && escolhida === indice) {
+          <ion-icon name="close-circle" aria-label="Resposta incorreta"></ion-icon>
+        }
+      </button>
+    }
+  </div>
+
+  @if (respondida) {
+    <aside class="explanation" [class.success]="escolhida === pergunta.correta">
+      <strong>{{ escolhida === pergunta.correta ? 'Resposta correta' : 'Resposta incorreta' }}</strong>
+      <p>{{ pergunta.explicacao }}</p>
+      @if (pergunta.artigoRef) {
+        <span>Artigo {{ pergunta.artigoRef }}</span>
+      }
+    </aside>
+  }
+</section>

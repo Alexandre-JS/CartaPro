@@ -1,0 +1,69 @@
+<ion-content [fullscreen]="true" class="performance-page">
+  <main class="performance-shell">
+    <header class="performance-hero">
+      <div><span>O seu progresso</span><h1>Desempenho</h1><p>Acompanhe a sua evolução e descubra onde deve concentrar os estudos.</p></div>
+      <span class="hero-icon"><ion-icon name="stats-chart-outline" aria-hidden="true"></ion-icon></span>
+    </header>
+
+    <section class="performance-content">
+      <article class="main-score">
+        <div class="score-ring" [style.--score]="taxaGeral"><strong>{{ taxaGeral }}%</strong><span>taxa geral</span></div>
+        <div class="score-copy"><span>Resumo da aprendizagem</span><h2>{{ totalQuestoes }} questões respondidas</h2><p>{{ historico.length }} exames concluídos</p></div>
+      </article>
+
+      <section class="metrics-grid">
+        <article><span class="metric-icon green"><ion-icon name="trending-up-outline" aria-hidden="true"></ion-icon></span><div><small>Média nos exames</small><strong>{{ mediaExames }}%</strong></div></article>
+        <article><span class="metric-icon yellow"><ion-icon name="ribbon-outline" aria-hidden="true"></ion-icon></span><div><small>Melhor resultado</small><strong>{{ melhorResultado }}%</strong></div></article>
+        <article><span class="metric-icon blue"><ion-icon name="time-outline" aria-hidden="true"></ion-icon></span><div><small>Tempo médio</small><strong>{{ tempoMedio }}</strong></div></article>
+        <article><span class="metric-icon purple"><ion-icon name="document-text-outline" aria-hidden="true"></ion-icon></span><div><small>Exames realizados</small><strong>{{ historico.length }}</strong></div></article>
+      </section>
+
+      @if (temaPrioritario; as tema) {
+        <section class="recommendation">
+          <div class="section-heading"><div><span>Recomendação</span><h2>Próximo passo</h2></div></div>
+          <a [routerLink]="['/estudo', tema.tema]">
+            <span class="recommend-icon"><ion-icon name="book-outline" aria-hidden="true"></ion-icon></span>
+            <div><strong>Reforce: {{ nomeTema(tema.tema) }}</strong><p>Este é atualmente o tema com menor taxa de acerto.</p><span class="mini-progress"><i [style.width.%]="tema.taxaAcerto * 100"></i></span></div>
+            <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
+          </a>
+        </section>
+      }
+
+      <section class="themes-section">
+        <div class="section-heading"><div><span>Conhecimento</span><h2>Desempenho por tema</h2></div></div>
+        <div class="theme-list">
+          @for (tema of temas; track tema.tema) {
+            <article class="theme-row">
+              <div><strong>{{ nomeTema(tema.tema) }}</strong><small>{{ tema.respondidas }} questões</small></div>
+              <span class="theme-progress"><i [style.width.%]="tema.taxaAcerto * 100"></i></span>
+              <b>{{ tema.taxaAcerto * 100 | number:'1.0-0' }}%</b>
+            </article>
+          }
+        </div>
+      </section>
+
+      <section class="history-section">
+        <div class="section-heading"><div><span>Atividade</span><h2>Histórico de exames</h2></div><strong>{{ historico.length }}</strong></div>
+        <div class="history-list">
+          @for (exame of historico; track exame.id) {
+            <article class="history-card">
+              <span class="exam-badge">{{ numeroExame(exame.numero) }}</span>
+              <div><strong>Exame {{ numeroExame(exame.numero) }}</strong><small><ion-icon name="calendar-outline" aria-hidden="true"></ion-icon>{{ exame.data | date:'dd/MM/yyyy, HH:mm' }} · {{ formatarTempo(exame.tempoSegundos) }}</small></div>
+              <span class="history-score" [class.good]="percentagem(exame) >= 80">{{ percentagem(exame) }}%</span>
+            </article>
+          } @empty {
+            <div class="empty-history"><ion-icon name="document-text-outline" aria-hidden="true"></ion-icon><strong>Ainda não concluiu exames</strong><p>Os resultados aparecerão aqui depois do primeiro exame.</p><a routerLink="/exames">Escolher um exame</a></div>
+          }
+        </div>
+      </section>
+    </section>
+
+    <nav class="bottom-nav" aria-label="Navegação principal">
+      <a routerLink="/inicio"><ion-icon name="home-outline" aria-hidden="true"></ion-icon><span>Início</span></a>
+      <a routerLink="/exames"><ion-icon name="document-text-outline" aria-hidden="true"></ion-icon><span>Exames</span></a>
+      <a routerLink="/estudos"><ion-icon name="book-outline" aria-hidden="true"></ion-icon><span>Estudos</span></a>
+      <a routerLink="/desempenho" class="active"><ion-icon name="stats-chart-outline" aria-hidden="true"></ion-icon><span>Desempenho</span></a>
+      <a routerLink="/perfil"><ion-icon name="person-outline" aria-hidden="true"></ion-icon><span>Perfil</span></a>
+    </nav>
+  </main>
+</ion-content>

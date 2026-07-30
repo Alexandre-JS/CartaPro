@@ -1,0 +1,100 @@
+/*
+ * CartaPro design tokens
+ * Fonte: src/assets/icon/identidade visual.png
+ *
+ * Use os tokens semanticos (--app-*) nos componentes. Os tokens --ion-color-*
+ * existem para que os componentes Ionic recebam a mesma identidade visual.
+ */
+:root {
+  /* Paleta oficial da marca */
+  --app-color-green: #43b649;
+  --app-color-green-dark: #218b38;
+  --app-color-green-light: #eaf7ec;
+  --app-color-yellow: #f5c518;
+  --app-color-red: #e31e24;
+  --app-color-road-gray: #666666;
+  --app-color-light-gray: #f5f6f7;
+  --app-color-white: #ffffff;
+
+  /* Uso semantico */
+  --app-color-brand: var(--app-color-green);
+  --app-color-brand-strong: var(--app-color-green-dark);
+  --app-color-brand-soft: var(--app-color-green-light);
+  --app-color-success: var(--app-color-green-dark);
+  --app-color-warning: var(--app-color-yellow);
+  --app-color-danger: var(--app-color-red);
+  --app-color-text: #202124;
+  --app-color-text-muted: var(--app-color-road-gray);
+  --app-color-background: var(--app-color-light-gray);
+  --app-color-surface: var(--app-color-white);
+  --app-color-border: #dfe3e6;
+
+  /* Ionic: primary / verde principal */
+  --ion-color-primary: #43b649;
+  --ion-color-primary-rgb: 67, 182, 73;
+  --ion-color-primary-contrast: #000000;
+  --ion-color-primary-contrast-rgb: 0, 0, 0;
+  --ion-color-primary-shade: #3ba040;
+  --ion-color-primary-tint: #56bd5b;
+
+  /* Ionic: secondary / verde escuro */
+  --ion-color-secondary: #218b38;
+  --ion-color-secondary-rgb: 33, 139, 56;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #1d7a31;
+  --ion-color-secondary-tint: #379746;
+
+  /* Ionic: success / respostas corretas */
+  --ion-color-success: #218b38;
+  --ion-color-success-rgb: 33, 139, 56;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #1d7a31;
+  --ion-color-success-tint: #379746;
+
+  /* Ionic: warning / atencao e respostas pendentes */
+  --ion-color-warning: #f5c518;
+  --ion-color-warning-rgb: 245, 197, 24;
+  --ion-color-warning-contrast: #000000;
+  --ion-color-warning-contrast-rgb: 0, 0, 0;
+  --ion-color-warning-shade: #d8ad15;
+  --ion-color-warning-tint: #f6cb2f;
+
+  /* Ionic: danger / erros e respostas incorretas */
+  --ion-color-danger: #e31e24;
+  --ion-color-danger-rgb: 227, 30, 36;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #c81a20;
+  --ion-color-danger-tint: #e6353a;
+
+  /* Neutros globais do Ionic */
+  --ion-color-light: #f5f6f7;
+  --ion-color-light-rgb: 245, 246, 247;
+  --ion-color-light-contrast: #202124;
+  --ion-color-light-contrast-rgb: 32, 33, 36;
+  --ion-color-light-shade: #d8d9d9;
+  --ion-color-light-tint: #f6f7f8;
+
+  --ion-color-medium: #666666;
+  --ion-color-medium-rgb: 102, 102, 102;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #5a5a5a;
+  --ion-color-medium-tint: #757575;
+
+  --ion-color-dark: #202124;
+  --ion-color-dark-rgb: 32, 33, 36;
+  --ion-color-dark-contrast: #ffffff;
+  --ion-color-dark-contrast-rgb: 255, 255, 255;
+  --ion-color-dark-shade: #1c1d20;
+  --ion-color-dark-tint: #36373a;
+
+  --ion-background-color: var(--app-color-background);
+  --ion-background-color-rgb: 245, 246, 247;
+  --ion-text-color: var(--app-color-text);
+  --ion-text-color-rgb: 32, 33, 36;
+  --ion-font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+}

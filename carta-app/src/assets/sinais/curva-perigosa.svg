@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 180" role="img" aria-labelledby="title">
+  <title id="title">Sinal de curva perigosa</title>
+  <path d="M100 8 192 168H8Z" fill="#fff" stroke="#d92525" stroke-width="16" stroke-linejoin="round"/>
+  <path d="M112 137c-18-12-27-25-27-40 0-17 12-26 29-31l17-5-10-18 45 13-13 45-10-18-18 5c-9 3-14 7-14 13 0 8 7 16 20 25z" fill="#1f2937"/>
+</svg>
