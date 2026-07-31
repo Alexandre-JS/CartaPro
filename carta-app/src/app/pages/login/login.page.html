@@ -10,23 +10,12 @@
       </div>
     </section>
 
-    <section class="road-scene" aria-hidden="true">
-      <div class="sun"></div>
-      <div class="cloud cloud-one"></div>
-      <div class="cloud cloud-two"></div>
-      <div class="city city-back"></div>
-      <div class="city city-front"></div>
-      <div class="tree tree-one"><i></i></div>
-      <div class="tree tree-two"><i></i></div>
-      <div class="tree tree-three"><i></i></div>
-      <div class="road"><span></span></div>
-      <div class="car">🚙</div>
-    </section>
+    <div class="road-scene" role="img" aria-label="Estrada de aprendizagem de condução"></div>
 
     <section class="login-card">
       <header>
-        <h1>Bem-vindo!</h1>
-        <p>Acede à tua conta para continuares<br>a preparação para o INATRO.</p>
+        <h1>Entrar</h1>
+        <p>Continua a tua preparação para o INATRO.</p>
       </header>
 
       <form [formGroup]="formulario" (ngSubmit)="entrar()" novalidate>
@@ -64,8 +53,6 @@
           }
         </div>
 
-        <button class="forgot-password" type="button">Esqueceu a palavra-passe?</button>
-
         @if (mensagemErro) {
           <ion-note color="danger" class="login-error">
             {{ mensagemErro }}
@@ -77,16 +64,7 @@
         </ion-button>
       </form>
 
-      <p class="register">Não tem conta? <button type="button" routerLink="/registo">Registe-se</button></p>
-
-      <div class="school-access">
-        <span></span>
-        <button type="button">
-          <ion-icon name="business-outline" aria-hidden="true"></ion-icon>
-          Entrar como Escola
-        </button>
-        <span></span>
-      </div>
+      <p class="register">Ainda não tens conta? <button type="button" routerLink="/registo">Criar conta</button></p>
     </section>
   </main>
 </ion-content>

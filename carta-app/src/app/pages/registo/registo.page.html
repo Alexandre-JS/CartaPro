@@ -13,13 +13,13 @@
         </div>
       </div>
 
-      <div class="header-copy">
-        <h1>Cria a tua conta</h1>
-        <p>Comece hoje a preparar-se para os exames de condução do INATRO.</p>
-      </div>
     </header>
 
     <section class="register-card">
+      <header class="form-heading">
+        <h1>Criar conta</h1>
+        <p>Começa a tua preparação para o INATRO.</p>
+      </header>
       <form [formGroup]="formulario" (ngSubmit)="criarConta()" novalidate>
         <div class="field-group">
           <ion-item lines="none" class="form-field" [class.field-error]="submetido && formulario.controls.nome.invalid">
@@ -75,14 +75,6 @@
           }
         </div>
 
-        <div class="terms" [class.terms-error]="submetido && formulario.controls.termos.invalid">
-          <ion-checkbox formControlName="termos" aria-label="Aceitar termos e política de privacidade"></ion-checkbox>
-          <p>Li e aceito os <button type="button">Termos de Uso</button> e a <button type="button">Política de Privacidade</button>.</p>
-        </div>
-        @if (submetido && formulario.controls.termos.invalid) {
-          <ion-note color="danger" class="terms-note">É necessário aceitar os termos.</ion-note>
-        }
-
         @if (errosApi.length) {
           <div class="api-errors" role="alert">
             @for (erro of errosApi; track erro) {
@@ -96,7 +88,7 @@
         <ion-button expand="block" type="submit" class="register-button" [disabled]="processando">{{ processando ? 'A criar conta…' : 'Criar conta' }}</ion-button>
       </form>
 
-      <p class="login-link">Já tem uma conta? <a routerLink="/">Entrar</a></p>
+      <p class="login-link">Já tens uma conta? <a routerLink="/">Entrar</a></p>
     </section>
   </main>
 </ion-content>
