@@ -1,6 +1,6 @@
 :host { display: block; }
 
-.register-page { --background: #eef7ef; }
+.register-page { --background: url('/assets/backgrounds/estrada-aprendiz-mocambique.webp') center / cover no-repeat; }
 
 .register-shell {
   display: flex;
@@ -9,7 +9,7 @@
   min-height: 100%;
   margin: 0 auto;
   overflow: hidden;
-  background: var(--app-color-white);
+  background-color: transparent;
   box-shadow: 0 0 42px rgb(32 33 36 / 10%);
 }
 
@@ -21,7 +21,7 @@
   place-items: center;
   padding: max(20px, env(safe-area-inset-top)) 24px 14px;
   color: var(--app-color-text);
-  background: var(--app-color-white);
+  background: transparent;
 }
 
 .back-button {
@@ -52,7 +52,7 @@
   z-index: 2;
   flex: 1 0 auto;
   padding: 12px 24px max(26px, env(safe-area-inset-bottom));
-  background: var(--app-color-white);
+  background: transparent;
 }
 
 .form-heading { margin-bottom: 18px; text-align: center; }
@@ -64,7 +64,7 @@
   --min-height: 51px;
   --padding-start: 14px;
   --inner-padding-end: 8px;
-  --background: var(--app-color-white);
+  --background: rgb(255 255 255 / 84%);
   --border-radius: 10px;
   border: 1px solid var(--app-color-border);
   border-radius: 10px;
@@ -85,8 +85,8 @@ ion-note { display: block; margin: 5px 4px 0; font-size: .7rem; }
   text-transform: none;
 }
 
-.login-link { margin: 18px 0 0; text-align: center; color: var(--app-color-text); font-size: .78rem; }
-.login-link a { color: var(--app-color-green-dark); font-weight: 600; text-decoration: none; }
+.login-link { margin: 18px 0 0; text-align: center; color: #fff; font-size: .78rem; }
+.login-link a { color: #fff; font-weight: 600; text-decoration: none; }
 
 @media (min-width: 700px) {
   .register-shell { min-height: min(920px, calc(100vh - 48px)); margin-block: 24px; border-radius: 28px; }

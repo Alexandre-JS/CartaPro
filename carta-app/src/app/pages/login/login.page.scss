@@ -3,7 +3,7 @@
 }
 
 .login-page {
-  --background: #eef7ef;
+  --background: url('/assets/backgrounds/estrada-aprendiz-mocambique.webp') center / cover no-repeat;
 }
 
 .login-shell {
@@ -14,7 +14,7 @@
   min-height: 100%;
   margin: 0 auto;
   overflow: hidden;
-  background: var(--app-color-white);
+  background-color: transparent;
   box-shadow: 0 0 42px rgb(32 33 36 / 10%);
 }
 
@@ -26,7 +26,7 @@
   place-items: center;
   height: clamp(138px, 21vh, 176px);
   padding: max(20px, env(safe-area-inset-top)) 24px 14px;
-  background: var(--app-color-white);
+  background: transparent;
 }
 
 .brand-lockup {
@@ -78,10 +78,7 @@
   flex: 0 0 auto;
   height: clamp(112px, 18vh, 148px);
   overflow: hidden;
-  background-color: var(--app-color-green-light);
-  background-image: url('/assets/backgrounds/estrada-aprendiz-mocambique.webp');
-  background-position: center 58%;
-  background-size: cover;
+  background: transparent;
 }
 
 .login-card {
@@ -91,13 +88,13 @@
   margin-top: -14px;
   padding: 26px 24px max(28px, env(safe-area-inset-bottom));
   border-radius: 22px 22px 0 0;
-  background: var(--app-color-white);
-  box-shadow: 0 -5px 18px rgb(32 33 36 / 13%);
+  background: transparent;
+  box-shadow: none;
 }
 
 .login-card header { text-align: center; }
 .login-card h1 { margin: 0; color: var(--app-color-green-dark); font-size: 1.45rem; font-weight: 600; }
-.login-card header p { margin: 7px 0 22px; color: var(--app-color-text); font-size: .9rem; line-height: 1.45; }
+.login-card header p { margin: 7px 0 22px; color: #fff; font-size: .9rem; line-height: 1.45; }
 
 .field-group { margin-bottom: 12px; }
 
@@ -105,7 +102,7 @@
   --min-height: 52px;
   --padding-start: 14px;
   --inner-padding-end: 8px;
-  --background: var(--app-color-white);
+  --background: rgb(255 255 255 / 84%);
   --border-radius: 10px;
   border: 1px solid var(--app-color-border);
   border-radius: 10px;
@@ -136,8 +133,8 @@ ion-note { display: block; margin: 5px 4px 0; font-size: .72rem; }
   text-transform: none;
 }
 
-.register { margin: 18px 0 0; text-align: center; color: var(--app-color-text); font-size: .78rem; }
-.register button { padding: 0; color: var(--app-color-green-dark); font-weight: 600; }
+.register { margin: 18px 0 0; text-align: center; color: #fff; font-size: .78rem; }
+.register button { padding: 0; color: #fff; font-weight: 600; }
 
 @media (min-width: 700px) {
   .login-shell { min-height: min(900px, calc(100vh - 48px)); margin-block: 24px; border-radius: 28px; }
