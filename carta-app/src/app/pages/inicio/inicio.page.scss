@@ -1,7 +1,8 @@
 :host { display: block; }
-.home-page { --background: #edf2ee; }
+.home-page { --background: var(--app-color-page); }
 .home-shell { width: min(100%, 520px); min-height: 100%; margin: 0 auto; padding-bottom: calc(78px + env(safe-area-inset-bottom)); overflow: hidden; background: var(--app-color-light-gray); box-shadow: 0 0 42px rgb(32 33 36 / 10%); }
-.hero { position: relative; min-height: 190px; padding: max(34px, env(safe-area-inset-top)) 22px 48px; overflow: hidden; color: #fff; background: radial-gradient(circle at 83% 8%, rgb(255 255 255 / 13%) 0 75px, transparent 76px), linear-gradient(145deg, var(--app-color-green-dark), var(--app-color-green)); }
+.hero { position: relative; min-height: 210px; padding: max(34px, env(safe-area-inset-top)) 22px 48px; overflow: hidden; color: #fff; background-color: var(--app-color-brand-panel); background-image: url('/assets/backgrounds/ESCOLA-DE-CONDUCAO.jpg'); background-position: center 42%; background-size: cover; }
+.hero::before { position: absolute; inset: 0; background: rgb(23 106 42 / 55%); content: ''; }
 .hero-top { position: relative; z-index: 2; display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
 .eyebrow { margin: 0 0 7px; font-size: 1.2rem; font-weight: 600; }
 .hero h1 { margin: 0; font-size: .84rem; font-weight: 400; line-height: 1.45; }
@@ -15,7 +16,7 @@
 .section-heading h2 { margin: 3px 0 0; font-size: .9rem; }
 .section-heading a { display: flex; align-items: center; color: var(--app-color-green-dark); font-size: .6rem; font-weight: 600; text-decoration: none; }
 .section-block { margin-top: 27px; }
-.recommendation-card { display: grid; grid-template-columns: 46px minmax(0, 1fr) auto; align-items: center; gap: 10px; margin-top: 11px; padding: 13px; border-radius: 11px; color: var(--app-color-text); background: linear-gradient(135deg, #fff, var(--app-color-green-light)); box-shadow: 0 4px 13px rgb(32 33 36 / 6%); text-decoration: none; }
+.recommendation-card { display: grid; grid-template-columns: 46px minmax(0, 1fr) auto; align-items: center; gap: 10px; margin-top: 11px; padding: 13px; border-radius: 11px; color: var(--app-color-text); background: var(--app-color-green-light); box-shadow: 0 4px 13px rgb(32 33 36 / 6%); text-decoration: none; }
 .recommend-icon { display: grid; width: 44px; height: 49px; place-items: center; border-radius: 9px; color: #9a7100; background: #fff1bd; font-size: 1.25rem; }
 .recommend-copy { display: grid; min-width: 0; gap: 4px; }
 .recommend-copy strong { font-size: .7rem; }
@@ -28,15 +29,15 @@
 .activity-copy, .empty-activity > span { display: grid; gap: 4px; }
 .activity-copy strong, .empty-activity strong { font-size: .68rem; }
 .activity-copy small, .empty-activity small { color: var(--app-color-text-muted); font-size: .54rem; line-height: 1.35; }
-.activity-score { color: #9a6800; font-size: .75rem; font-weight: 600; }
+.activity-score { color: var(--app-color-warning-text); font-size: .75rem; font-weight: 600; }
 .activity-score.good { color: var(--app-color-green-dark); }
 .empty-activity > ion-icon:first-child { color: var(--app-color-green-dark); font-size: 1.6rem; }
 .empty-activity > ion-icon:last-child { color: var(--app-color-green-dark); font-size: .9rem; }
 @media (min-width: 700px) { .home-shell { min-height: calc(100vh - 48px); margin-block: 24px; border-radius: 28px; } }
 
 /* Cartão de revisões pendentes e cadeado do plano gratuito. */
-.recommendation-card.locked { border-color: #e7ce7d; background: #fffaf0; }
-.recommendation-card.locked .recommend-icon { color: #8a6000; background: #fdf0d0; }
+.recommendation-card.locked { border-color: var(--app-color-warning-border); background: var(--app-color-warning-soft); }
+.recommendation-card.locked .recommend-icon { color: var(--app-color-warning-text); background: var(--app-color-warning-soft); }
 
 /* Fila secundária: as tarefas que não são a de agora ficam em linhas discretas. */
 .next-list { display: grid; gap: 8px; margin-top: 11px; }

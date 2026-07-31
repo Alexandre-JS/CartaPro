@@ -12,8 +12,6 @@ import { SkeletonComponent } from '../../components/skeleton/skeleton.component'
 import { AcessoService } from '../../core/acesso.service';
 import { ContentService } from '../../core/content.service';
 import { DesbloqueioService } from '../../core/desbloqueio.service';
-import { RegrasService } from '../../core/regras.service';
-import { StorageService } from '../../core/storage.service';
 import { mensagemDeErro } from '../../core/erros-api';
 import { CatalogoPlanos, MetodoPagamento, Pagamento, PagamentoService, PlanoVenda } from '../../core/pagamento.service';
 import { EstadoAcesso } from '../../models/progresso.model';
@@ -48,8 +46,6 @@ export class DesbloquearPage implements OnInit {
     private readonly desbloqueio = inject(DesbloqueioService);
     private readonly acesso = inject(AcessoService);
     private readonly content = inject(ContentService);
-    private readonly storage = inject(StorageService);
-    private readonly regras = inject(RegrasService);
 
     etapa: Etapa = 'pagar';
     carregando = true;
@@ -59,12 +55,6 @@ export class DesbloquearPage implements OnInit {
     metodo: MetodoPagamento | null = null;
     estado: EstadoAcesso = { plano: 'gratis' };
     perguntasBloqueadas = 0;
-
-    /* Prova construída com os números reais do aluno. Inventar "95% dos nossos
-       alunos aprovam" seria mentir; o que ele próprio já fez convence mais. */
-    respondidas = 0;
-    taxaAcerto = 0;
-    exigidoNoExame = 0;
 
     /** Número da carteira. Arranca no da conta e é editável. */
     carteira = '';
@@ -87,29 +77,6 @@ export class DesbloquearPage implements OnInit {
 
     get moeda(): string {
         return this.catalogo?.moeda || 'MZN';
-    }
-
-    /** Custo diário: 500 MZN num ano lê-se melhor como "menos de 2 MZN por dia". */
-    get porDia(): number {
-        const dias = this.plano?.dias ?? 0;
-
-        return dias > 0 ? Math.ceil(((this.plano?.preco ?? 0) / dias) * 100) / 100 : 0;
-    }
-
-    /**
-     * Só se mostra a prova pessoal com respostas suficientes para significar
-     * algo: 3 perguntas certas não são "100% de acerto".
-     */
-    get temProvaPessoal(): boolean {
-        return this.respondidas >= 10 && this.exigidoNoExame > 0;
-    }
-
-    get faltamPontos(): number {
-        return Math.max(0, this.exigidoNoExame - this.taxaAcerto);
-    }
-
-    get jaChegaria(): boolean {
-        return this.temProvaPessoal && this.faltamPontos === 0;
     }
 
     get metodos(): MetodoPagamento[] {
@@ -139,18 +106,10 @@ export class DesbloquearPage implements OnInit {
 
     async ngOnInit(): Promise<void> {
         try {
-            await this.regras.carregar();
-
-            const [catalogo, bloqueado, respostas] = await Promise.all([
+            const [catalogo, bloqueado] = await Promise.all([
                 this.pagamentos.catalogo(),
                 this.acesso.conteudoBloqueado(),
-                this.storage.listarRespostas(),
             ]);
-
-            this.respondidas = respostas.length;
-            const certas = respostas.filter((resposta) => resposta.acertou).length;
-            this.taxaAcerto = respostas.length ? Math.round((certas / respostas.length) * 100) : 0;
-            this.exigidoNoExame = Math.round(this.regras.percentagemPassagem());
 
             this.catalogo = catalogo;
             this.plano = catalogo.planos[0] ?? null;

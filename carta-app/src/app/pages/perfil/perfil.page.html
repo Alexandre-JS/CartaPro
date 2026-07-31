@@ -1,7 +1,6 @@
 <ion-content [fullscreen]="true" class="profile-page">
   <main class="profile-shell">
     <header class="profile-hero">
-      <div class="hero-title"><span>Conta CartaPro</span><h1>Perfil</h1></div>
       <!-- O selo do plano só aparece depois de o servidor responder: mostrar
            "Plano Gratuito" por omissão dizia a um assinante que não tinha
            pago, durante todo o carregamento. -->
@@ -22,8 +21,25 @@
          guardavam estado. -->
     <section class="profile-content">
       <section class="profile-section">
-        <div class="section-heading"><div><span>Dados pessoais</span><h2>Informações da conta</h2></div></div>
-        <form [formGroup]="formulario" (ngSubmit)="guardar()" novalidate>
+        <div class="section-heading">
+          <div><span>Conta</span><h2>Dados pessoais</h2></div>
+          @if (!carregando) {
+            <button type="button" class="edit-button" (click)="editando = !editando">
+              <ion-icon [name]="editando ? 'close-outline' : 'pencil-outline'" aria-hidden="true"></ion-icon>
+              {{ editando ? 'Fechar' : 'Editar' }}
+            </button>
+          }
+        </div>
+
+        @if (!carregando && !editando) {
+          <div class="account-summary">
+            <div><ion-icon name="mail-outline" aria-hidden="true"></ion-icon><span><small>Email</small><strong>{{ formulario.controls.email.value }}</strong></span></div>
+            <div><ion-icon name="call-outline" aria-hidden="true"></ion-icon><span><small>Telemóvel</small><strong>{{ formulario.controls.telefone.value || 'Não indicado' }}</strong></span></div>
+          </div>
+        }
+
+        @if (editando) {
+          <form [formGroup]="formulario" (ngSubmit)="guardar()" novalidate>
           <div class="field-group">
             <ion-item lines="none" class="form-field" [class.field-error]="submetido && formulario.controls.nome.invalid">
               <ion-icon name="person-outline" slot="start" aria-hidden="true"></ion-icon>
@@ -45,8 +61,9 @@
             </ion-item>
             <ion-note>É este o número que fica ligado ao plano completo.</ion-note>
           </div>
-          <button class="save-button" type="submit"><ion-icon name="checkmark-circle" aria-hidden="true"></ion-icon>{{ guardado ? 'Dados guardados' : 'Guardar alterações' }}</button>
-        </form>
+            <button class="save-button" type="submit"><ion-icon name="checkmark-circle" aria-hidden="true"></ion-icon>{{ guardado ? 'Dados guardados' : 'Guardar alterações' }}</button>
+          </form>
+        }
       </section>
 
       @if (!carregando && plano === 'gratis') {

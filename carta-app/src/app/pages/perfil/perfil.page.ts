@@ -5,7 +5,7 @@ import { IonContent, IonIcon, IonInput, IonItem, IonNote } from '@ionic/angular/
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
 import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
 import { addIcons } from 'ionicons';
-import { callOutline, checkmarkCircle, chevronForwardOutline, lockOpenOutline, logOutOutline, mailOutline, personOutline } from 'ionicons/icons';
+import { callOutline, checkmarkCircle, chevronForwardOutline, closeOutline, lockOpenOutline, logOutOutline, mailOutline, pencilOutline, personOutline } from 'ionicons/icons';
 import { DesbloqueioService } from '../../core/desbloqueio.service';
 import { PerfilService } from '../../core/perfil.service';
 import { AuthService } from '../../core/auth.service';
@@ -23,6 +23,7 @@ export class PerfilPage implements OnInit {
     carregando = true;
     guardado = false;
     submetido = false;
+    editando = false;
 
     constructor(
         formBuilder: FormBuilder,
@@ -31,7 +32,7 @@ export class PerfilPage implements OnInit {
         private readonly router: Router,
         private readonly auth: AuthService,
     ) {
-        addIcons({ callOutline, checkmarkCircle, chevronForwardOutline, lockOpenOutline, logOutOutline, mailOutline, personOutline });
+        addIcons({ callOutline, checkmarkCircle, chevronForwardOutline, closeOutline, lockOpenOutline, logOutOutline, mailOutline, pencilOutline, personOutline });
         this.formulario = formBuilder.nonNullable.group({
             nome: ['', [Validators.required, Validators.minLength(3)]],
             email: ['', [Validators.required, Validators.email]],
@@ -62,6 +63,7 @@ export class PerfilPage implements OnInit {
         }
         await this.perfil.guardar(this.formulario.getRawValue());
         this.guardado = true;
+        this.editando = false;
     }
 
     async sair(): Promise<boolean> {

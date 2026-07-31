@@ -16,15 +16,30 @@
         <app-skeleton variante="lista" [quantidade]="4"></app-skeleton>
       } @else {
       <article class="main-score">
-        <div class="score-ring" [style.--score]="taxaGeral"><strong>{{ taxaGeral }}%</strong><span>acerto</span></div>
-        <div class="score-copy"><span>Todas as respostas</span><h2>{{ totalQuestoes }} questões respondidas</h2><p>Estudo, treino e exames somados.</p></div>
+        @if (consolidacaoAvaliada) {
+          <div class="score-ring"><strong>{{ dominioGlobal }}%</strong><span>domínio</span></div>
+          <div class="score-copy">
+            <span>Matéria consolidada</span>
+            <h2>{{ perguntasConsolidadas }} de {{ totalPerguntasBanco }} perguntas</h2>
+            <p>Conhecimento confirmado em revisões posteriores.</p>
+          </div>
+        } @else {
+          <div class="score-ring current"><strong>{{ retencao }}%</strong><span>retenção</span></div>
+          <div class="score-copy">
+            <span>Conhecimento atual</span>
+            <h2>{{ perguntasRetidas }} de {{ perguntasPraticadas }} perguntas retidas</h2>
+            <p>Faz as revisões agendadas para confirmar este conhecimento.</p>
+          </div>
+        }
       </article>
 
       <section class="metrics-grid">
-        <article><span class="metric-icon green"><ion-icon name="trending-up-outline" aria-hidden="true"></ion-icon></span><div><small>Média só nos exames</small><strong>{{ mediaExames }}%</strong></div></article>
-        <article><span class="metric-icon yellow"><ion-icon name="ribbon-outline" aria-hidden="true"></ion-icon></span><div><small>Melhor exame</small><strong>{{ melhorResultado }}%</strong></div></article>
-        <article><span class="metric-icon blue"><ion-icon name="time-outline" aria-hidden="true"></ion-icon></span><div><small>Tempo médio</small><strong>{{ tempoMedio }}</strong></div></article>
-        <article><span class="metric-icon purple"><ion-icon name="document-text-outline" aria-hidden="true"></ion-icon></span><div><small>Exames feitos</small><strong>{{ historico.length }}</strong></div></article>
+        <article><span class="metric-icon green"><ion-icon name="eye-outline" aria-hidden="true"></ion-icon></span><div><small>Cobertura</small><strong>{{ cobertura }}%</strong><em>{{ perguntasPraticadas }}/{{ totalPerguntasBanco }}</em></div></article>
+        @if (consolidacaoAvaliada) {
+          <article><span class="metric-icon blue"><ion-icon name="bulb-outline" aria-hidden="true"></ion-icon></span><div><small>Retenção atual</small><strong>{{ retencao }}%</strong><em>{{ perguntasRetidas }}/{{ perguntasPraticadas }}</em></div></article>
+        }
+        <article><span class="metric-icon red"><ion-icon name="refresh-outline" aria-hidden="true"></ion-icon></span><div><small>A rever</small><strong>{{ perguntasARever }}</strong><em>erro ou revisão vencida</em></div></article>
+        <article><span class="metric-icon purple"><ion-icon name="document-text-outline" aria-hidden="true"></ion-icon></span><div><small>Exames feitos</small><strong>{{ historico.length }}</strong><em>resultados guardados</em></div></article>
       </section>
 
       <section class="themes-section">
@@ -34,16 +49,25 @@
                lia-se como ponto fraco. Os por praticar vão listados à parte. -->
           @for (tema of temasComDados; track tema.tema) {
             <article class="theme-row">
-              <div><strong>{{ nomeTema(tema.tema) }}</strong><small>{{ tema.respondidas }} questões</small></div>
-              <span class="theme-progress"><i [style.width.%]="tema.taxaAcerto * 100"></i></span>
-              <b>{{ tema.taxaAcerto * 100 | number:'1.0-0' }}%</b>
+              <div><strong>{{ nomeTema(tema.tema) }}</strong><small>{{ tema.retidas }}/{{ tema.praticadas }} retidas · {{ tema.consolidadas }} consolidadas</small></div>
+              <span class="theme-progress"><i [style.width.%]="tema.retencao"></i></span>
+              <b>{{ tema.retencao }}%</b>
             </article>
           } @empty {
             <p class="hint">Responde a algumas perguntas para veres o teu perfil por tema.</p>
           }
         </div>
-        @if (temasPorPraticar.length) {
-          <p class="untouched">Ainda por praticar: {{ nomesPorPraticar }}.</p>
+        @if (temasPorPraticar.length && alertaVisivel) {
+          <aside class="untouched" role="status" aria-live="polite" aria-label="Temas ainda por praticar">
+            <ion-icon name="alert-circle-outline" aria-hidden="true"></ion-icon>
+            <div>
+              <strong>Ainda por praticar</strong>
+              <p>{{ nomesPorPraticar }}</p>
+            </div>
+            <button type="button" (click)="alertaVisivel = false" aria-label="Fechar aviso">
+              <ion-icon name="close-outline" aria-hidden="true"></ion-icon>
+            </button>
+          </aside>
         }
       </section>
 

@@ -5,8 +5,8 @@
         <ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>
       </a>
       <div>
-        <span>CartaPro</span>
-        <h1>Desbloqueia tudo</h1>
+        <span>Acesso</span>
+        <h1>Plano completo</h1>
       </div>
     </header>
 
@@ -44,35 +44,13 @@
         </article>
       } @else {
         @if (plano; as venda) {
-          @if (catalogo?.promessa; as promessa) {
-            <h2 class="promise">{{ promessa }}</h2>
-          }
-
-          <!-- Prova com os números do próprio aluno. A barra diz o essencial;
-               a frase que a explicava por extenso era repetição. -->
-          @if (temProvaPessoal) {
-            <article class="proof-card">
-              <span class="proof-bar">
-                <i class="mine" [style.width.%]="taxaAcerto"></i>
-                <b class="mark" [style.left.%]="exigidoNoExame"></b>
-              </span>
-              <div class="proof-legend">
-                <span><strong>{{ taxaAcerto }}%</strong><small>estás</small></span>
-                @if (!jaChegaria) {
-                  <em>faltam {{ faltamPontos }} pontos</em>
-                }
-                <span class="target"><strong>{{ exigidoNoExame }}%</strong><small>INATRO</small></span>
-              </div>
-            </article>
-          }
-
           <article class="price-card">
             <strong class="price">{{ venda.preco | currency:moeda:'symbol':'1.0-2' }}</strong>
-            <small>{{ venda.periodo }} · {{ porDia | currency:moeda:'symbol':'1.0-2' }} por dia</small>
+            <small>{{ venda.periodo }}</small>
             @if (perguntasBloqueadas > 0) {
-              <p class="unlocks">Desbloqueias <strong>{{ perguntasBloqueadas }} perguntas</strong>, os exames completos e todo o material.</p>
+              <p class="unlocks"><strong>{{ perguntasBloqueadas }} perguntas</strong> · exames · material</p>
             } @else {
-              <p class="unlocks">Todo o banco, os exames completos e todo o material.</p>
+              <p class="unlocks">Perguntas · exames · material</p>
             }
           </article>
 
@@ -128,12 +106,7 @@
           </button>
 
           <!-- Garantia e segurança eram dois blocos; são o mesmo sinal. -->
-          <p class="trust">
-            @if (catalogo?.garantia; as garantia) {
-              <span><ion-icon name="ribbon-outline" aria-hidden="true"></ion-icon> {{ garantia }}</span>
-            }
-            <span><ion-icon name="shield-checkmark-outline" aria-hidden="true"></ion-icon> Confirmas com o teu PIN. Nunca o vemos.</span>
-          </p>
+          <p class="trust"><span><ion-icon name="shield-checkmark-outline" aria-hidden="true"></ion-icon> Pagamento confirmado no teu telemóvel.</span></p>
         } @else {
           <div class="empty-state">
             <ion-icon name="alert-circle-outline" aria-hidden="true"></ion-icon>

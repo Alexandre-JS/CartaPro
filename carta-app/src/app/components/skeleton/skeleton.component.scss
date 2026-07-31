@@ -20,13 +20,13 @@
 .tile .line.short { width: 55%; }
 .texto .line { max-width: 100%; }
 
-/* O brilho corre por cima; é a única indicação de que algo está a acontecer. */
+/* Pulso solido: comunica carregamento sem recorrer a gradientes. */
 .shape { position: relative; overflow: hidden; }
-.shape::after { position: absolute; inset: 0; background: linear-gradient(90deg, transparent, var(--skeleton-brilho), transparent); animation: brilho 1.35s ease-in-out infinite; content: ''; }
+.shape::after { position: absolute; inset: 0; background: var(--skeleton-brilho); animation: brilho 1.35s ease-in-out infinite; content: ''; }
 
 @keyframes brilho {
-  from { transform: translateX(-100%); }
-  to { transform: translateX(100%); }
+  0%, 100% { opacity: 0; }
+  50% { opacity: .45; }
 }
 
 /* Quem pediu menos movimento fica com o bloco estático — continua a ler-se

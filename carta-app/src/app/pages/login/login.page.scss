@@ -23,7 +23,7 @@
   place-items: center;
   height: clamp(168px, 25vh, 220px);
   padding: max(24px, env(safe-area-inset-top)) 24px 18px;
-  background: linear-gradient(180deg, #fff 25%, #fbfdfb 100%);
+  background: var(--app-color-white);
 }
 
 .brand-lockup {
@@ -74,8 +74,13 @@
   position: relative;
   height: clamp(128px, 20vh, 174px);
   overflow: hidden;
-  background: linear-gradient(180deg, #f8fcf8 0%, #e8f7e9 56%, #b9e0b7 57%, #75bd6e 100%);
+  background-color: var(--app-color-green-light);
+  background-image: url('/assets/backgrounds/estrada-aprendiz-mocambique.webp');
+  background-position: center 58%;
+  background-size: cover;
 }
+
+.road-scene > * { display: none; }
 
 .sun {
   position: absolute;
@@ -116,7 +121,7 @@
   left: 0;
   height: 66px;
   opacity: .62;
-  background: repeating-linear-gradient(90deg, transparent 0 13px, #cceacd 14px 39px, transparent 40px 46px);
+  background: #cceacd;
   clip-path: polygon(0 44%, 8% 44%, 8% 16%, 16% 16%, 16% 52%, 24% 52%, 24% 0, 31% 0, 31% 31%, 42% 31%, 42% 14%, 49% 14%, 49% 56%, 58% 56%, 58% 27%, 67% 27%, 67% 48%, 76% 48%, 76% 8%, 84% 8%, 84% 39%, 92% 39%, 92% 20%, 100% 20%, 100% 100%, 0 100%);
 }
 
@@ -155,7 +160,8 @@
   right: 0;
   left: 0;
   height: 3px;
-  background: repeating-linear-gradient(90deg, transparent 0 40px, #fff 41px 78px, transparent 79px 112px);
+  border-top: 3px dashed #fff;
+  background: transparent;
 }
 
 .car {
@@ -212,7 +218,7 @@ ion-note { display: block; margin: 5px 4px 0; font-size: .72rem; }
 .forgot-password { display: block; margin: 2px 0 20px auto; padding: 2px; color: var(--app-color-text-muted); font-size: .76rem; }
 
 .login-button {
-  --background: linear-gradient(135deg, var(--app-color-green-dark), var(--app-color-green));
+  --background: var(--app-color-action);
   --background-hover: var(--app-color-green-dark);
   --border-radius: 9px;
   --box-shadow: 0 7px 16px rgb(33 139 56 / 20%);

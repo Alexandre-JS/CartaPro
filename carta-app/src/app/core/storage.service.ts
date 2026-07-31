@@ -113,6 +113,11 @@ export class StorageService {
         return this.db.revisoes.where('agendadaPara').belowOrEqual(agora).sortBy('agendadaPara');
     }
 
+    /** Todo o estado de repetição espaçada, usado para medir consolidação. */
+    async listarRevisoes(): Promise<RevisaoAgendada[]> {
+        return this.db.revisoes.toArray();
+    }
+
     async contarRevisoesPendentes(agora = Date.now()): Promise<number> {
         return this.db.revisoes.where('agendadaPara').belowOrEqual(agora).count();
     }
