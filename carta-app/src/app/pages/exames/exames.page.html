@@ -20,12 +20,25 @@
         @for (exame of exames; track exame.numero) {
           <article class="exam-item" [class]="estadoExame(exame)" [class.locked]="exame.bloqueado">
             <div class="exam-card">
-              <span class="exam-number"><small>Exame</small><strong>{{ numeroFormatado(exame.numero) }}</strong></span>
+              <!-- O quadrado com "EXAME 02" dizia o que o nome já diz. O ícone
+                   da identidade visual — volante, estrada e visto — carrega a
+                   cor do estado, que antes só existia na borda do cartão. -->
+              <span class="exam-icon">
+                <app-icone-prova [comVisto]="!!exame.historico.length"></app-icone-prova>
+              </span>
               <span class="exam-copy">
+                <small class="exam-eyebrow">Prova de</small>
                 <strong>{{ exame.nome }}</strong>
-                <small><span>{{ exame.perguntas }} questões</span><i></i><span><ion-icon name="time-outline" aria-hidden="true"></ion-icon>{{ exame.minutos }} minutos</span></small>
+                <span class="exam-meta">
+                  <em class="pill">{{ exame.perguntas }} questões</em>
+                  <em><ion-icon name="time-outline" aria-hidden="true"></ion-icon>{{ exame.minutos }} min</em>
+                </span>
                 @if (exame.historico[0]; as ultimo) {
-                  <span class="status-label"><ion-icon name="checkmark-circle-outline" aria-hidden="true"></ion-icon> {{ rotuloEstado(exame) }} · {{ percentagem(ultimo) }}%</span>
+                  <span class="exam-progress">
+                    <i [style.width.%]="percentagem(ultimo)"></i>
+                    <b>{{ percentagem(ultimo) }}%</b>
+                  </span>
+                  <span class="status-label">{{ rotuloEstado(exame) }}</span>
                 } @else {
                   <span class="status-label">{{ rotuloEstado(exame) }}</span>
                 }

@@ -19,19 +19,9 @@
 .exam-item.failed { border-color: rgb(227 30 36 / 38%); }
 .exam-item.attention { border-color: rgb(245 197 24 / 65%); }
 .exam-item.passed { border-color: rgb(33 139 56 / 45%); }
-.exam-card { display: grid; grid-template-columns: 58px minmax(0, 1fr) auto; align-items: center; gap: 11px; min-height: 84px; padding: 13px; color: var(--app-color-text); }
-.exam-number { display: grid; width: 52px; height: 58px; place-content: center; border-radius: 9px; color: #fff; background: linear-gradient(145deg, var(--app-color-green-dark), var(--app-color-green)); text-align: center; }
-.pending .exam-number { background: linear-gradient(145deg, #737873, var(--app-color-road-gray)); }
-.failed .exam-number { background: linear-gradient(145deg, #b5161b, var(--app-color-red)); }
-.attention .exam-number { color: #4b3900; background: linear-gradient(145deg, #dda900, var(--app-color-yellow)); }
-.exam-number small { font-size: .48rem; text-transform: uppercase; letter-spacing: .06em; opacity: .9; }
-.exam-number strong { margin-top: 2px; font-size: 1.18rem; line-height: 1; }
-.exam-copy { display: grid; min-width: 0; gap: 7px; }
-.exam-copy > strong { font-size: .75rem; }
-.exam-copy > small { display: flex; align-items: center; gap: 7px; color: var(--app-color-text-muted); font-size: .58rem; }
-.exam-copy small span { display: flex; align-items: center; gap: 3px; }
-.exam-copy small i { width: 3px; height: 3px; border-radius: 50%; background: #a8afa9; }
-.status-label { display: flex; align-items: center; gap: 4px; color: var(--app-color-text-muted); font-size: .59rem; font-weight: 700; }
+.exam-card { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; align-items: center; gap: 11px; min-height: 84px; padding: 13px; color: var(--app-color-text); }
+.exam-copy { display: grid; min-width: 0; gap: 1px; }
+.status-label { margin-top: 5px; color: var(--app-color-text-muted); font-size: .55rem; font-weight: 600; }
 .failed .status-label { color: var(--app-color-red); }
 .attention .status-label { color: #9a6800; }
 .passed .status-label { color: var(--app-color-green-dark); }
@@ -50,6 +40,41 @@
 
 /* Prova fechada: visível para o aluno saber que existe, sem parecer avariada. */
 .exam-item.locked { border-color: #e7ce7d; background: #fffdf7; }
-.exam-item.locked .exam-number { background: linear-gradient(145deg, #b9a05a, #d8bd6c); }
 .exam-item.locked .exam-copy > strong { color: var(--app-color-text-muted); }
 .start-action.locked { color: #8a6000; background: #fdf0d0; }
+
+/* Identidade visual da prova: volante, estrada e visto, num círculo tingido
+   pelo estado. As cores são as da folha de identidade. */
+.exam-icon { display: grid; width: 54px; height: 54px; place-items: center; border-radius: 50%; }
+.exam-icon app-icone-prova { width: 34px; height: 34px; }
+.pending .exam-icon { color: #666; background: #f1f2f3; }
+.passed .exam-icon { color: #21b838; background: #e8f7ea; }
+.attention .exam-icon { color: #f5c518; background: #fff8e1; }
+.failed .exam-icon { color: #e31e24; background: #fdeaea; }
+.exam-item.locked .exam-icon { color: #b9a05a; background: #fdf6e3; }
+
+.exam-eyebrow { color: var(--app-color-text-muted); font-size: .52rem; }
+.exam-copy > strong { font-size: .82rem; line-height: 1.25; }
+.exam-meta { display: flex; align-items: center; gap: 8px; margin-top: 5px; }
+.exam-meta em { display: inline-flex; align-items: center; gap: 4px; color: var(--app-color-text-muted); font-size: .55rem; font-style: normal; }
+.exam-meta .pill { padding: 3px 8px; border-radius: 20px; background: #eef1ef; font-weight: 600; }
+.passed .exam-meta .pill { color: #14532d; background: #e8f7ea; }
+.attention .exam-meta .pill { color: #7a5c00; background: #fff8e1; }
+.failed .exam-meta .pill { color: #7f1d1d; background: #fdeaea; }
+
+/* Barra do último resultado — o número que antes só aparecia em texto. */
+.exam-progress { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 9px; margin-top: 8px; }
+.exam-progress::before { grid-area: 1 / 1; height: 5px; border-radius: 4px; background: #eef1ef; content: ''; }
+.exam-progress i { grid-area: 1 / 1; height: 5px; border-radius: 4px; background: currentColor; }
+.exam-progress b { font-size: .6rem; }
+.passed .exam-progress { color: #21b838; }
+.attention .exam-progress { color: #f5c518; }
+.failed .exam-progress { color: #e31e24; }
+.pending .exam-progress { color: #666; }
+
+/* Estados de vazio e de erro: usavam classes que esta página nunca definiu. */
+.empty-state { display: grid; justify-items: center; gap: 9px; padding: 40px 20px; text-align: center; }
+.empty-state ion-icon { color: var(--app-color-road-gray); font-size: 2.6rem; }
+.empty-state strong { font-size: .82rem; }
+.empty-state p { max-width: 34ch; margin: 0; color: var(--app-color-text-muted); font-size: .64rem; line-height: 1.5; }
+.empty-state .primary-button { display: inline-flex; min-height: 44px; align-items: center; gap: 8px; margin-top: 6px; padding: 0 18px; border: 0; border-radius: 12px; color: #fff; background: linear-gradient(135deg, var(--app-color-green-dark), var(--app-color-green)); font: inherit; font-size: .72rem; font-weight: 700; cursor: pointer; }

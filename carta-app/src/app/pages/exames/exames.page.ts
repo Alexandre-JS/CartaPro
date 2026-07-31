@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
+import { IconeProvaComponent } from '../../components/icone-prova/icone-prova.component';
 import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
 import { addIcons } from 'ionicons';
 import { bookOutline, checkmarkCircleOutline, lockClosed, chevronDownOutline, chevronForwardOutline, chevronUpOutline, cloudOfflineOutline, documentTextOutline, refreshOutline, schoolOutline, timeOutline } from 'ionicons/icons';
@@ -26,7 +27,7 @@ interface ExameDisponivel {
 @Component({
     standalone: true,
     selector: 'app-exames',
-    imports: [DatePipe, RouterLink, IonContent, IonIcon, BottomNavComponent, SkeletonComponent],
+    imports: [DatePipe, RouterLink, IonContent, IonIcon, BottomNavComponent, SkeletonComponent, IconeProvaComponent],
     templateUrl: './exames.page.html',
     styleUrls: ['./exames.page.scss'],
 })

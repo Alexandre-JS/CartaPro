@@ -12,7 +12,7 @@
             <div class="field"><label>Artigo de referência</label><input type="number" name="article_ref" min="1"></div>
             <div class="field full"><label>Definição</label><textarea name="definition" maxlength="2000" rows="4" required></textarea></div>
             <div class="field"><label>Ordem</label><input type="number" name="sort_order" min="0" value="0"></div>
-            <div class="field full"><div class="checks"><label><input type="checkbox" name="is_active" value="1" checked> Ativo</label></div></div>
+            <div class="field full"><div class="checks"><label><input type="checkbox" name="is_active" value="1" checked> Ativo</label><label><input type="checkbox" name="is_locked" value="1"> Plano completo</label></div></div>
             <div class="form-actions full"><button class="btn">Adicionar termo</button></div>
         </form>
     @endif
@@ -29,7 +29,7 @@
                         <td><strong>{{ $term->term }}</strong><br><small>{{ $term->slug }}</small></td>
                         <td>{{ str($term->definition)->limit(160) }}</td>
                         <td>{{ $term->article_ref ? 'Art. '.$term->article_ref : '—' }}</td>
-                        <td><span class="status {{ $term->is_active ? 'active' : 'inactive' }}">{{ $term->is_active ? 'Ativo' : 'Inativo' }}</span></td>
+                        <td><span class="status {{ $term->is_active ? 'active' : 'inactive' }}">{{ $term->is_active ? 'Ativo' : 'Inativo' }}</span> <span class="status {{ $term->is_locked ? 'review' : 'approved' }}">{{ $term->is_locked ? 'Plano completo' : 'Gratuito' }}</span></td>
                         <td class="actions">
                             <a class="btn light small" href="{{ route('admin.glossary.show', $term) }}">Ver</a>
                             @if(auth()->user()->isAdmin())

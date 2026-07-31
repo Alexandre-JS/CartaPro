@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Admin\AmostraController;
 use App\Http\Controllers\Admin\ApprovalController;
 use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\ClassroomController;
@@ -85,10 +84,8 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         Route::resource('categories', LicenseCategoryController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::patch('/exams/{exam}/publish', [ExamController::class, 'publish'])->name('exams.publish');
         Route::patch('/exams/{exam}/archive', [ExamController::class, 'archive'])->name('exams.archive');
-        // O que o plano gratuito mostra. Marcar item a item existia desde o
-        // início; o que faltava era poder fazê-lo à escala do catálogo.
-        Route::get('/amostra', [AmostraController::class, 'index'])->name('amostra.index');
-        Route::post('/amostra', [AmostraController::class, 'store'])->name('amostra.store');
+        // Gratuita ou plano completo, sem ter de apagar e recriar a prova.
+        Route::patch('/exams/{exam}/plano', [ExamController::class, 'plan'])->name('exams.plan');
         Route::get('/publications', [PublicationController::class, 'index'])->name('publications.index');
         Route::post('/publications', [PublicationController::class, 'publish'])->name('publications.publish');
         Route::patch('/publications/{package}/restore', [PublicationController::class, 'restore'])->name('publications.restore');

@@ -4,54 +4,20 @@ namespace Tests\Feature;
 
 use App\Models\Exam;
 use App\Models\Question;
-use App\Models\Sign;
 use App\Models\Topic;
-use App\Services\AmostraGratuita;
 use App\Services\EntitlementService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class AmostraGratuitaTest extends TestCase
+/**
+ * Conteúdo pago.
+ *
+ * O plano de cada conteúdo é decidido no painel, item a item — não há regra
+ * automática por trás. O app limita-se a consumir a decisão: nunca a toma.
+ */
+class ConteudoPagoTest extends TestCase
 {
     use RefreshDatabase;
-
-    public function test_the_rule_leaves_the_first_n_of_every_group_open(): void
-    {
-        $temas = collect(['sinais', 'prioridade', 'velocidade'])
-            ->map(fn (string $slug) => Topic::create(['slug' => $slug, 'name' => ucfirst($slug)]));
-
-        foreach ($temas as $tema) {
-            foreach (range(1, 6) as $ordem) {
-                $this->pergunta($tema->id, $ordem);
-            }
-        }
-
-        app(AmostraGratuita::class)->aplicar(['perguntas' => 2]);
-
-        // Em profundidade: o aluno prova os três temas e bate no cadeado dentro
-        // de cada um, em vez de encontrar temas inteiros fechados.
-        foreach ($temas as $tema) {
-            $doTema = Question::where('topic_id', $tema->id)->orderBy('sort_order')->get();
-
-            $this->assertEquals([false, false, true, true, true, true], $doTema->pluck('is_locked')->all(),
-                "Tema {$tema->slug}: deviam ficar livres as duas primeiras.");
-        }
-    }
-
-    public function test_simulating_changes_nothing(): void
-    {
-        $tema = Topic::create(['slug' => 'sinais', 'name' => 'Sinais']);
-        foreach (range(1, 5) as $ordem) {
-            $this->pergunta($tema->id, $ordem);
-        }
-
-        $plano = app(AmostraGratuita::class)->simular(['perguntas' => 2]);
-
-        $this->assertSame(2, $plano['perguntas']['livres']);
-        $this->assertSame(3, $plano['perguntas']['bloqueados']);
-        // O operador tem de poder ver o efeito antes de se comprometer.
-        $this->assertSame(0, Question::where('is_locked', true)->count());
-    }
 
     public function test_the_free_plan_never_receives_a_half_exam(): void
     {
@@ -172,27 +138,6 @@ class AmostraGratuitaTest extends TestCase
         $this->assertSame(0, $filtrado['sinaisBloqueados']);
     }
 
-    public function test_only_playable_exams_are_left_open(): void
-    {
-        $tema = Topic::create(['slug' => 'sinais', 'name' => 'Sinais']);
-        $perguntas = collect(range(1, 6))->map(fn (int $ordem) => $this->pergunta($tema->id, $ordem));
-
-        // A primeira usa só perguntas que ficam livres; a segunda apanha uma das
-        // que vão fechar.
-        $jogavel = $this->prova('Exame 01', $perguntas->take(2));
-        $inutil = $this->prova('Exame 02', $perguntas->slice(4, 2));
-
-        app(AmostraGratuita::class)->aplicar(['perguntas' => 3, 'exames' => 2]);
-
-        /*
-         * Abrir "as duas primeiras" por ordem daria ao aluno uma prova que vê
-         * mas não consegue abrir — basta uma pergunta fechada para fechar a
-         * prova inteira. Pior do que não a ter.
-         */
-        $this->assertFalse($jogavel->fresh()->is_locked, 'A prova só com perguntas livres devia abrir.');
-        $this->assertTrue($inutil->fresh()->is_locked, 'A prova com uma pergunta fechada não é jogável.');
-    }
-
     public function test_a_locked_exam_cannot_be_opened_by_a_free_account(): void
     {
         $tema = Topic::create(['slug' => 'sinais', 'name' => 'Sinais']);
@@ -213,6 +158,37 @@ class AmostraGratuitaTest extends TestCase
         $this->assertTrue(collect($lista)->firstWhere('id', $prova->id)['bloqueado'], 'A lista tem de dizer que está fechada.');
     }
 
+    public function test_admin_can_switch_an_exam_between_free_and_paid(): void
+    {
+        $tema = Topic::create(['slug' => 'sinais', 'name' => 'Sinais']);
+        $prova = $this->prova('Exame 01', collect([$this->pergunta($tema->id, 1)]));
+
+        $admin = \App\Models\User::factory()->create(['role' => 'admin']);
+
+        /*
+         * Alternar em vez de editar: as provas não têm formulário de edição, e
+         * obrigar a apagar e recriar uma prova só para mudar o plano seria
+         * absurdo.
+         */
+        $this->actingAs($admin)->patch(route('admin.exams.plan', $prova))->assertRedirect();
+        $this->assertTrue($prova->fresh()->is_locked);
+
+        $this->actingAs($admin)->patch(route('admin.exams.plan', $prova))->assertRedirect();
+        $this->assertFalse($prova->fresh()->is_locked);
+    }
+
+    public function test_a_private_exam_has_no_plan_to_switch(): void
+    {
+        $tema = Topic::create(['slug' => 'sinais', 'name' => 'Sinais']);
+        $prova = $this->prova('Prova da escola', collect([$this->pergunta($tema->id, 1)]));
+        $prova->update(['is_public' => false]);
+
+        $admin = \App\Models\User::factory()->create(['role' => 'admin']);
+
+        // Uma prova privada não chega ao aplicativo: não há plano a definir.
+        $this->actingAs($admin)->patch(route('admin.exams.plan', $prova))->assertStatus(422);
+    }
+
     private function prova(string $nome, $perguntas): Exam
     {
         $prova = Exam::create([
@@ -227,24 +203,6 @@ class AmostraGratuitaTest extends TestCase
         )->all());
 
         return $prova;
-    }
-
-    public function test_signs_are_sampled_per_category(): void
-    {
-        foreach (['perigo', 'proibicao'] as $categoria) {
-            foreach (range(1, 4) as $ordem) {
-                Sign::create([
-                    'name' => "{$categoria} {$ordem}", 'slug' => "{$categoria}-{$ordem}",
-                    'category' => $categoria, 'meaning' => 'x', 'file_path' => "sinais/{$categoria}-{$ordem}.svg",
-                    'sort_order' => $ordem, 'is_active' => true,
-                ]);
-            }
-        }
-
-        app(AmostraGratuita::class)->aplicar(['sinais' => 1]);
-
-        $this->assertSame(2, Sign::where('is_locked', false)->count(), 'Um sinal livre por categoria.');
-        $this->assertSame(6, Sign::where('is_locked', true)->count());
     }
 
     private function pergunta(int $temaId, int $ordem): Question
