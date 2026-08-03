@@ -3,7 +3,6 @@ import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Va
 import { Router, RouterLink } from '@angular/router';
 import {
     IonButton,
-    IonCheckbox,
     IonContent,
     IonIcon,
     IonInput,
@@ -31,7 +30,6 @@ function palavrasPasseIguais(controle: AbstractControl): ValidationErrors | null
         ReactiveFormsModule,
         RouterLink,
         IonButton,
-        IonCheckbox,
         IonContent,
         IonIcon,
         IonInput,
@@ -64,7 +62,6 @@ export class RegistoPage {
             telefone: ['', [Validators.required, Validators.pattern(/^[0-9+ ]{8,16}$/)]],
             palavraPasse: ['', [Validators.required, Validators.minLength(6)]],
             confirmarPalavraPasse: ['', [Validators.required]],
-            termos: [false, [Validators.requiredTrue]],
         }, { validators: palavrasPasseIguais });
     }
 

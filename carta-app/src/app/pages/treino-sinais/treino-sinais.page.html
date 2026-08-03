@@ -18,7 +18,7 @@
     }
 
     @if (carregando) {
-      <section class="train-content"><p class="hint">A preparar o treino…</p></section>
+      <section class="train-content"><app-skeleton variante="cartao" [quantidade]="1" etiqueta="A preparar o treino"></app-skeleton></section>
     } @else if (!perguntas.length) {
       <section class="empty-state">
         <ion-icon name="warning-outline" aria-hidden="true"></ion-icon>

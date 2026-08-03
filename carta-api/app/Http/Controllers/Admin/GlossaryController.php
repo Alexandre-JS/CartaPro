@@ -55,7 +55,10 @@ class GlossaryController extends Controller
             'article_ref' => ['nullable', 'integer', 'min:1'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
             'is_active' => ['nullable', 'boolean'],
+            'is_locked' => ['nullable', 'boolean'],
         ]);
+        // Cada termo decide o seu plano: não há regra automática por trás.
+        $data['is_locked'] = $request->boolean('is_locked');
 
         $data['slug'] = ($data['slug'] ?? null) ?: Str::slug($data['term']);
         $data['sort_order'] = (int) ($data['sort_order'] ?? 0);

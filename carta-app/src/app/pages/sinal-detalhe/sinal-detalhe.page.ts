@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
+import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
 import { addIcons } from 'ionicons';
 import {
     albumsOutline, arrowBackOutline, arrowForwardCircleOutline, bookOutline, checkmarkCircle, chevronBackOutline,
@@ -20,7 +21,7 @@ import { ArtigoCodigoEstrada, BlocoTexto, LicaoEstudo, SinalTransito, TaxonomiaI
 @Component({
     standalone: true,
     selector: 'app-sinal-detalhe',
-    imports: [RouterLink, IonContent, IonIcon],
+    imports: [RouterLink, IonContent, IonIcon, SkeletonComponent],
     templateUrl: './sinal-detalhe.page.html',
     styleUrls: ['./sinal-detalhe.page.scss'],
 })
@@ -65,15 +66,29 @@ export class SinalDetalhePage implements OnInit {
         this.artigoAberto = !this.artigoAberto;
     }
 
+    /**
+     * Sem `finally`, qualquer falha num destes `await` deixava `carregando` a
+     * true para sempre e a página ficava presa a rodar, sem erro visível.
+     */
     private async mostrar(slug: string): Promise<void> {
         this.carregando = true;
         this.artigoAberto = false;
 
+        try {
+            await this.carregarSinal(slug);
+        } catch (erro) {
+            console.error('CartaPro: falha ao abrir o sinal.', erro);
+            this.sinal = undefined;
+        } finally {
+            this.carregando = false;
+        }
+    }
+
+    private async carregarSinal(slug: string): Promise<void> {
         const sinal = await this.material.sinal(slug);
 
         if (!sinal) {
             this.sinal = undefined;
-            this.carregando = false;
             return;
         }
 
@@ -99,7 +114,5 @@ export class SinalDetalhePage implements OnInit {
 
         // Abrir o sinal conta como estudado: é o que o ecrã de sinais promete.
         await this.material.marcarSinalVisto(sinal.slug);
-
-        this.carregando = false;
     }
 }

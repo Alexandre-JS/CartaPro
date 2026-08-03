@@ -1,9 +1,11 @@
 :host { display: block; }
 
-.signs-page { --background: #edf2ee; }
+.signs-page { --background: var(--app-color-page); }
 .signs-shell { width: min(100%, 560px); min-height: 100%; margin: 0 auto; padding-bottom: calc(88px + env(safe-area-inset-bottom)); overflow: hidden; background: var(--app-color-light-gray); box-shadow: 0 0 42px rgb(32 33 36 / 10%); }
 
-.signs-header { display: grid; grid-template-columns: 42px 1fr auto; align-items: center; gap: 12px; min-height: 118px; padding: max(28px, env(safe-area-inset-top)) 18px 24px; color: #fff; background: linear-gradient(145deg, var(--app-color-green-dark), var(--app-color-green)); }
+.signs-header { position: relative; display: grid; grid-template-columns: 42px 1fr auto; align-items: center; gap: 12px; min-height: 148px; padding: max(28px, env(safe-area-inset-top)) 18px 24px; overflow: hidden; color: #fff; background-color: var(--app-color-brand-panel); background-image: url('/assets/backgrounds/Sinais-de-conducao.webp'); background-position: center 43%; background-size: cover; }
+.signs-header::before { position: absolute; inset: 0; background: rgb(23 106 42 / 55%); content: ''; }
+.signs-header > * { position: relative; z-index: 1; }
 .signs-header .icon-button { display: grid; width: 40px; height: 40px; place-items: center; border-radius: 50%; color: #fff; background: rgb(255 255 255 / 13%); text-decoration: none; }
 .signs-header span { font-size: .58rem; text-transform: uppercase; letter-spacing: .07em; opacity: .85; }
 .signs-header h1 { margin: 4px 0 0; font-size: 1.1rem; font-weight: 600; }
@@ -11,23 +13,22 @@
 
 .signs-content { padding: 16px 18px 0; }
 
-.progress-card { display: grid; gap: 10px; padding: 14px 16px; border: 1px solid #e1e7e2; border-radius: 14px; background: #fff; }
+.progress-card { display: grid; gap: 10px; padding: 14px 16px; border: 1px solid var(--app-color-border-subtle); border-radius: 14px; background: #fff; }
 .progress-card strong { display: block; font-size: .82rem; }
 .progress-card small { color: var(--app-color-text-muted); font-size: .68rem; }
-.progress-bar { display: block; height: 6px; overflow: hidden; border-radius: 6px; background: #e4e8e5; }
-.progress-bar i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--app-color-green-dark), var(--app-color-green)); }
+.progress-bar { display: block; height: 6px; overflow: hidden; border-radius: 6px; background: var(--app-color-track); }
+.progress-bar i { display: block; height: 100%; border-radius: inherit; background: var(--app-color-green-dark); }
 
-.train-actions { display: grid; gap: 8px; margin-top: 12px; }
 .primary-button, .outline-button { display: flex; min-height: 48px; align-items: center; justify-content: center; gap: 8px; border-radius: 12px; font-size: .78rem; font-weight: 700; text-decoration: none; }
-.primary-button { color: #fff; background: linear-gradient(135deg, var(--app-color-green-dark), var(--app-color-green)); }
-.outline-button { border: 1px solid #e7ce7d; color: #7a5600; background: #fff9e8; }
+.primary-button { color: #fff; background: var(--app-color-action); }
+.outline-button { border: 1px solid var(--app-color-warning-border); color: var(--app-color-warning-text); background: var(--app-color-warning-soft); }
 
-.locked-notice { display: flex; align-items: center; gap: 11px; margin-top: 12px; padding: 12px 14px; border: 1px solid #e7ce7d; border-radius: 12px; background: #fffaf0; color: #7a5600; text-decoration: none; }
+.locked-notice { display: flex; align-items: center; gap: 11px; margin-top: 12px; padding: 12px 14px; border: 1px solid var(--app-color-warning-border); border-radius: 12px; background: var(--app-color-warning-soft); color: var(--app-color-warning-text); text-decoration: none; }
 .locked-notice ion-icon { flex: 0 0 auto; font-size: 1.3rem; }
 .locked-notice strong { display: block; font-size: .8rem; }
 .locked-notice small { font-size: .68rem; opacity: .85; }
 
-.signs-search { --background: #fff; --border-radius: 12px; --box-shadow: none; margin: 14px 0 4px; padding: 0; border: 1px solid #e1e7e2; border-radius: 12px; }
+.signs-search { --background: #fff; --border-radius: 12px; --box-shadow: none; margin: 14px 0 4px; padding: 0; border: 1px solid var(--app-color-border-subtle); border-radius: 12px; }
 
 .category-chips { display: flex; gap: 7px; margin: 10px -18px 0; padding: 4px 18px 8px; overflow-x: auto; scrollbar-width: none; }
 .category-chips::-webkit-scrollbar { display: none; }
@@ -37,7 +38,7 @@
 .category-hint { margin: 8px 0 0; color: var(--app-color-text-muted); font-size: .72rem; line-height: 1.5; }
 
 .signs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-top: 14px; }
-.sign-card { display: grid; gap: 7px; padding: 13px 12px; border: 1px solid #e1e7e2; border-radius: 14px; background: #fff; color: inherit; text-decoration: none; }
+.sign-card { display: grid; gap: 7px; padding: 13px 12px; border: 1px solid var(--app-color-border-subtle); border-radius: 14px; background: #fff; color: inherit; text-decoration: none; }
 .sign-image { position: relative; display: grid; height: 84px; place-items: center; border-radius: 10px; background: #f4f7f4; }
 .sign-image img { width: auto; max-width: 78px; max-height: 74px; }
 .sign-image > ion-icon { color: var(--app-color-green-dark); font-size: 2.2rem; }
@@ -51,13 +52,19 @@
 .empty-state h2 { margin: 14px 0 6px; font-size: 1.05rem; }
 .empty-state p { max-width: 300px; margin: 0; color: var(--app-color-text-muted); font-size: .76rem; line-height: 1.55; }
 
-.bottom-nav { position: fixed; z-index: 20; bottom: 0; left: 50%; display: grid; grid-template-columns: repeat(5, 1fr); width: min(100%, 560px); min-height: calc(67px + env(safe-area-inset-bottom)); padding: 8px 5px env(safe-area-inset-bottom); border-top: 1px solid #e7e9e7; background: rgb(255 255 255 / 96%); box-shadow: 0 -4px 18px rgb(32 33 36 / 8%); backdrop-filter: blur(12px); transform: translateX(-50%); }
-.bottom-nav a { display: flex; min-width: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; color: var(--app-color-road-gray); text-decoration: none; }
-.bottom-nav ion-icon { font-size: 1.25rem; }
-.bottom-nav span { font-size: .54rem; }
-.bottom-nav .active { color: var(--app-color-green-dark); font-weight: 600; }
 
 @media (min-width: 700px) {
   .signs-shell { min-height: calc(100vh - 48px); margin-block: 24px; border-radius: 28px; }
-  .bottom-nav { bottom: 24px; border-radius: 0 0 28px 28px; }
 }
+
+/* Progresso reduzido a uma linha e o treino junto aos resultados que filtra. */
+.progress-card.slim { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 12px; }
+.progress-card.slim strong { white-space: nowrap; }
+.train-cta { margin-bottom: 14px; }
+
+/* Bloqueado: reconhece-se de relance sem parecer avariado. */
+.sign-card.locked { opacity: .78; }
+.sign-card.locked .sign-image img { filter: grayscale(1); opacity: .55; }
+.sign-card.locked strong { color: var(--app-color-text-muted); }
+.lock-badge { position: absolute; right: 4px; bottom: 4px; color: var(--app-color-warning-text); background: #fff; border-radius: 50%; font-size: 1rem; }
+.locked-hint { color: var(--app-color-green-dark); font-weight: 700; }

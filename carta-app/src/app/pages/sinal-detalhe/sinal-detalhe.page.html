@@ -11,7 +11,7 @@
     </header>
 
     @if (carregando) {
-      <section class="sign-content"><p class="hint">A carregar…</p></section>
+      <section class="sign-content"><app-skeleton variante="cartao" [quantidade]="1" etiqueta="A carregar o sinal"></app-skeleton><app-skeleton variante="texto" [quantidade]="4"></app-skeleton></section>
     } @else if (!sinal) {
       <section class="empty-state">
         <ion-icon name="warning-outline" aria-hidden="true"></ion-icon>

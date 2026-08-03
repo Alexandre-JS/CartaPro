@@ -2,11 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { IonContent, IonIcon, IonSearchbar } from '@ionic/angular/standalone';
+import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
 import { addIcons } from 'ionicons';
-import {
-    arrowBackOutline, bookOutline, chevronDownOutline, chevronForwardOutline, createOutline,
-    documentTextOutline, home, personOutline, statsChartOutline, textOutline,
-} from 'ionicons/icons';
+import { arrowBackOutline, bookOutline, chevronDownOutline, lockClosed, chevronForwardOutline, documentTextOutline, textOutline } from 'ionicons/icons';
 import { MaterialEstudoService } from '../../core/material-estudo.service';
 import { normalizarTexto } from '../../core/texto';
 import { TermoGlossario } from '../../models/material-estudo.model';
@@ -26,7 +24,7 @@ interface LetraGlossario {
 @Component({
     standalone: true,
     selector: 'app-glossario',
-    imports: [FormsModule, RouterLink, IonContent, IonIcon, IonSearchbar],
+    imports: [FormsModule, RouterLink, IonContent, IonIcon, IonSearchbar, SkeletonComponent],
     templateUrl: './glossario.page.html',
     styleUrls: ['./glossario.page.scss'],
 })
@@ -37,10 +35,7 @@ export class GlossarioPage implements OnInit {
     carregando = true;
 
     constructor(private readonly material: MaterialEstudoService) {
-        addIcons({
-            arrowBackOutline, bookOutline, chevronDownOutline, chevronForwardOutline, createOutline,
-            documentTextOutline, home, personOutline, statsChartOutline, textOutline,
-        });
+        addIcons({ arrowBackOutline, bookOutline, chevronDownOutline, lockClosed, chevronForwardOutline, documentTextOutline, textOutline });
     }
 
     async ngOnInit(): Promise<void> {

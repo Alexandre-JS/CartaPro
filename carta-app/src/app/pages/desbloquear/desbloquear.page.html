@@ -1,65 +1,156 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Plano completo</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" class="unlock-page">
+  <main class="unlock-shell">
+    <header class="unlock-header">
+      <a class="icon-button" routerLink="/perfil" aria-label="Voltar ao perfil">
+        <ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>
+      </a>
+      <div>
+        <span>Acesso</span>
+        <h1>Plano completo</h1>
+      </div>
+    </header>
 
-<ion-content class="ion-padding">
+    <!-- Esta página tinha catorze blocos empilhados — promessa com parágrafo,
+         prova com prose, quatro benefícios, dois títulos de passo, garantia e
+         nota de segurança separadas. Ficou o que decide a compra: o que ele
+         ganha, onde está, quanto custa, e como confirma. -->
+    <section class="unlock-content">
+      @if (carregando) {
+        <app-skeleton variante="cartao" [quantidade]="1" etiqueta="A preparar o teu acesso"></app-skeleton>
+      } @else if (etapa === 'ativo') {
+        <article class="active-card">
+          <span class="active-icon"><ion-icon name="checkmark-circle" aria-hidden="true"></ion-icon></span>
+          <h2>Tens tudo desbloqueado!</h2>
+          @if (estado.expiraEm) {
+            <small class="validity">Até {{ estado.expiraEm | slice:0:10 }}@if (estado.diasRestantes != null) { — faltam {{ estado.diasRestantes }} dias}.</small>
+          }
+          <a class="primary-button" routerLink="/inicio">Começar a estudar <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>
+        </article>
+      } @else if (etapa === 'aguardar') {
+        <article class="waiting-card" role="status" aria-live="polite">
+          <span class="waiting-icon"><ion-icon name="phone-portrait-outline" aria-hidden="true"></ion-icon></span>
+          <h2>Estás quase lá!</h2>
+          @if (checkoutUrl) {
+            <p>Termina na página {{ metodo?.nome }} que se abriu.</p>
+            <button type="button" class="primary-button" (click)="abrirCheckout()">
+              <ion-icon name="open-outline" aria-hidden="true"></ion-icon>
+              Abrir página {{ metodo?.nome }}
+            </button>
+          } @else {
+            <p>Confirma o pedido {{ metodo?.nome }} em <strong>{{ carteira }}</strong> com o teu PIN.</p>
+          }
+          <span class="waiting-bar" aria-hidden="true"><i></i></span>
+          <small>{{ segundosAEsperar }}s</small>
+        </article>
+      } @else {
+        @if (plano; as venda) {
+          <article class="price-card">
+            <strong class="price">{{ venda.preco | currency:moeda:'symbol':'1.0-2' }}</strong>
+            <small>{{ venda.periodo }}</small>
+            @if (perguntasBloqueadas > 0) {
+              <p class="unlocks"><strong>{{ perguntasBloqueadas }} perguntas</strong> · exames · material</p>
+            } @else {
+              <p class="unlocks">Perguntas · exames · material</p>
+            }
+          </article>
 
-  @if (etapa === 'ativo') {
-    <section class="unlock-card active">
-      <h2>Plano completo ativo</h2>
-      <p>
-        Tens acesso a todo o conteúdo neste número.
-        @if (estado.expiraEm) {
-          Válido até {{ estado.expiraEm | slice:0:10 }}@if (estado.diasRestantes !== null && estado.diasRestantes !== undefined) { ({{ estado.diasRestantes }} dias){{ '' }}}.
-        }
-      </p>
-    </section>
-    <ion-button fill="clear" expand="block" routerLink="/inicio">Ir estudar</ion-button>
-  } @else {
-    <section class="unlock-card">
-      <h2>O que ganhas</h2>
-      <p>
-        @if (perguntasBloqueadas > 0) {
-          Mais {{ perguntasBloqueadas }} perguntas com explicação e artigo do Código, além dos exames completos.
+          <div class="method-row" role="radiogroup" aria-label="Carteira móvel">
+            @for (opcao of metodos; track opcao.chave) {
+              <button
+                type="button"
+                role="radio"
+                class="method-button"
+                [class]="opcao.chave"
+                [class.active]="metodo?.chave === opcao.chave"
+                [attr.aria-checked]="metodo?.chave === opcao.chave"
+                (click)="escolherMetodo(opcao)">
+                <strong>{{ opcao.nome }}</strong>
+              </button>
+            }
+          </div>
+
+          <!-- Confirmação do número: cobrar sempre o número da conta deixava
+               sem forma de pagar quem tem a carteira noutro número. -->
+          @if (editarNumero) {
+            <ion-item lines="none" class="phone-field">
+              <ion-input
+                type="tel"
+                inputmode="numeric"
+                autocomplete="tel"
+                label="Número da carteira"
+                labelPlacement="stacked"
+                placeholder="84 123 4567"
+                [(ngModel)]="carteira">
+              </ion-input>
+            </ion-item>
+          } @else {
+            <button type="button" class="phone-row" (click)="editarNumero = true">
+              <ion-icon name="phone-portrait-outline" aria-hidden="true"></ion-icon>
+              <span><strong>{{ catalogo?.telefone }}</strong><small>Sai deste número</small></span>
+              <em>Alterar</em>
+            </button>
+          }
+
+          @if (numeroNaoBate) {
+            <p class="warning" role="status">
+              <ion-icon name="alert-circle-outline" aria-hidden="true"></ion-icon>
+              Este número é {{ metodoDoNumero?.operadora }} — usa {{ metodoDoNumero?.nome }}.
+            </p>
+          }
+
+          <!-- O valor fica no botão de propósito: linguagem calorosa, mecânica
+               transparente. Ninguém deve confirmar sem saber quanto. -->
+          <button type="button" class="primary-button pay" [disabled]="ocupado || !numeroValido || !metodo" (click)="pagar()">
+            <ion-icon name="lock-open-outline" aria-hidden="true"></ion-icon>
+            {{ ocupado ? 'A preparar…' : 'Desbloquear por ' + (venda.preco | currency:moeda:'symbol':'1.0-2') }}
+          </button>
+
+          <!-- Garantia e segurança eram dois blocos; são o mesmo sinal. -->
+          <p class="trust"><span><ion-icon name="shield-checkmark-outline" aria-hidden="true"></ion-icon> Pagamento confirmado no teu telemóvel.</span></p>
         } @else {
-          Acesso a todo o banco de perguntas, com explicação e artigo do Código em cada uma.
+          <div class="empty-state">
+            <ion-icon name="alert-circle-outline" aria-hidden="true"></ion-icon>
+            <strong>Sem planos disponíveis</strong>
+            <p>Tenta novamente dentro de momentos.</p>
+          </div>
         }
-      </p>
+
+        <!-- Via manual: quem já ativou por fora e o apoio registou. -->
+        @if (etapa === 'codigo') {
+          <section class="manual-card">
+            <h2>Já ativaste por fora?</h2>
+            <ion-item lines="none" class="code-field">
+              <ion-input
+                type="tel"
+                inputmode="numeric"
+                maxlength="6"
+                label="Código recebido por SMS"
+                labelPlacement="stacked"
+                placeholder="000000"
+                [(ngModel)]="codigo">
+              </ion-input>
+            </ion-item>
+            <button type="button" class="primary-button" [disabled]="codigo.trim().length !== 6 || ocupado" (click)="confirmarCodigo()">
+              {{ ocupado ? 'A confirmar…' : 'Confirmar código' }}
+            </button>
+            <button type="button" class="ghost-button" [disabled]="ocupado" (click)="pedirCodigo()">
+              <ion-icon name="refresh-outline" aria-hidden="true"></ion-icon>
+              Reenviar código
+            </button>
+          </section>
+        } @else {
+          <button type="button" class="ghost-button" [disabled]="ocupado" (click)="pedirCodigo()">
+            Já ativei por fora
+          </button>
+        }
+      }
+
+      @if (mensagemInfo) {
+        <p class="notice info" role="status">{{ mensagemInfo }}</p>
+      }
+      @if (mensagemErro) {
+        <p class="notice error" role="alert">{{ mensagemErro }}</p>
+      }
     </section>
-
-    <section class="unlock-card">
-      <h2>Como pagar</h2>
-      <p>Faz o pagamento por <strong>M-Pesa</strong> ou <strong>e-Mola</strong> para o número indicado pela CartaPro e guarda a referência da transação.</p>
-      <p class="small">A ativação fica ligada ao número desta conta: <strong>{{ telefone || 'sem número definido' }}</strong>. Para mudar o número, atualiza o perfil primeiro.</p>
-    </section>
-
-    @if (etapa === 'estado') {
-      <ion-button expand="block" [disabled]="ocupado" (click)="pedirCodigo()">
-        {{ ocupado ? 'A verificar…' : 'Ativar o meu plano' }}
-      </ion-button>
-    } @else {
-      <ion-item>
-        <ion-label position="stacked">Código recebido por SMS</ion-label>
-        <ion-input type="tel" inputmode="numeric" maxlength="6" [(ngModel)]="codigo" placeholder="000000"></ion-input>
-      </ion-item>
-
-      <ion-button expand="block" [disabled]="codigo.trim().length !== 6 || ocupado" (click)="confirmar()">
-        {{ ocupado ? 'A confirmar…' : 'Confirmar código' }}
-      </ion-button>
-
-      <ion-button fill="clear" expand="block" [disabled]="ocupado" (click)="pedirCodigo()">Reenviar código</ion-button>
-    }
-  }
-
-  <ion-text color="success" *ngIf="mensagemInfo">
-    <p>{{ mensagemInfo }}</p>
-  </ion-text>
-
-  <ion-text color="danger" *ngIf="mensagemErro">
-    <p>{{ mensagemErro }}</p>
-  </ion-text>
-
-  <ion-button fill="clear" expand="block" routerLink="/inicio">Voltar ao início</ion-button>
+  </main>
 </ion-content>

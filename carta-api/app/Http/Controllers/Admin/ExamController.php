@@ -62,6 +62,7 @@ class ExamController extends Controller
             'type' => ['required', 'in:teorico,pratico'],
             'duration_minutes' => ['required', 'integer', 'min:1', 'max:300'],
             'visibility' => ['required', 'in:public,private'],
+            'is_locked' => ['nullable', 'boolean'],
             'selection_mode' => ['nullable', 'in:manual,blueprint'],
             // Modo manual
             'question_ids' => [$mode === 'manual' ? 'required' : 'nullable', 'array', 'min:1', 'max:100'],
@@ -75,6 +76,8 @@ class ExamController extends Controller
 
         $schoolId = $request->user()->isSchool() ? $request->user()->school_id : ($data['school_id'] ?? null);
         $isPublic = $request->user()->isAdmin() && $data['visibility'] === 'public';
+        // Só faz sentido numa prova que chega ao app; a privada é da escola.
+        $isLocked = $isPublic && $request->boolean('is_locked');
         if ($isPublic) {
             $schoolId = null;
         }
@@ -97,6 +100,7 @@ class ExamController extends Controller
             // Nota de passagem vem da regra única (config/grading.php).
             'pass_score' => Grading::passScore($questionCount, $primaryCategory), 'is_active' => true,
             'duration_minutes' => $data['duration_minutes'], 'is_public' => $isPublic,
+            'is_locked' => $isLocked,
             'publication_status' => 'draft',
         ]);
         $exam->questions()->sync($orderedQuestions->mapWithKeys(fn ($question, $index) => [$question->id => ['sort_order' => $index + 1]])->all());
@@ -157,6 +161,24 @@ class ExamController extends Controller
         $exam->update(['publication_status' => 'published', 'published_at' => now(), 'is_active' => true]);
 
         return back()->with('status', 'Prova publicada no aplicativo. Publique um novo pacote para atualizar também a cópia offline.');
+    }
+
+    /**
+     * Prova gratuita ou do plano completo.
+     *
+     * Alterna em vez de editar porque as provas não têm formulário de edição —
+     * o recurso só expõe create/store/destroy —, e obrigar a apagar e recriar
+     * uma prova só para mudar o plano seria absurdo.
+     */
+    public function plan(Exam $exam): RedirectResponse
+    {
+        abort_unless($exam->is_public, 422, 'Só as provas públicas chegam ao aplicativo.');
+
+        $exam->update(['is_locked' => ! $exam->is_locked]);
+
+        return back()->with('status', $exam->is_locked
+            ? 'Prova marcada como plano completo. Publique um novo pacote para atualizar a cópia offline.'
+            : 'Prova aberta ao plano gratuito. Publique um novo pacote para atualizar a cópia offline.');
     }
 
     public function archive(Exam $exam): RedirectResponse

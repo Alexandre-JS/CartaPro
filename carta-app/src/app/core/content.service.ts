@@ -125,6 +125,19 @@ export class ContentService {
                 ...prova,
                 perguntas: (prova.perguntas || []).map((pergunta) => ({ ...pergunta, imagem: this.api.absoluteAssetUrl(pergunta.imagem) })),
             })),
+            /*
+             * As imagens dos sinais escapavam a esta reescrita e chegavam com o
+             * host do APP_URL do servidor — que em desenvolvimento não é o
+             * mesmo por onde a API é servida, e no emulador Android nunca é.
+             * Resultado: nenhuma imagem de sinal carregava.
+             */
+            estudo: pacote.estudo && {
+                ...pacote.estudo,
+                sinais: (pacote.estudo.sinais || []).map((sinal) => ({
+                    ...sinal,
+                    imagem: this.api.absoluteAssetUrl(sinal.imagem ?? null),
+                })),
+            },
         };
     }
 

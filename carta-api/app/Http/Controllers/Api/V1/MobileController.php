@@ -200,8 +200,13 @@ class MobileController extends Controller
         $paid = $this->entitlements->isPaid($request->user());
 
         return response()->json(['data' => Exam::where(['is_active' => true, 'is_public' => true, 'publication_status' => 'published'])
-            ->withCount('questions')->orderBy('id')->get()
-            ->map(fn (Exam $exam) => $this->examSummary($exam, $paid))]);
+            ->withCount(['questions', 'questions as locked_questions_count' => fn ($query) => $query->where('is_locked', true)])
+            ->orderBy('id')->get()
+            ->map(function (Exam $exam) use ($paid) {
+                $exam->has_locked_questions = $exam->locked_questions_count > 0;
+
+                return $this->examSummary($exam, $paid);
+            })]);
     }
 
     public function exam(Request $request, Exam $exam): JsonResponse
@@ -210,10 +215,30 @@ class MobileController extends Controller
         $exam->load('questions.topic');
 
         $paid = $this->entitlements->isPaid($request->user());
-        $questions = $exam->questions->reject(fn ($question) => $question->is_locked && ! $paid);
 
-        // Uma prova só de perguntas bloqueadas não é entregue a plano gratuito.
-        abort_if($questions->isEmpty(), 402, 'Esta prova exige o plano completo.');
+        /*
+         * O cadeado da própria prova era ignorado aqui: filtravam-se as
+         * perguntas bloqueadas mas nunca se olhava para `is_locked` da prova,
+         * pelo que uma prova marcada como paga continuava a ser jogada por
+         * quem não pagou, desde que tivesse perguntas livres.
+         */
+        abort_if($exam->is_locked && ! $paid, 402, 'Esta prova exige o plano completo.');
+
+        /*
+         * Uma prova é inteira ou não é entregue. Retirar as perguntas
+         * bloqueadas e servir o resto dava ao aluno um exame de 11 de 30
+         * perguntas com a nota de passagem calculada sobre 30 — reprovava sem
+         * perceber porquê.
+         */
+        $questions = $exam->questions;
+
+        abort_if(
+            ! $paid && $questions->contains(fn ($question) => $question->is_locked),
+            402,
+            'Esta prova exige o plano completo.',
+        );
+
+        abort_if($questions->isEmpty(), 404, 'Esta prova ainda não tem perguntas.');
 
         return response()->json($this->examSummary($exam, $paid) + [
             'perguntas' => $questions->map(fn ($question) => $question->toPackageArray())->values(),
@@ -237,6 +262,13 @@ class MobileController extends Controller
             'valoresPassagem' => Grading::passValues($category),
             'minutos' => $exam->duration_minutes ?: Grading::durationMinutes($category),
             'plano' => $paid ? 'pago' : 'gratis',
+            /*
+             * O app precisa de saber que a prova existe mas está fechada — sem
+             * isto a lista mostrava-a como qualquer outra e o aluno só descobria
+             * ao tentar entrar. Uma prova com perguntas bloqueadas conta como
+             * fechada: é servida inteira ou não é servida.
+             */
+            'bloqueado' => ! $paid && ($exam->is_locked || $exam->has_locked_questions),
         ];
     }
 

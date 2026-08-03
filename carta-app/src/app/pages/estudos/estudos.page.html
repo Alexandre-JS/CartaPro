@@ -2,64 +2,19 @@
   <main class="studies-shell">
     <header class="studies-hero compact">
       <div class="hero-copy">
-        <span>Plano de estudo</span>
-        <h1>O que estudar hoje</h1>
-        <p>Uma recomendação curta com base no teu desempenho.</p>
+        <span>Material de estudo</span>
+        <h1>Biblioteca</h1>
+        <p>Tudo o que precisas de saber, organizado por frente.</p>
       </div>
       <div class="hero-icon" aria-hidden="true"><ion-icon name="book-outline"></ion-icon></div>
     </header>
 
+    <!-- Esta página era um segundo Início: repetia a recomendação do dia, as
+         revisões pendentes e o reforço de sinais que o Início já dá. O que a
+         torna única é a biblioteca, e é só isso que aqui fica. -->
     <section class="studies-content">
-      @if (recomendacao; as plano) {
-        <article class="daily-card">
-          <span class="daily-label">Recomendado para ti</span>
-          <h2>{{ nomeTema(plano.tema) }}</h2>
-          <p>{{ plano.motivo }}</p>
-          <div class="daily-meta">
-            <span>{{ plano.totalPerguntas }} perguntas</span>
-            <i></i>
-            <span>Cerca de {{ plano.minutosEstimados }} min</span>
-            @if (revisoesPendentes) {
-              <i></i>
-              <span>{{ revisoesPendentes }} {{ revisoesPendentes === 1 ? 'revisão' : 'revisões' }}</span>
-            }
-          </div>
-          <a [routerLink]="['/estudo', plano.tema]" [queryParams]="{ categoria: categoria, modo: plano.acao === 'revisar' ? 'revisao' : null }">
-            {{ plano.acao === 'revisar' ? 'Revisar agora' : plano.acao === 'reforcar' ? 'Reforçar agora' : 'Começar estudo' }}
-            <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
-          </a>
-          @if (fichaRecomendada) {
-            <a class="daily-secondary" [routerLink]="['/licao', fichaRecomendada.slug]">
-              <ion-icon name="library-outline" aria-hidden="true"></ion-icon>
-              Ler primeiro a ficha "{{ fichaRecomendada.titulo }}"
-            </a>
-          }
-        </article>
-      }
-
-      @if (revisoesPendentes || sinaisPorReforcar) {
-        <div class="quick-row">
-          @if (revisoesPendentes) {
-            <a class="quick-card" routerLink="/revisoes">
-              <ion-icon name="refresh-outline" aria-hidden="true"></ion-icon>
-              <strong>{{ revisoesPendentes }}</strong>
-              <small>{{ revisoesPendentes === 1 ? 'revisão pendente' : 'revisões pendentes' }}</small>
-            </a>
-          }
-          @if (sinaisPorReforcar) {
-            <a class="quick-card" routerLink="/treino-sinais" [queryParams]="{ modo: 'reforco' }">
-              <ion-icon name="warning-outline" aria-hidden="true"></ion-icon>
-              <strong>{{ sinaisPorReforcar }}</strong>
-              <small>{{ sinaisPorReforcar === 1 ? 'sinal a reforçar' : 'sinais a reforçar' }}</small>
-            </a>
-          }
-        </div>
-      }
-
-      <h2 class="section-title">Material de estudo</h2>
-
       @if (carregando) {
-        <p class="hint">A carregar material…</p>
+        <app-skeleton variante="lista" [quantidade]="4" etiqueta="A carregar o material de estudo"></app-skeleton>
       } @else if (semMaterial) {
         <div class="empty-state">
           <ion-icon name="library-outline" aria-hidden="true"></ion-icon>
@@ -74,43 +29,22 @@
               <span class="section-copy">
                 <strong>{{ secao.titulo }}</strong>
                 <small>{{ secao.descricao }}</small>
-                <span class="section-meta">{{ secao.total }} {{ secao.id === 'codigo' ? 'artigos' : secao.id === 'glossario' ? 'termos' : secao.id === 'sinais' ? 'sinais' : 'fichas' }}</span>
                 @if (secao.progresso && secao.progresso.total) {
                   <span class="section-progress">
                     <i [style.width.%]="secao.progresso.percentagem"></i>
                   </span>
-                  <span class="section-meta muted">{{ secao.progresso.lidos }} de {{ secao.progresso.total }} concluídos</span>
+                  <span class="section-meta">{{ secao.progresso.lidos }} de {{ secao.total }} {{ secao.unidade }}</span>
+                } @else {
+                  <span class="section-meta">{{ secao.total }} {{ secao.unidade }}</span>
                 }
               </span>
               <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
             </a>
           }
         </div>
-
-        <a class="train-cta" routerLink="/treino-sinais">
-          <ion-icon name="school-outline" aria-hidden="true"></ion-icon>
-          <span>
-            <strong>Treino de reconhecimento de sinais</strong>
-            <small>Sessões curtas geradas a partir da biblioteca de sinais</small>
-          </span>
-          <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
-        </a>
-
-        @if (plano === 'gratis' && bloqueados > 0) {
-          <a class="locked-notice" routerLink="/desbloquear">
-            <ion-icon name="lock-closed-outline" aria-hidden="true"></ion-icon>
-            <span><strong>{{ bloqueados }} conteúdos bloqueados</strong><small>Ativa o plano completo para ter todo o material.</small></span>
-          </a>
-        }
       }
     </section>
 
-    <nav class="bottom-nav" aria-label="Navegação principal">
-      <a routerLink="/inicio"><ion-icon name="home-outline" aria-hidden="true"></ion-icon><span>Início</span></a>
-      <a routerLink="/exames"><ion-icon name="document-text-outline" aria-hidden="true"></ion-icon><span>Exames</span></a>
-      <a routerLink="/estudos" class="active"><ion-icon name="book-outline" aria-hidden="true"></ion-icon><span>Estudos</span></a>
-      <a routerLink="/desempenho"><ion-icon name="stats-chart-outline" aria-hidden="true"></ion-icon><span>Desempenho</span></a>
-      <a routerLink="/perfil"><ion-icon name="person-outline" aria-hidden="true"></ion-icon><span>Perfil</span></a>
-    </nav>
+    <app-bottom-nav ativo="estudos"></app-bottom-nav>
   </main>
 </ion-content>

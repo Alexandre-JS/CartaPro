@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
+import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
 import { addIcons } from 'ionicons';
 import {
     arrowBackOutline, arrowForwardOutline, checkmarkCircle, closeCircleOutline, refreshOutline,
@@ -27,7 +28,7 @@ const PERGUNTAS_POR_SESSAO = 10;
 @Component({
     standalone: true,
     selector: 'app-treino-sinais',
-    imports: [RouterLink, IonContent, IonIcon, PerguntaCardComponent],
+    imports: [RouterLink, IonContent, IonIcon, PerguntaCardComponent, SkeletonComponent],
     templateUrl: './treino-sinais.page.html',
     styleUrls: ['./treino-sinais.page.scss'],
 })

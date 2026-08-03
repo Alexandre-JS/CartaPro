@@ -29,6 +29,35 @@
   --app-color-surface: var(--app-color-white);
   --app-color-border: #dfe3e6;
 
+  /* Superficies e divisores */
+  --app-color-page: #edf2ee;
+  --app-color-surface-subtle: #f8fbf8;
+  --app-color-border-subtle: #e1e7e2;
+  --app-color-divider: #eef1ef;
+  --app-color-track: #e4e8e5;
+  --app-color-disabled: #b6bdb8;
+
+  /* Estados: cada familia tem texto, fundo suave e borda */
+  --app-color-success-text: #176a2a;
+  --app-color-success-soft: #e8f7ea;
+  --app-color-success-border: rgb(33 139 56 / 45%);
+  --app-color-warning-text: #7a5600;
+  --app-color-warning-soft: #fff9e8;
+  --app-color-warning-border: #e7ce7d;
+  --app-color-danger-text: #b9171d;
+  --app-color-danger-soft: #fdeaea;
+  --app-color-danger-border: rgb(227 30 36 / 38%);
+
+  /* Acentos auxiliares para distinguir metricas, sem competir com a marca */
+  --app-color-info: #176fa8;
+  --app-color-info-soft: #e2f1fb;
+  --app-color-accent: #7354a0;
+  --app-color-accent-soft: #eee7f8;
+
+  /* Cores solidas para cabecalhos e acoes com texto branco */
+  --app-color-brand-panel: #176a2a;
+  --app-color-action: #176a2a;
+
   /* Ionic: primary / verde principal */
   --ion-color-primary: #43b649;
   --ion-color-primary-rgb: 67, 182, 73;

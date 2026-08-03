@@ -22,7 +22,7 @@
       }
 
       @if (carregando) {
-        <p class="hint">A carregar glossário…</p>
+        <app-skeleton variante="lista" [quantidade]="5" etiqueta="A carregar o glossário"></app-skeleton>
       } @else if (!porLetra.length) {
         <section class="empty-state">
           <ion-icon name="text-outline" aria-hidden="true"></ion-icon>
@@ -39,11 +39,20 @@
             <h2>{{ grupo.letra }}</h2>
             @for (termo of grupo.termos; track termo.slug) {
               <article class="term-card">
-                <button type="button" (click)="alternar(termo.slug)" [attr.aria-expanded]="aberto === termo.slug">
+                <button type="button" [class.locked]="termo.bloqueado" (click)="alternar(termo.slug)" [attr.aria-expanded]="aberto === termo.slug">
                   <span>{{ termo.termo }}</span>
-                  <ion-icon [name]="aberto === termo.slug ? 'chevron-down-outline' : 'chevron-forward-outline'" aria-hidden="true"></ion-icon>
+                  @if (termo.bloqueado) {
+                    <ion-icon class="lock-badge" name="lock-closed" aria-label="Bloqueado"></ion-icon>
+                  } @else {
+                    <ion-icon [name]="aberto === termo.slug ? 'chevron-down-outline' : 'chevron-forward-outline'" aria-hidden="true"></ion-icon>
+                  }
                 </button>
-                @if (aberto === termo.slug) {
+                @if (aberto === termo.slug && termo.bloqueado) {
+                  <a class="locked-body" routerLink="/desbloquear">
+                    <ion-icon name="lock-closed" aria-hidden="true"></ion-icon>
+                    <span>Definição disponível no plano completo.</span>
+                  </a>
+                } @else if (aberto === termo.slug) {
                   <div class="term-body">
                     <p>{{ termo.definicao }}</p>
                     @if (termo.artigoRef) {
@@ -61,12 +70,5 @@
       }
     </section>
 
-    <nav class="bottom-nav" aria-label="Navegação principal">
-      <a routerLink="/inicio"><ion-icon name="home" aria-hidden="true"></ion-icon><span>Início</span></a>
-      <a routerLink="/exames"><ion-icon name="create-outline" aria-hidden="true"></ion-icon><span>Exames</span></a>
-      <a routerLink="/estudos" class="active"><ion-icon name="book-outline" aria-hidden="true"></ion-icon><span>Estudos</span></a>
-      <a routerLink="/desempenho"><ion-icon name="stats-chart-outline" aria-hidden="true"></ion-icon><span>Desempenho</span></a>
-      <a routerLink="/perfil"><ion-icon name="person-outline" aria-hidden="true"></ion-icon><span>Perfil</span></a>
-    </nav>
   </main>
 </ion-content>

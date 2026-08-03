@@ -148,10 +148,24 @@ class StudyContentTest extends TestCase
         $response = $this->withToken($token)->getJson('/api/v1/content-package')->assertOk();
 
         $this->assertSame('gratis', $response->json('plano'));
-        $this->assertSame(['curva-a-direita'], array_column($response->json('estudo.sinais'), 'slug'));
-        $this->assertSame(['ler-os-sinais-pela-forma'], array_column($response->json('estudo.licoes'), 'slug'));
 
-        // O conteúdo pago não escapa em nenhum campo do payload.
+        /*
+         * O bloqueado aparece na lista, mas vazio. Retirá-lo por completo — como
+         * se fazia — tornava o cadeado invisível: o ecrã afirmava "mais N sinais"
+         * e não havia nada para ver, pelo que parecia que o cadeado não fazia
+         * nada. O aluno também nunca via o que estava a perder.
+         */
+        $sinais = collect($response->json('estudo.sinais'))->keyBy('slug');
+        $this->assertTrue($sinais->has('curva-a-direita'));
+        $this->assertTrue($sinais->has('sinal-reservado-ao-plano-completo'));
+        $this->assertArrayHasKey('nome', $sinais['sinal-reservado-ao-plano-completo']);
+        $this->assertArrayNotHasKey('significado', $sinais['sinal-reservado-ao-plano-completo']);
+
+        $licoes = collect($response->json('estudo.licoes'))->keyBy('slug');
+        $this->assertTrue($licoes->has('ler-os-sinais-pela-forma'));
+        $this->assertArrayNotHasKey('corpo', $licoes->last());
+
+        // O conteúdo pago continua a não escapar em nenhum campo do payload.
         $this->assertStringNotContainsString('Significado reservado', $response->getContent());
         $this->assertStringNotContainsString('Corpo reservado', $response->getContent());
 

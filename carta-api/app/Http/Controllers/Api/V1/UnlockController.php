@@ -58,8 +58,8 @@ class UnlockController extends Controller
             abort(
                 $claimedElsewhere ? 409 : 404,
                 $claimedElsewhere
-                    ? 'Este número já foi usado para activar outra conta CartaPro.'
-                    : 'Ainda não recebemos um pagamento associado a este número. Confirme a referência M-Pesa/e-Mola.',
+                    ? 'Este número já desbloqueou outra conta CartaPro. Usa essa conta ou fala connosco.'
+                    : 'Ainda não encontrámos uma activação para este número. Podes desbloquear já no app, em segundos.',
             );
         }
 

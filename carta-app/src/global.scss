@@ -34,7 +34,12 @@
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import "@ionic/angular/css/palettes/dark.system.css";
+/*
+ * O tema CartaPro atual e deliberadamente claro. O dark.system do Ionic
+ * substituia o verde da marca por azul e misturava componentes escuros com
+ * superficies claras. Quando existir uma paleta escura completa, deve ser
+ * ativada explicitamente por classe, e nao pela configuracao do dispositivo.
+ */
 
 /* O aplicativo utiliza toda a área disponível em qualquer tamanho de ecrã. */
 main[class$="-shell"] {

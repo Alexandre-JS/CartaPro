@@ -2,8 +2,11 @@ import { DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
+import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
+import { IconeProvaComponent } from '../../components/icone-prova/icone-prova.component';
+import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
 import { addIcons } from 'ionicons';
-import { bookOutline, checkmarkCircleOutline, chevronDownOutline, chevronForwardOutline, chevronUpOutline, documentTextOutline, gridOutline, homeOutline, listOutline, personOutline, refreshOutline, schoolOutline, statsChartOutline, timeOutline } from 'ionicons/icons';
+import { bookOutline, checkmarkCircleOutline, lockClosed, chevronDownOutline, chevronForwardOutline, chevronUpOutline, cloudOfflineOutline, documentTextOutline, refreshOutline, schoolOutline, timeOutline } from 'ionicons/icons';
 import { RegrasService } from '../../core/regras.service';
 import { StorageService } from '../../core/storage.service';
 import { HistoricoExame } from '../../models/progresso.model';
@@ -11,6 +14,7 @@ import { ExameApiService } from '../../core/exame-api.service';
 import { ExameApiResumo } from '../../models/exame-api.model';
 
 interface ExameDisponivel {
+    bloqueado: boolean;
     id: number;
     nome: string;
     numero: number;
@@ -23,32 +27,45 @@ interface ExameDisponivel {
 @Component({
     standalone: true,
     selector: 'app-exames',
-    imports: [DatePipe, RouterLink, IonContent, IonIcon],
+    imports: [DatePipe, RouterLink, IonContent, IonIcon, BottomNavComponent, SkeletonComponent, IconeProvaComponent],
     templateUrl: './exames.page.html',
     styleUrls: ['./exames.page.scss'],
 })
 export class ExamesPage implements OnInit {
     exames: ExameDisponivel[] = [];
     mensagemErro = '';
+    carregando = true;
     historicoAberto?: number;
-    visualizacao: 'grelha' | 'lista' = 'grelha';
 
     constructor(
         private readonly storage: StorageService,
         private readonly examesApi: ExameApiService,
         private readonly regras: RegrasService,
     ) {
-        addIcons({ bookOutline, checkmarkCircleOutline, chevronDownOutline, chevronForwardOutline, chevronUpOutline, documentTextOutline, gridOutline, homeOutline, listOutline, personOutline, refreshOutline, schoolOutline, statsChartOutline, timeOutline });
+        addIcons({ bookOutline, checkmarkCircleOutline, lockClosed, chevronDownOutline, chevronForwardOutline, chevronUpOutline, cloudOfflineOutline, documentTextOutline, refreshOutline, schoolOutline, timeOutline });
     }
 
-    async ngOnInit(): Promise<void> {
+    ngOnInit(): Promise<void> {
+        return this.carregar();
+    }
+
+    /**
+     * Falhar a carregar e não haver provas publicadas são coisas diferentes: o
+     * ecrã dizia "Nenhuma prova disponível" nos dois casos — e também enquanto
+     * ainda estava a carregar, antes de saber a resposta.
+     */
+    async carregar(): Promise<void> {
+        this.carregando = true;
+        this.mensagemErro = '';
         await this.regras.carregar();
 
         try {
             const [catalogo, historico] = await Promise.all([this.examesApi.listar(), this.storage.listarExames()]);
-            this.exames = catalogo.map((exame: ExameApiResumo) => ({ id: exame.id, nome: exame.nome, numero: exame.id, perguntas: exame.perguntas, minutos: exame.minutos, notaPassagem: exame.notaPassagem, historico: historico.filter((tentativa) => tentativa.numero === exame.id) }));
+            this.exames = catalogo.map((exame: ExameApiResumo) => ({ id: exame.id, nome: exame.nome, numero: exame.id, perguntas: exame.perguntas, minutos: exame.minutos, notaPassagem: exame.notaPassagem, bloqueado: !!exame.bloqueado, historico: historico.filter((tentativa) => tentativa.numero === exame.id) }));
         } catch (error: any) {
             this.mensagemErro = error?.message || 'Não foi possível carregar as provas.';
+        } finally {
+            this.carregando = false;
         }
     }
 

@@ -11,7 +11,7 @@ import {
     IonNote,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { businessOutline, lockClosedOutline, mailOutline } from 'ionicons/icons';
+import { lockClosedOutline, mailOutline } from 'ionicons/icons';
 import { AuthService } from '../../core/auth.service';
 import { mensagemDeErro } from '../../core/erros-api';
 
@@ -43,7 +43,7 @@ export class LoginPage {
         private readonly router: Router,
         private readonly auth: AuthService,
     ) {
-        addIcons({ businessOutline, lockClosedOutline, mailOutline });
+        addIcons({ lockClosedOutline, mailOutline });
         this.formulario = formBuilder.nonNullable.group({
             identificador: ['', [Validators.required]],
             palavraPasse: ['', [Validators.required, Validators.minLength(4)]],

@@ -1,67 +1,82 @@
 <ion-content [fullscreen]="true" class="profile-page">
   <main class="profile-shell">
     <header class="profile-hero">
-      <div class="hero-title"><span>Conta CartaPro</span><h1>Perfil</h1></div>
+      <!-- O selo do plano só aparece depois de o servidor responder: mostrar
+           "Plano Gratuito" por omissão dizia a um assinante que não tinha
+           pago, durante todo o carregamento. -->
       <div class="identity">
-        <div class="avatar">{{ iniciais }}</div>
-        <div><h2>{{ formulario.controls.nome.value || 'Utilizador CartaPro' }}</h2><p>{{ formulario.controls.email.value }}</p><span [class.premium]="plano === 'pago'">Plano {{ plano === 'pago' ? 'Premium' : 'Gratuito' }}</span></div>
+        <div class="avatar">{{ carregando ? '·' : iniciais }}</div>
+        @if (carregando) {
+          <div class="identity-loading"><app-skeleton variante="texto" [quantidade]="1" etiqueta="A carregar a tua conta"></app-skeleton></div>
+        } @else {
+          <div><h2>{{ formulario.controls.nome.value || 'Utilizador CartaPro' }}</h2><p>{{ formulario.controls.email.value }}</p><span [class.premium]="plano === 'pago'">Plano {{ plano === 'pago' ? 'Premium' : 'Gratuito' }}</span></div>
+        }
       </div>
     </header>
 
+    <!-- A stats-card com questões e taxa de acerto era a terceira cópia dos
+         mesmos números; vivem no separador Desempenho. Aqui trata-se da conta.
+         As linhas "Privacidade e segurança" e "Ajuda e suporte" e o interruptor
+         de notificações eram controlos sem ligação nenhuma: não abriam nada nem
+         guardavam estado. -->
     <section class="profile-content">
-      <article class="stats-card">
-        <div><strong>{{ totalRespondidas }}</strong><span>Questões</span></div>
-        <i></i>
-        <div><strong>{{ taxaAcerto }}%</strong><span>Taxa de acerto</span></div>
-        <i></i>
-        <div><strong>{{ plano === 'pago' ? 'Pro' : 'Free' }}</strong><span>Subscrição</span></div>
-      </article>
-
       <section class="profile-section">
-        <div class="section-heading"><div><span>Dados pessoais</span><h2>Informações da conta</h2></div></div>
-        <form [formGroup]="formulario" (ngSubmit)="guardar()" novalidate>
+        <div class="section-heading">
+          <div><span>Conta</span><h2>Dados pessoais</h2></div>
+          @if (!carregando) {
+            <button type="button" class="edit-button" (click)="editando = !editando">
+              <ion-icon [name]="editando ? 'close-outline' : 'pencil-outline'" aria-hidden="true"></ion-icon>
+              {{ editando ? 'Fechar' : 'Editar' }}
+            </button>
+          }
+        </div>
+
+        @if (!carregando && !editando) {
+          <div class="account-summary">
+            <div><ion-icon name="mail-outline" aria-hidden="true"></ion-icon><span><small>Email</small><strong>{{ formulario.controls.email.value }}</strong></span></div>
+            <div><ion-icon name="call-outline" aria-hidden="true"></ion-icon><span><small>Telemóvel</small><strong>{{ formulario.controls.telefone.value || 'Não indicado' }}</strong></span></div>
+          </div>
+        }
+
+        @if (editando) {
+          <form [formGroup]="formulario" (ngSubmit)="guardar()" novalidate>
           <div class="field-group">
             <ion-item lines="none" class="form-field" [class.field-error]="submetido && formulario.controls.nome.invalid">
               <ion-icon name="person-outline" slot="start" aria-hidden="true"></ion-icon>
               <ion-input formControlName="nome" type="text" autocomplete="name" label="Nome completo" labelPlacement="stacked"></ion-input>
             </ion-item>
-            @if (submetido && formulario.controls.nome.invalid) { <ion-note color="danger">Introduza um nome válido.</ion-note> }
+            @if (submetido && formulario.controls.nome.invalid) { <ion-note color="danger">Introduz um nome válido.</ion-note> }
           </div>
           <div class="field-group">
             <ion-item lines="none" class="form-field" [class.field-error]="submetido && formulario.controls.email.invalid">
               <ion-icon name="mail-outline" slot="start" aria-hidden="true"></ion-icon>
               <ion-input formControlName="email" type="email" autocomplete="email" label="Email" labelPlacement="stacked"></ion-input>
             </ion-item>
-            @if (submetido && formulario.controls.email.invalid) { <ion-note color="danger">Introduza um email válido.</ion-note> }
+            @if (submetido && formulario.controls.email.invalid) { <ion-note color="danger">Introduz um email válido.</ion-note> }
           </div>
           <div class="field-group">
             <ion-item lines="none" class="form-field" [class.field-error]="submetido && formulario.controls.telefone.invalid">
               <ion-icon name="call-outline" slot="start" aria-hidden="true"></ion-icon>
               <ion-input formControlName="telefone" type="tel" autocomplete="tel" label="Telemóvel" labelPlacement="stacked" placeholder="+258"></ion-input>
             </ion-item>
+            <ion-note>É este o número que fica ligado ao plano completo.</ion-note>
           </div>
-          <button class="save-button" type="submit"><ion-icon name="checkmark-circle" aria-hidden="true"></ion-icon>{{ guardado ? 'Dados guardados' : 'Guardar alterações' }}</button>
-        </form>
+            <button class="save-button" type="submit"><ion-icon name="checkmark-circle" aria-hidden="true"></ion-icon>{{ guardado ? 'Dados guardados' : 'Guardar alterações' }}</button>
+          </form>
+        }
       </section>
 
-      <section class="profile-section settings-section">
-        <div class="section-heading"><div><span>Preferências</span><h2>Definições</h2></div></div>
-        <div class="settings-list">
-          <div class="setting-row"><span class="setting-icon"><ion-icon name="notifications-outline" aria-hidden="true"></ion-icon></span><div><strong>Notificações</strong><small>Lembretes de estudo e novidades</small></div><ion-toggle [checked]="true" aria-label="Ativar notificações"></ion-toggle></div>
-          <button type="button"><span class="setting-icon"><ion-icon name="shield-checkmark-outline" aria-hidden="true"></ion-icon></span><div><strong>Privacidade e segurança</strong><small>Palavra-passe e utilização dos dados</small></div><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></button>
-          <button type="button"><span class="setting-icon"><ion-icon name="help-circle-outline" aria-hidden="true"></ion-icon></span><div><strong>Ajuda e suporte</strong><small>Perguntas frequentes e contactos</small></div><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></button>
-        </div>
-      </section>
+      @if (!carregando && plano === 'gratis') {
+        <a class="plan-row" routerLink="/desbloquear">
+          <span class="setting-icon"><ion-icon name="lock-open-outline" aria-hidden="true"></ion-icon></span>
+          <div><strong>Desbloquear tudo</strong><small>Todas as perguntas, exames e material de estudo</small></div>
+          <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
+        </a>
+      }
 
       <button type="button" class="logout-button" (click)="sair()"><ion-icon name="log-out-outline" aria-hidden="true"></ion-icon>Terminar sessão</button>
     </section>
 
-    <nav class="bottom-nav" aria-label="Navegação principal">
-      <a routerLink="/inicio"><ion-icon name="home-outline" aria-hidden="true"></ion-icon><span>Início</span></a>
-      <a routerLink="/exames"><ion-icon name="document-text-outline" aria-hidden="true"></ion-icon><span>Exames</span></a>
-      <a routerLink="/estudos"><ion-icon name="book-outline" aria-hidden="true"></ion-icon><span>Estudos</span></a>
-      <a routerLink="/desempenho"><ion-icon name="stats-chart-outline" aria-hidden="true"></ion-icon><span>Desempenho</span></a>
-      <a routerLink="/perfil" class="active"><ion-icon name="person-outline" aria-hidden="true"></ion-icon><span>Perfil</span></a>
-    </nav>
+    <app-bottom-nav ativo="perfil"></app-bottom-nav>
   </main>
 </ion-content>

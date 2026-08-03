@@ -2,16 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { IonContent, IonIcon, IonSearchbar } from '@ionic/angular/standalone';
+import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
 import { addIcons } from 'ionicons';
-import {
-    albumsOutline, arrowBackOutline, arrowForwardCircleOutline, bookOutline, checkmarkCircle, closeCircleOutline,
-    createOutline, handLeftOutline, home, informationCircleOutline, lockClosedOutline, personOutline, removeOutline,
-    schoolOutline, statsChartOutline, stopCircleOutline, swapHorizontalOutline, warningOutline,
-} from 'ionicons/icons';
+import { albumsOutline, arrowBackOutline, arrowForwardCircleOutline, bookOutline, checkmarkCircle, lockClosed, closeCircleOutline, handLeftOutline, informationCircleOutline, lockClosedOutline, removeOutline, schoolOutline, stopCircleOutline, swapHorizontalOutline, warningOutline } from 'ionicons/icons';
 import { AcessoService } from '../../core/acesso.service';
 import { MaterialEstudoService } from '../../core/material-estudo.service';
 import { normalizarTexto } from '../../core/texto';
-import { TreinoSinaisService } from '../../core/treino-sinais.service';
 import { SinalTransito, TaxonomiaItem } from '../../models/material-estudo.model';
 
 /**
@@ -23,7 +19,7 @@ import { SinalTransito, TaxonomiaItem } from '../../models/material-estudo.model
 @Component({
     standalone: true,
     selector: 'app-sinais',
-    imports: [FormsModule, RouterLink, IonContent, IonIcon, IonSearchbar],
+    imports: [FormsModule, RouterLink, IonContent, IonIcon, IonSearchbar, SkeletonComponent],
     templateUrl: './sinais.page.html',
     styleUrls: ['./sinais.page.scss'],
 })
@@ -36,27 +32,20 @@ export class SinaisPage implements OnInit {
     carregando = true;
     bloqueados = 0;
     plano: 'gratis' | 'pago' = 'gratis';
-    paraReforcar = 0;
 
     constructor(
         private readonly material: MaterialEstudoService,
-        private readonly treino: TreinoSinaisService,
         private readonly acesso: AcessoService,
     ) {
-        addIcons({
-            albumsOutline, arrowBackOutline, arrowForwardCircleOutline, bookOutline, checkmarkCircle, closeCircleOutline,
-            createOutline, handLeftOutline, home, informationCircleOutline, lockClosedOutline, personOutline, removeOutline,
-            schoolOutline, statsChartOutline, stopCircleOutline, swapHorizontalOutline, warningOutline,
-        });
+        addIcons({ albumsOutline, arrowBackOutline, arrowForwardCircleOutline, bookOutline, checkmarkCircle, lockClosed, closeCircleOutline, handLeftOutline, informationCircleOutline, lockClosedOutline, removeOutline, schoolOutline, stopCircleOutline, swapHorizontalOutline, warningOutline });
     }
 
     async ngOnInit(): Promise<void> {
-        const [categorias, sinais, vistos, material, reforco] = await Promise.all([
+        const [categorias, sinais, vistos, material] = await Promise.all([
             this.material.categoriasSinais(),
             this.material.sinais(),
             this.material.conteudosLidos(),
             this.material.carregar(),
-            this.treino.totalParaReforcar(),
         ]);
 
         this.categorias = categorias;
@@ -64,7 +53,6 @@ export class SinaisPage implements OnInit {
         this.vistos = vistos;
         this.bloqueados = material.sinaisBloqueados ?? 0;
         this.plano = (await this.acesso.estaPago()) ? 'pago' : 'gratis';
-        this.paraReforcar = reforco;
         this.carregando = false;
     }
 
@@ -73,7 +61,7 @@ export class SinaisPage implements OnInit {
 
         return this.sinais.filter((sinal) => {
             const categoriaOk = !this.categoriaAtiva || sinal.categoria === this.categoriaAtiva;
-            const termoOk = !termo || this.normalizar(`${sinal.nome} ${sinal.significado}`).includes(termo);
+            const termoOk = !termo || this.normalizar(`${sinal.nome} ${sinal.significado ?? ''}`).includes(termo);
             return categoriaOk && termoOk;
         });
     }
@@ -84,6 +72,14 @@ export class SinaisPage implements OnInit {
 
     get percentagemVista(): number {
         return this.sinais.length ? Math.round((this.totalVistos / this.sinais.length) * 100) : 0;
+    }
+
+    /** Descrição da categoria filtrada — antes varria a lista no template. */
+    get descricaoCategoriaAtiva(): string {
+        if (!this.categoriaAtiva) {
+            return '';
+        }
+        return this.categorias.find((categoria) => categoria.slug === this.categoriaAtiva)?.descricao || '';
     }
 
     nomeCategoria(slug: string): string {

@@ -31,7 +31,7 @@
       }
 
       @if (carregando) {
-        <p class="hint">A carregar o Código…</p>
+        <app-skeleton variante="lista" [quantidade]="5" etiqueta="A carregar o Código da Estrada"></app-skeleton>
       } @else if (!total) {
         <section class="empty-state">
           <ion-icon name="document-text-outline" aria-hidden="true"></ion-icon>
@@ -46,7 +46,7 @@
         }
         @for (artigo of resultados; track artigo.numero) {
           <article class="article-card">
-            <button type="button" (click)="alternarArtigo(artigo)" [attr.aria-expanded]="artigoAberto === artigo.numero">
+            <button type="button" [class.locked]="artigo.bloqueado" (click)="alternarArtigo(artigo)" [attr.aria-expanded]="artigoAberto === artigo.numero">
               <span>
                 <strong>Artigo {{ artigo.numero }}</strong>
                 <small>{{ artigo.titulo }}</small>
@@ -54,13 +54,20 @@
                   <em>{{ artigo.capituloTitulo }}</em>
                 }
               </span>
-              @if (lido(artigo.numero)) {
+              @if (artigo.bloqueado) {
+                <ion-icon class="lock-badge" name="lock-closed" aria-label="Bloqueado"></ion-icon>
+              } @else if (lido(artigo.numero)) {
                 <ion-icon class="read-badge" name="checkmark-circle" aria-label="Já aberto"></ion-icon>
               } @else {
                 <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
               }
             </button>
-            @if (artigoAberto === artigo.numero) {
+            @if (artigoAberto === artigo.numero && artigo.bloqueado) {
+              <a class="locked-body" routerLink="/desbloquear">
+                <ion-icon name="lock-closed" aria-hidden="true"></ion-icon>
+                <span>Este artigo faz parte do plano completo. Desbloqueia para o ler.</span>
+              </a>
+            } @else if (artigoAberto === artigo.numero) {
               <div class="article-body">
                 @for (bloco of blocos; track $index) {
                   @if (bloco.tipo === 'lista') {
@@ -100,18 +107,25 @@
               <div class="chapter-body">
                 @for (artigo of capitulo.lista; track artigo.numero) {
                   <article class="article-card">
-                    <button type="button" (click)="alternarArtigo(artigo)" [attr.aria-expanded]="artigoAberto === artigo.numero">
+                    <button type="button" [class.locked]="artigo.bloqueado" (click)="alternarArtigo(artigo)" [attr.aria-expanded]="artigoAberto === artigo.numero">
                       <span>
                         <strong>Artigo {{ artigo.numero }}</strong>
                         <small>{{ artigo.titulo }}</small>
                       </span>
-                      @if (lido(artigo.numero)) {
+                      @if (artigo.bloqueado) {
+                        <ion-icon class="lock-badge" name="lock-closed" aria-label="Bloqueado"></ion-icon>
+                      } @else if (lido(artigo.numero)) {
                         <ion-icon class="read-badge" name="checkmark-circle" aria-label="Já aberto"></ion-icon>
                       } @else {
                         <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
                       }
                     </button>
-                    @if (artigoAberto === artigo.numero) {
+                    @if (artigoAberto === artigo.numero && artigo.bloqueado) {
+                      <a class="locked-body" routerLink="/desbloquear">
+                        <ion-icon name="lock-closed" aria-hidden="true"></ion-icon>
+                        <span>Este artigo faz parte do plano completo. Desbloqueia para o ler.</span>
+                      </a>
+                    } @else if (artigoAberto === artigo.numero) {
                       <div class="article-body">
                         @for (bloco of blocos; track $index) {
                           @if (bloco.tipo === 'lista') {
@@ -141,12 +155,5 @@
       }
     </section>
 
-    <nav class="bottom-nav" aria-label="Navegação principal">
-      <a routerLink="/inicio"><ion-icon name="home" aria-hidden="true"></ion-icon><span>Início</span></a>
-      <a routerLink="/exames"><ion-icon name="create-outline" aria-hidden="true"></ion-icon><span>Exames</span></a>
-      <a routerLink="/estudos" class="active"><ion-icon name="book-outline" aria-hidden="true"></ion-icon><span>Estudos</span></a>
-      <a routerLink="/desempenho"><ion-icon name="stats-chart-outline" aria-hidden="true"></ion-icon><span>Desempenho</span></a>
-      <a routerLink="/perfil"><ion-icon name="person-outline" aria-hidden="true"></ion-icon><span>Perfil</span></a>
-    </nav>
   </main>
 </ion-content>

@@ -7,12 +7,12 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['phone', 'plan', 'payment_method', 'payment_reference', 'unlocked_at', 'expires_at', 'notes', 'is_active', 'created_by', 'mobile_user_id', 'last_verified_at'])]
+#[Fillable(['phone', 'plan', 'payment_method', 'payment_reference', 'amount', 'unlocked_at', 'expires_at', 'notes', 'is_active', 'created_by', 'mobile_user_id', 'last_verified_at'])]
 class Unlock extends Model
 {
     protected function casts(): array
     {
-        return ['unlocked_at' => 'datetime', 'expires_at' => 'datetime', 'last_verified_at' => 'datetime', 'is_active' => 'boolean'];
+        return ['unlocked_at' => 'datetime', 'expires_at' => 'datetime', 'last_verified_at' => 'datetime', 'is_active' => 'boolean', 'amount' => 'decimal:2'];
     }
 
     protected static function booted(): void

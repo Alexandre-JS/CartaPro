@@ -1,0 +1,36 @@
+/* `--skeleton-shape` e `--skeleton-brilho` deixam o host retemar os blocos sem
+   furar a encapsulação: no hero verde do Perfil o cinzento não se lia. */
+:host { display: block; --skeleton-shape: #e8ebe9; --skeleton-brilho: rgb(255 255 255 / 78%); }
+
+.skeleton { display: grid; gap: 10px; }
+.skeleton.grelha { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 12px; }
+
+.row, .card { display: grid; grid-template-columns: 46px minmax(0, 1fr); align-items: center; gap: 11px; padding: 13px; border-radius: 11px; background: #fff; box-shadow: 0 3px 11px rgb(32 33 36 / 5%); }
+.card { min-height: 74px; }
+.tile { display: grid; justify-items: center; gap: 8px; padding: 13px; border-radius: 11px; background: #fff; box-shadow: 0 3px 11px rgb(32 33 36 / 5%); }
+.copy { display: grid; gap: 7px; }
+
+/* As formas herdam as medidas dos cartões reais para nada saltar ao chegar. */
+.shape { display: block; border-radius: 6px; background: var(--skeleton-shape); }
+.avatar { width: 44px; height: 49px; border-radius: 9px; }
+.thumb { width: 100%; max-width: 68px; aspect-ratio: 1; border-radius: 9px; }
+.line { height: 10px; }
+.line.short { width: 58%; height: 8px; }
+.tile .line { width: 80%; }
+.tile .line.short { width: 55%; }
+.texto .line { max-width: 100%; }
+
+/* Pulso solido: comunica carregamento sem recorrer a gradientes. */
+.shape { position: relative; overflow: hidden; }
+.shape::after { position: absolute; inset: 0; background: var(--skeleton-brilho); animation: brilho 1.35s ease-in-out infinite; content: ''; }
+
+@keyframes brilho {
+  0%, 100% { opacity: 0; }
+  50% { opacity: .45; }
+}
+
+/* Quem pediu menos movimento fica com o bloco estático — continua a ler-se
+   como espaço reservado, sem animação a correr indefinidamente. */
+@media (prefers-reduced-motion: reduce) {
+  .shape::after { animation: none; }
+}

@@ -11,7 +11,7 @@
     </header>
 
     @if (carregando) {
-      <section class="lesson-content"><p class="hint">A carregar ficha…</p></section>
+      <section class="lesson-content"><app-skeleton variante="texto" [quantidade]="6" etiqueta="A carregar a ficha"></app-skeleton></section>
     } @else if (!licao) {
       <section class="empty-state">
         <ion-icon name="library-outline" aria-hidden="true"></ion-icon>

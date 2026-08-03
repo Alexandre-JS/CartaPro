@@ -98,8 +98,11 @@ class ArticleController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'text' => ['required', 'string'],
             'is_active' => ['nullable', 'boolean'],
+            'is_locked' => ['nullable', 'boolean'],
         ]);
         $data['is_active'] = $request->boolean('is_active');
+        // Cada artigo decide o seu plano: não há regra automática por trás.
+        $data['is_locked'] = $request->boolean('is_locked');
         $data['sort_order'] = (int) ($data['sort_order'] ?? 0);
 
         return $data;

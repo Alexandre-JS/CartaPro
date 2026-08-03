@@ -89,9 +89,19 @@ class EntitlementService
 
         if (! $paid) {
             $questions = array_values(array_filter($questions, fn ($question) => ! ($question['bloqueado'] ?? false)));
+
+            /*
+             * Uma prova é inteira ou não é servida. Antes filtravam-se as
+             * perguntas bloqueadas dentro de cada prova, o que entregava ao
+             * aluno gratuito exames mutilados — 11 de 30 perguntas, com a nota
+             * de passagem calculada sobre 30 — em vez de exames fechados.
+             */
             $exams = array_values(array_map(function (array $exam) {
-                $exam['perguntas'] = array_values(array_filter($exam['perguntas'] ?? [], fn ($question) => ! ($question['bloqueado'] ?? false)));
-                $exam['bloqueadoPorPlano'] = count($exam['perguntas']) === 0;
+                $bloqueada = ($exam['bloqueado'] ?? false)
+                    || collect($exam['perguntas'] ?? [])->contains(fn ($question) => $question['bloqueado'] ?? false);
+
+                $exam['perguntas'] = $bloqueada ? [] : ($exam['perguntas'] ?? []);
+                $exam['bloqueadoPorPlano'] = $bloqueada;
 
                 return $exam;
             }, $exams));
@@ -117,34 +127,70 @@ class EntitlementService
      * gratuito — nem o corpo da ficha nem o significado do sinal. Enviam-se
      * apenas as contagens, que alimentam os cadeados no app.
      */
+    /**
+     * O que sobra de um item bloqueado: o suficiente para o aluno o ver na
+     * lista, nada do que lhe daria o conhecimento.
+     *
+     * Retirar os bloqueados por completo — como se fazia — tornava o cadeado
+     * invisível: o ecrã afirmava "mais 42 sinais" e não havia 42 sinais em
+     * lado nenhum, pelo que parecia que o cadeado não fazia nada. E o aluno
+     * nunca via o que estava a perder, que é o que faz querer desbloquear.
+     */
+    private const MONTRA = [
+        'sinais' => ['slug', 'nome', 'categoria', 'imagem'],
+        /*
+         * `sinais` e `artigos` são referências (slugs e números), não
+         * conhecimento — e sem eles as ligações cruzadas partiam-se: o ecrã do
+         * sinal faz `licao.sinais.includes(...)` e rebentava com TypeError
+         * numa ficha bloqueada, deixando a página presa a carregar.
+         */
+        'licoes' => ['slug', 'titulo', 'resumo', 'grupo', 'minutosLeitura', 'sinais', 'artigos'],
+        'artigos' => ['numero', 'capitulo', 'capituloTitulo', 'titulo'],
+        'glossario' => ['slug', 'termo'],
+    ];
+
     public function filterStudy(array $estudo, bool $paid): array
     {
-        $licoes = $estudo['licoes'] ?? [];
-        $sinais = $estudo['sinais'] ?? [];
+        /*
+         * Os artigos e o glossário juntaram-se aqui: eram as duas únicas
+         * frentes que seguiam inteiras para o plano gratuito, não por decisão
+         * mas por não existir sequer campo para as marcar.
+         */
+        $frentes = [
+            'sinais' => 'sinaisBloqueados',
+            'licoes' => 'licoesBloqueadas',
+            'artigos' => 'artigosBloqueados',
+            'glossario' => 'glossarioBloqueado',
+        ];
 
-        $licoesBloqueadas = 0;
-        $sinaisBloqueados = 0;
+        foreach ($frentes as $chave => $contador) {
+            $itens = $estudo[$chave] ?? [];
+            $bloqueados = 0;
 
-        foreach ($licoes as $licao) {
-            if ($licao['bloqueado'] ?? false) {
-                $licoesBloqueadas++;
+            foreach ($itens as $item) {
+                if ($item['bloqueado'] ?? false) {
+                    $bloqueados++;
+                }
             }
-        }
 
-        foreach ($sinais as $sinal) {
-            if ($sinal['bloqueado'] ?? false) {
-                $sinaisBloqueados++;
+            if (! $paid) {
+                $estudo[$chave] = array_values(array_map(
+                    fn (array $item) => ($item['bloqueado'] ?? false)
+                        ? $this->montra($item, self::MONTRA[$chave])
+                        : $item,
+                    $itens,
+                ));
             }
-        }
 
-        if (! $paid) {
-            $estudo['licoes'] = array_values(array_filter($licoes, fn ($licao) => ! ($licao['bloqueado'] ?? false)));
-            $estudo['sinais'] = array_values(array_filter($sinais, fn ($sinal) => ! ($sinal['bloqueado'] ?? false)));
+            $estudo[$contador] = $paid ? 0 : $bloqueados;
         }
-
-        $estudo['licoesBloqueadas'] = $paid ? 0 : $licoesBloqueadas;
-        $estudo['sinaisBloqueados'] = $paid ? 0 : $sinaisBloqueados;
 
         return $estudo;
+    }
+
+    /** Só os campos de identificação, mais a marca de bloqueado. */
+    private function montra(array $item, array $campos): array
+    {
+        return array_intersect_key($item, array_flip($campos)) + ['bloqueado' => true];
     }
 }

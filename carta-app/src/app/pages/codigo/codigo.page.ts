@@ -2,12 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { IonContent, IonIcon, IonSearchbar } from '@ionic/angular/standalone';
+import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
 import { addIcons } from 'ionicons';
-import {
-    arrowBackOutline, bookOutline, checkmarkCircle, checkmarkCircleOutline, chevronDownOutline,
-    chevronForwardOutline, createOutline, documentTextOutline, home, layersOutline, personOutline,
-    statsChartOutline,
-} from 'ionicons/icons';
+import { arrowBackOutline, bookOutline, checkmarkCircle, lockClosed, checkmarkCircleOutline, chevronDownOutline, chevronForwardOutline, documentTextOutline, layersOutline } from 'ionicons/icons';
 import { MaterialEstudoService } from '../../core/material-estudo.service';
 import { ArtigoCodigoEstrada, BlocoTexto, CapituloCodigo, LicaoEstudo } from '../../models/material-estudo.model';
 
@@ -26,7 +23,7 @@ interface CapituloComArtigos extends CapituloCodigo {
 @Component({
     standalone: true,
     selector: 'app-codigo',
-    imports: [FormsModule, RouterLink, IonContent, IonIcon, IonSearchbar],
+    imports: [FormsModule, RouterLink, IonContent, IonIcon, IonSearchbar, SkeletonComponent],
     templateUrl: './codigo.page.html',
     styleUrls: ['./codigo.page.scss'],
 })
@@ -47,11 +44,7 @@ export class CodigoPage implements OnInit {
         private readonly route: ActivatedRoute,
         private readonly material: MaterialEstudoService,
     ) {
-        addIcons({
-            arrowBackOutline, bookOutline, checkmarkCircle, checkmarkCircleOutline, chevronDownOutline,
-            chevronForwardOutline, createOutline, documentTextOutline, home, layersOutline, personOutline,
-            statsChartOutline,
-        });
+        addIcons({ arrowBackOutline, bookOutline, checkmarkCircle, lockClosed, checkmarkCircleOutline, chevronDownOutline, chevronForwardOutline, documentTextOutline, layersOutline });
     }
 
     async ngOnInit(): Promise<void> {

@@ -7,7 +7,11 @@
     </header>
 
     <section class="study-content">
-      @if (!iniciada && perguntaAtual) {
+      <!-- Sem este ramo, o ecrã abria em "Nenhuma questão disponível" e só
+           depois é que as perguntas apareciam. -->
+      @if (carregando) {
+        <app-skeleton variante="cartao" [quantidade]="1" etiqueta="A preparar a sessão de estudo"></app-skeleton>
+      } @else if (!iniciada && perguntaAtual) {
         <article class="session-intro">
           <span>{{ modoRevisao ? 'Revisão focada' : 'Sessão recomendada' }}</span>
           <h2>{{ nomeTema }}</h2>
