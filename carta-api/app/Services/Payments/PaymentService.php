@@ -59,23 +59,40 @@ class PaymentService
             ]);
         }
 
-        $telefone = Phone::normalize($carteira ?: ($user->phone_normalized ?: $user->phone));
+        $minimo = (float) config("payments.methods.{$metodo}.minimo", 0);
 
-        if (strlen($telefone) !== 12) {
+        if ($minimo > 0 && (float) $plano['preco'] < $minimo) {
             throw ValidationException::withMessages([
-                'wallet_phone' => 'Escreve os 9 dígitos da tua carteira móvel.',
+                'method' => "{$this->nomeMetodo($metodo)} só aceita pagamentos a partir de {$minimo} ".config('payments.currency').'.',
             ]);
         }
 
-        if (! Carteira::serve($telefone, $metodo)) {
-            $nome = config("payments.methods.{$metodo}.nome");
-            $sugerido = Carteira::paraNumero($telefone);
+        $telefone = Phone::normalize($carteira ?: ($user->phone_normalized ?: $user->phone));
 
-            throw ValidationException::withMessages([
-                'wallet_phone' => $sugerido
-                    ? "Este número é {$this->nomeOperadora($sugerido)}. Escolhe {$this->nomeMetodo($sugerido)} ou usa um número {$this->nomeOperadora($metodo)}."
-                    : "Este número não parece servir {$nome}. Confirma antes de continuar.",
-            ]);
+        /*
+         * O cartão não se cobra a um número: os dados vão para o Hosted
+         * Checkout da DebitoPay. Guardamos na mesma o número da conta — a
+         * reconciliação e o apoio precisam de saber a quem pertence o
+         * pagamento — mas não o validamos contra operadora nenhuma, porque
+         * aqui ele não é a carteira, é só a identificação do aluno.
+         */
+        if (config("payments.methods.{$metodo}.movel", true)) {
+            if (strlen($telefone) !== 12) {
+                throw ValidationException::withMessages([
+                    'wallet_phone' => 'Escreve os 9 dígitos da tua carteira móvel.',
+                ]);
+            }
+
+            if (! Carteira::serve($telefone, $metodo)) {
+                $nome = config("payments.methods.{$metodo}.nome");
+                $sugerido = Carteira::paraNumero($telefone);
+
+                throw ValidationException::withMessages([
+                    'wallet_phone' => $sugerido
+                        ? "Este número é {$this->nomeOperadora($sugerido)}. Escolhe {$this->nomeMetodo($sugerido)} ou usa um número {$this->nomeOperadora($metodo)}."
+                        : "Este número não parece servir {$nome}. Confirma antes de continuar.",
+                ]);
+            }
         }
 
         $gateway = $this->gateways->para($metodo);

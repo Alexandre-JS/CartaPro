@@ -34,6 +34,16 @@ return [
     | `driver` diz quem executa. A e-Mola não tem API pública — a Movitel só
     | cede o WSDL por acordo comercial — pelo que passa por um agregador.
     |
+    | `movel` distingue quem cobra no telemóvel de quem cobra numa página. As
+    | carteiras móveis recebem um pedido de PIN no número que indicamos, e por
+    | isso exigem — e validam — esse número. O cartão não tem número nenhum: os
+    | dados são recolhidos no Hosted Checkout da DebitoPay, que é quem tem
+    | certificação PCI-DSS. Pedir uma "carteira" a quem paga com Visa seria
+    | inventar um requisito que o meio de pagamento não tem.
+    |
+    | `minimo` é o valor abaixo do qual o fornecedor recusa. Está aqui para o
+    | aluno ser avisado antes da transação, em vez de receber um 400 opaco.
+    |
     */
 
     'methods' => [
@@ -41,13 +51,34 @@ return [
             'nome' => 'M-Pesa',
             'operadora' => 'Vodacom',
             'prefixos' => array_filter(explode(',', env('MPESA_PREFIXES', '84,85'))),
-            'driver' => env('MPESA_DRIVER', 'mpesa'),
+            'driver' => env('MPESA_DRIVER', 'debitopay'),
+            'movel' => true,
+            'minimo' => (float) env('MPESA_MIN', 10),
         ],
         'emola' => [
             'nome' => 'e-Mola',
             'operadora' => 'Movitel',
             'prefixos' => array_filter(explode(',', env('EMOLA_PREFIXES', '86,87'))),
-            'driver' => env('EMOLA_DRIVER', 'paysuite'),
+            'driver' => env('EMOLA_DRIVER', 'debitopay'),
+            'movel' => true,
+            'minimo' => (float) env('EMOLA_MIN', 50),
+        ],
+        'mkesh' => [
+            'nome' => 'mKesh',
+            'operadora' => 'Tmcel',
+            'prefixos' => array_filter(explode(',', env('MKESH_PREFIXES', '82'))),
+            'driver' => env('MKESH_DRIVER', 'debitopay'),
+            'movel' => true,
+            'minimo' => (float) env('MKESH_MIN', 10),
+        ],
+        'cartao' => [
+            'nome' => 'Visa / Mastercard',
+            'operadora' => 'Cartão',
+            // Sem prefixos: não é o número que decide, é o cartão.
+            'prefixos' => [],
+            'driver' => env('CARD_DRIVER', 'debitopay'),
+            'movel' => false,
+            'minimo' => (float) env('CARD_MIN', 50),
         ],
     ],
 
@@ -150,6 +181,58 @@ return [
         'token' => env('PAYSUITE_TOKEN'),
         'webhook_secret' => env('PAYSUITE_WEBHOOK_SECRET'),
         'timeout' => (int) env('PAYSUITE_TIMEOUT', 30),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | DebitoPay — orquestrador M-Pesa / e-Mola / mKesh / cartões
+    |--------------------------------------------------------------------------
+    |
+    | A chave secreta fica exclusivamente no backend. O wallet_code pode ser
+    | comum ou específico por método, conforme as carteiras criadas no portal.
+    | O webhook é HMAC-SHA256 sobre o corpo bruto da requisição.
+    |
+    | O `base_url` fica em ambiente e não fixo em código porque a DebitoPay tem
+    | dois endereços em circulação: o das Edge Functions (que é o que a própria
+    | documentação usa nos exemplos, e o que responde hoje) e o vaidoso
+    | `https://api.debitopay.com/v1`, que ainda não apresenta certificado TLS
+    | válido. O primeiro é o predefinido por ser o que funciona; passar ao
+    | segundo, quando estiver no ar, é mudar uma linha do .env.
+    |
+    */
+
+    'debitopay' => [
+        'base_url' => env('DEBITOPAY_BASE_URL', 'https://gyqoaningqhurhvdugne.supabase.co/functions/v1'),
+        'api_key' => env('DEBITOPAY_API_KEY'),
+        'merchant_id' => env('DEBITOPAY_MERCHANT_ID'),
+        'wallet_code' => env('DEBITOPAY_WALLET_CODE'),
+        'wallets' => [
+            'mpesa' => env('DEBITOPAY_MPESA_WALLET_CODE'),
+            'emola' => env('DEBITOPAY_EMOLA_WALLET_CODE'),
+            'mkesh' => env('DEBITOPAY_MKESH_WALLET_CODE'),
+            'cartao' => env('DEBITOPAY_CARD_WALLET_CODE'),
+        ],
+
+        /*
+         * O nosso vocabulário para o deles. A DebitoPay também expõe 'payfast'
+         * (cartões e EFT em ZAR, África do Sul); não está ligado porque a
+         * CartaPro vende em MZN e o PayFast só aceita carteiras em ZAR — abri-lo
+         * exigia uma carteira e um preço numa segunda moeda, que é decisão de
+         * negócio, não de código. O driver cobra-o sem alterações no dia em que
+         * existir esse método com a sua carteira.
+         */
+        'metodos' => [
+            'mpesa' => 'mpesa',
+            'emola' => 'emola',
+            'mkesh' => 'mkesh',
+            'cartao' => 'visa_mastercard',
+        ],
+
+        // Para onde o Hosted Checkout devolve o cliente depois do cartão.
+        'return_url' => env('DEBITOPAY_RETURN_URL'),
+
+        'webhook_secret' => env('DEBITOPAY_WEBHOOK_SECRET'),
+        'timeout' => (int) env('DEBITOPAY_TIMEOUT', 30),
     ],
 
 ];

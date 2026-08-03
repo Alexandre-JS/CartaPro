@@ -115,7 +115,8 @@ class PaymentController extends Controller
             'moeda' => $payment->currency,
             'mensagem' => $payment->provider_message,
             'transacao' => $payment->provider_transaction_id,
-            // Só a e-Mola (via agregador) o usa: o app abre esta página.
+            // Preenchido quando o método cobra numa página em vez de no
+            // telemóvel — cartões, e a e-Mola via agregador. O app abre-a.
             'checkoutUrl' => $payment->checkout_url,
             // O app precisa do acesso actualizado na mesma resposta: sem isto
             // teria de fazer outra chamada só para saber se os cadeados abrem.

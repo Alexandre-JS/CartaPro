@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\ContentController;
+use App\Http\Controllers\Api\V1\DebitoPayWebhookController;
 use App\Http\Controllers\Api\V1\ExamSessionController;
 use App\Http\Controllers\Api\V1\ManagementController;
 use App\Http\Controllers\Api\V1\MobileController;
@@ -29,6 +30,10 @@ Route::prefix('v1')->group(function () {
     Route::post('/webhooks/paysuite', PaySuiteWebhookController::class)
         ->name('webhooks.paysuite')
         ->middleware('throttle:60,1');
+
+    Route::post('/webhooks/debitopay', DebitoPayWebhookController::class)
+        ->name('webhooks.debitopay')
+        ->middleware('throttle:120,1');
 
     // Prova da escola: o ecrã de entrada só mostra o estado da sessão.
     // A pauta da turma deixou de ser exposta e a submissão exige bilhete.
@@ -66,7 +71,14 @@ Route::prefix('v1')->group(function () {
             // cada tentativa faz aparecer um pedido de PIN no telemóvel do aluno.
             Route::get('/payments/plans', [PaymentController::class, 'plans']);
             Route::post('/payments', [PaymentController::class, 'store'])->middleware('throttle:5,10');
-            Route::get('/payments/{payment}', [PaymentController::class, 'show'])->whereNumber('payment');
+            // O polling não é uma leitura barata: enquanto o pagamento está
+            // pendente, cada chamada faz um check-status à DebitoPay. Sem
+            // limite, um ecrã que sondasse em ciclo apertado gastava processos
+            // do servidor e esbarrava no tecto de 60/min do fornecedor —
+            // devolvendo 429 a toda a gente, não só a quem sondava.
+            Route::get('/payments/{payment}', [PaymentController::class, 'show'])
+                ->whereNumber('payment')
+                ->middleware('throttle:30,1');
         });
 
         Route::get('/topics', [ContentController::class, 'topics']);

@@ -236,15 +236,21 @@ class PaymentApiTest extends TestCase
 
     // ---- Dois métodos, e a carteira que pode não ser a da conta ----
 
-    public function test_catalogue_offers_both_wallets_with_their_prefixes(): void
+    public function test_catalogue_offers_every_configured_wallet_with_its_prefixes(): void
     {
+        // Explícito para o catálogo não depender do .env de quem corre os testes.
+        config(['payments.provider' => 'fake']);
         [, $token] = $this->mobileUser(['phone' => '841234567']);
 
         $resposta = $this->withToken($token)->getJson('/api/v1/mobile/payments/plans')->assertOk();
 
-        $this->assertSame(['mpesa', 'emola'], array_column($resposta->json('metodos'), 'chave'));
+        $this->assertSame(['mpesa', 'emola', 'mkesh', 'cartao'], array_column($resposta->json('metodos'), 'chave'));
         $this->assertSame(['84', '85'], $resposta->json('metodos.0.prefixos'));
         $this->assertSame(['86', '87'], $resposta->json('metodos.1.prefixos'));
+        $this->assertSame(['82'], $resposta->json('metodos.2.prefixos'));
+        // O cartão não se escolhe pelo número: vai sem prefixos, e o app não
+        // deve pedir carteira nenhuma para ele.
+        $this->assertSame([], $resposta->json('metodos.3.prefixos'));
         // O app pré-selecciona o método a partir do número da conta.
         $resposta->assertJsonPath('metodoSugerido', 'mpesa');
     }
@@ -308,8 +314,19 @@ class PaymentApiTest extends TestCase
 
     public function test_method_without_credentials_is_not_offered_nor_accepted(): void
     {
-        config(['payments.provider' => 'real', 'payments.paysuite.token' => null,
-            'payments.mpesa.api_key' => 'k', 'payments.mpesa.public_key' => 'p']);
+        config([
+            'payments.provider' => 'real',
+            'payments.methods.mpesa.driver' => 'mpesa',
+            'payments.methods.emola.driver' => 'paysuite',
+            'payments.paysuite.token' => null,
+            'payments.mpesa.api_key' => 'k',
+            'payments.mpesa.public_key' => 'p',
+            // Sem credenciais DebitoPay, os métodos que dependem dela caem fora.
+            'payments.debitopay.api_key' => null,
+            'payments.debitopay.merchant_id' => null,
+            'payments.debitopay.wallet_code' => null,
+            'payments.debitopay.wallets' => [],
+        ]);
         [, $token] = $this->mobileUser(['phone' => '861234567']);
 
         $metodos = $this->withToken($token)->getJson('/api/v1/mobile/payments/plans')->json('metodos');
