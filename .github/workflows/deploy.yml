@@ -1,0 +1,138 @@
+# Publica a API quando main muda.
+#
+# O trabalho pesado — instalar dependências, optimizar o autoloader — corre
+# aqui, nas máquinas do GitHub. O servidor recebe ficheiros prontos: em
+# alojamento partilhado, um `composer install` é o que mais depressa esgota a
+# memória da conta.
+#
+# O deploy depende dos testes. Com pagamentos reais em produção, um merge que
+# parta o gateway não pode chegar ao servidor por não termos olhado.
+#
+# Sem SSH, o envio é por FTP e em duas metades, porque a aplicação e a pasta
+# servida pela web vivem em sítios diferentes — ver o passo "Montar a árvore".
+
+name: Deploy API
+
+on:
+  push:
+    branches: [main]
+  # Permite publicar à mão a partir do separador Actions, sem um commit novo.
+  workflow_dispatch:
+
+concurrency:
+  # Dois deploys em simultâneo deixariam o servidor a meio de dois envios.
+  group: deploy-producao
+  cancel-in-progress: false
+
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: carta-api
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          # A mesma do servidor (8.3.31). Testar noutra versão daria confiança
+          # sobre um ambiente que não é o nosso.
+          php-version: '8.3'
+          coverage: none
+
+      - name: Instalar dependências
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      # Sem preparar ambiente: o .env.testing está no repositório e o Laravel
+      # prefere-o quando APP_ENV=testing, que é o que o phpunit.xml define.
+      - name: Testes
+        run: php artisan test
+
+  publicar:
+    needs: testes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+
+      - name: Construir para produção
+        working-directory: carta-api
+        run: composer install --no-dev --optimize-autoloader --no-interaction --no-progress
+
+      - name: Montar a árvore de envio
+        # Duas pastas com destinos distintos:
+        #
+        #   app/     → fora da raiz web. Aqui está o .env, o vendor e o código.
+        #   web/     → public_html. Só o que pode ser servido pela internet.
+        #
+        # É esta separação que impede o .env — com a chave que cobra clientes —
+        # de ser descarregável por quem adivinhe o endereço.
+        run: |
+          mkdir -p envio/app envio/web
+
+          rsync -a \
+            --exclude='public/' \
+            --exclude='.env' \
+            --exclude='.env.*' \
+            --exclude='tests/' \
+            --exclude='node_modules/' \
+            --exclude='storage/logs/' \
+            carta-api/ envio/app/
+
+          rsync -a carta-api/public/ envio/web/
+
+          # O index.php procura o vendor e o bootstrap um nível acima de si.
+          # Como a aplicação deixou de estar aí, os três caminhos passam a
+          # apontar para a pasta irmã.
+          sed -i "s|__DIR__\.'/\.\./|__DIR__.'/../carta-api/|g" envio/web/index.php
+
+          echo "--- index.php publicado ---"
+          grep -n "carta-api" envio/web/index.php
+
+      - name: Enviar aplicação (fora da raiz web)
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          # FTPS: em FTP simples a palavra-passe viaja em texto legível.
+          protocol: ftps
+          local-dir: ./envio/app/
+          server-dir: ${{ secrets.FTP_APP_DIR }}
+          # Guarda o que só existe no servidor e a aplicação escreve.
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            .env
+            storage/logs/**
+            storage/framework/cache/**
+            storage/framework/sessions/**
+            storage/framework/views/**
+            bootstrap/cache/**
+
+      - name: Enviar pasta pública
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          local-dir: ./envio/web/
+          server-dir: ${{ secrets.FTP_WEB_DIR }}
+
+      - name: Confirmar que a API responde
+        # Um deploy que corre sem erros mas deixa o site em 500 não é sucesso.
+        run: |
+          sleep 10
+          codigo=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 \
+            https://ivory-shark-126778.hostingersite.com/api/v1/topics)
+          echo "GET /api/v1/topics devolveu $codigo"
+          case "$codigo" in
+            200|401) echo "API a responder." ;;
+            *) echo "A API não respondeu como esperado."; exit 1 ;;
+          esac
