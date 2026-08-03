@@ -3,6 +3,9 @@
 .env
 .env.*
 !.env.example
+# Ambiente dos testes: sem segredos, e o CI precisa dele no repositório para
+# os testes não dependerem de um .env que lá não existe.
+!.env.testing
 .idea/
 .vscode/
 **/node_modules/
