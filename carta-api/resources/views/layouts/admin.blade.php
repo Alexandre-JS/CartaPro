@@ -5,7 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Painel') · CartaPro</title>
     <link rel="icon" type="image/png" href="{{ asset('images/logo/icon CartaPro.png') }}">
-    <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    {{--
+        A data de modificação no endereço obriga o browser — e o CDN à frente
+        dele — a buscar a folha de estilos outra vez quando ela muda. Sem isto
+        o ficheiro é servido de cache indefinidamente: uma correcção de estilo
+        publicada continuava invisível para quem já tinha visitado o painel, e
+        parecia que o deploy não tinha subido.
+    --}}
+    <link rel="stylesheet" href="{{ asset('css/admin.css') }}?v={{ @filemtime(public_path('css/admin.css')) ?: '1' }}">
 </head>
 <body>
 <div class="app-shell">
@@ -18,7 +25,7 @@
             @if(auth()->user()->isAdmin())<a class="{{ request()->routeIs('admin.approvals.*') ? 'active' : '' }}" href="{{ route('admin.approvals.index') }}"><svg viewBox="0 0 24 24"><path d="M12 22s8-3 8-10V5l-8-3-8 3v7c0 7 8 10 8 10zM8.5 12l2.2 2.2 4.8-5"/></svg>Aprovação @if(($sidebarReviewCount ?? 0)>0)<span class="badge">{{ $sidebarReviewCount }}</span>@endif</a>@endif
         </nav>
         <span class="nav-label">Conteúdo</span>
-        <nav class="nav"><a class="{{ request()->routeIs('admin.signs.*') ? 'active' : '' }}" href="{{ route('admin.signs.index') }}"><svg viewBox="0 0 24 24"><path d="M12 3 2 21h20zM12 9v5M12 18h.01"/></svg>Sinais</a><a class="{{ request()->routeIs('admin.articles.*') ? 'active' : '' }}" href="{{ route('admin.articles.index') }}"><svg viewBox="0 0 24 24"><path d="M5 3h14v18H5zM8 7h8M8 11h8M8 15h6"/></svg>Artigos</a><a class="{{ request()->routeIs('admin.lessons.*') ? 'active' : '' }}" href="{{ route('admin.lessons.index') }}"><svg viewBox="0 0 24 24"><path d="M4 19.5V6a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM8 8h8M8 12h6"/></svg>Fichas de estudo</a><a class="{{ request()->routeIs('admin.glossary.*') ? 'active' : '' }}" href="{{ route('admin.glossary.index') }}"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h4M16 13h.01"/></svg>Glossário</a><a class="{{ request()->routeIs('admin.topics.*') ? 'active' : '' }}" href="{{ route('admin.topics.index') }}"><svg viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg>Temas</a>@if(auth()->user()->isAdmin())<a class="{{ request()->routeIs('admin.categories.*') ? 'active' : '' }}" href="{{ route('admin.categories.index') }}"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Categorias</a>@endif</nav>
+        <nav class="nav"><a class="{{ request()->routeIs('admin.signs.*') ? 'active' : '' }}" href="{{ route('admin.signs.index') }}"><svg viewBox="0 0 24 24"><path d="M12 3 2 21h20zM12 9v5M12 18h.01"/></svg>Sinais</a>@if(auth()->user()->isAdmin())<a class="{{ request()->routeIs('admin.sign-categories.*') ? 'active' : '' }}" href="{{ route('admin.sign-categories.index') }}"><svg viewBox="0 0 24 24"><path d="M3 5h7v6H3zM14 5h7v6h-7zM3 15h7v4H3zM14 15h7v4h-7z"/></svg>Categorias de sinais</a>@endif<a class="{{ request()->routeIs('admin.articles.*') ? 'active' : '' }}" href="{{ route('admin.articles.index') }}"><svg viewBox="0 0 24 24"><path d="M5 3h14v18H5zM8 7h8M8 11h8M8 15h6"/></svg>Artigos</a><a class="{{ request()->routeIs('admin.lessons.*') ? 'active' : '' }}" href="{{ route('admin.lessons.index') }}"><svg viewBox="0 0 24 24"><path d="M4 19.5V6a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM8 8h8M8 12h6"/></svg>Fichas de estudo</a><a class="{{ request()->routeIs('admin.glossary.*') ? 'active' : '' }}" href="{{ route('admin.glossary.index') }}"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h4M16 13h.01"/></svg>Glossário</a><a class="{{ request()->routeIs('admin.topics.*') ? 'active' : '' }}" href="{{ route('admin.topics.index') }}"><svg viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg>Temas</a>@if(auth()->user()->isAdmin())<a class="{{ request()->routeIs('admin.categories.*') ? 'active' : '' }}" href="{{ route('admin.categories.index') }}"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Categorias</a>@endif</nav>
         @if(auth()->user()->isAdmin())
             <nav class="nav"><a class="{{ request()->routeIs('admin.publications.*') ? 'active' : '' }}" href="{{ route('admin.publications.index') }}"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 8l5-5 5 5M5 14v6h14v-6"/></svg>Publicação</a></nav>
             <span class="nav-label">Gestão</span>

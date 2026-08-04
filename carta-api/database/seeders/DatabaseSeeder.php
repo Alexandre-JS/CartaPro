@@ -11,6 +11,7 @@ use App\Models\LicenseCategory;
 use App\Models\Question;
 use App\Models\School;
 use App\Models\Sign;
+use App\Models\SignCategory;
 use App\Models\Student;
 use App\Models\Topic;
 use App\Models\Unlock;
@@ -54,7 +55,7 @@ class DatabaseSeeder extends Seeder
 
         Sign::updateOrCreate(['slug' => 'curva-perigosa'], [
             'name' => 'Curva perigosa',
-            'category' => 'perigo',
+            'sign_category_id' => SignCategory::where('slug', 'perigo')->value('id'),
             'meaning' => 'Aviso de curva perigosa à frente.',
             'file_path' => '/images/signs/curva-perigosa.svg',
             'is_active' => true,

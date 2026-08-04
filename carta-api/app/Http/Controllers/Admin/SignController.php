@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Sign;
+use App\Models\SignCategory;
 use App\Models\Topic;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class SignController extends Controller
@@ -16,11 +18,11 @@ class SignController extends Controller
     public function index(Request $request): View
     {
         return view('admin.signs.index', [
-            'categorias' => config('estudo.categorias_sinais'),
-            'porCategoria' => Sign::selectRaw('category, count(*) as total')->groupBy('category')->pluck('total', 'category'),
-            'signs' => Sign::query()->with('topic')
+            'categorias' => SignCategory::raiz()->ordenadas()->get(),
+            'porCategoria' => Sign::selectRaw('sign_category_id, count(*) as total')->groupBy('sign_category_id')->pluck('total', 'sign_category_id'),
+            'signs' => Sign::query()->with(['topic', 'category', 'subcategory'])
                 ->when($request->filled('q'), fn ($query) => $query->where(fn ($nested) => $nested->where('name', 'like', '%'.$request->string('q')->value().'%')->orWhere('meaning', 'like', '%'.$request->string('q')->value().'%')))
-                ->when($request->filled('category'), fn ($query) => $query->where('category', $request->string('category')->value()))
+                ->when($request->filled('category'), fn ($query) => $query->where('sign_category_id', $request->integer('category')))
                 ->orderBy('sort_order')->orderBy('name')->paginate(18)->withQueryString(),
         ]);
     }
@@ -46,10 +48,9 @@ class SignController extends Controller
     {
         return [
             'sign' => $sign,
-            // Categorias vindas de config/estudo.php — inclui marcas
-            // rodoviárias, semáforos e sinais dos agentes, que antes não
-            // tinham categoria possível.
-            'categorias' => config('estudo.categorias_sinais'),
+            // Só as activas: uma categoria desactivada deixa de ser oferecida
+            // para novos sinais, mas os que já lhe pertencem não se perdem.
+            'categorias' => SignCategory::raiz()->ativas()->ordenadas()->with(['children' => fn ($q) => $q->where('is_active', true)])->get(),
             'topics' => Topic::where('is_active', true)->orderBy('sort_order')->get(['id', 'name']),
         ];
     }
@@ -99,7 +100,10 @@ class SignController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:150'],
             'slug' => ['required', 'alpha_dash', 'max:150', Rule::unique('signs')->ignore($sign)],
-            'category' => ['required', Rule::in(array_keys(config('estudo.categorias_sinais')))],
+            // Categoria obrigatória e subcategoria opcional: nem todo o sinal
+            // precisa de refinamento, mas todos têm de pertencer a algum lado.
+            'sign_category_id' => ['required', Rule::exists('sign_categories', 'id')->whereNull('parent_id')],
+            'sign_subcategory_id' => ['nullable', 'exists:sign_categories,id'],
             'topic_id' => ['nullable', 'exists:topics,id'],
             'meaning' => ['required', 'string', 'max:500'],
             'description' => ['nullable', 'string'],
@@ -121,6 +125,25 @@ class SignController extends Controller
             'is_active' => ['nullable', 'boolean'],
         ]);
         unset($data['svg']);
+
+        /*
+         * A subcategoria tem de ser filha da categoria escolhida. Sem esta
+         * verificação, um pedido forjado — ou o formulário deixado a meio
+         * depois de trocar a categoria — gravava um sinal em "Sinais de
+         * perigo / Limite de velocidade", uma combinação que não existe.
+         */
+        if (filled($data['sign_subcategory_id'] ?? null)) {
+            $subcategoria = SignCategory::find($data['sign_subcategory_id']);
+
+            if (! $subcategoria || (int) $subcategoria->parent_id !== (int) $data['sign_category_id']) {
+                throw ValidationException::withMessages([
+                    'sign_subcategory_id' => 'Essa subcategoria não pertence à categoria escolhida.',
+                ]);
+            }
+        }
+
+        // Ausente do pedido, `validate()` não o devolve — daí o ?? antes do ?:
+        $data['sign_subcategory_id'] = ($data['sign_subcategory_id'] ?? null) ?: null;
         if ($request->hasFile('svg')) {
             $ficheiro = $request->file('svg');
             $extensao = strtolower($ficheiro->getClientOriginalExtension());

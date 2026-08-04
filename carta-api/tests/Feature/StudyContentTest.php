@@ -6,6 +6,7 @@ use App\Models\Article;
 use App\Models\GlossaryTerm;
 use App\Models\Lesson;
 use App\Models\Sign;
+use App\Models\SignCategory;
 use App\Models\Topic;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -26,7 +27,7 @@ class StudyContentTest extends TestCase
 
         Sign::create([
             'name' => 'Curva à direita',
-            'category' => 'perigo',
+            'sign_category_id' => SignCategory::where('slug', 'perigo')->value('id'),
             'topic_id' => $topic->id,
             'meaning' => 'Curva perigosa à direita',
             'description' => 'Reduz a velocidade antes de entrar na curva.',
@@ -38,7 +39,7 @@ class StudyContentTest extends TestCase
 
         Sign::create([
             'name' => 'Sinal reservado ao plano completo',
-            'category' => 'proibicao',
+            'sign_category_id' => SignCategory::where('slug', 'proibicao')->value('id'),
             'meaning' => 'Significado reservado ao plano pago',
             'file_path' => 'images/signs/proibido.svg',
             'is_locked' => true,

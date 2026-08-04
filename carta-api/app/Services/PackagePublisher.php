@@ -9,6 +9,7 @@ use App\Models\GlossaryTerm;
 use App\Models\Lesson;
 use App\Models\Question;
 use App\Models\Sign;
+use App\Models\SignCategory;
 use App\Models\Topic;
 use App\Models\User;
 use App\Support\Grading;
@@ -86,14 +87,20 @@ class PackagePublisher
      */
     public function buildStudyPayload(): array
     {
-        // A ordem das categorias é a de config/estudo.php (perigo, proibição,
-        // obrigação…): na grelha "Todos" o aluno vê os sinais agrupados como no
-        // manual, e não intercalados pelo sort_order de cada um.
-        $ordemCategorias = array_flip(array_keys(config('estudo.categorias_sinais', [])));
+        /*
+         * Os sinais saem agrupados por categoria, pela ordem que o painel lhes
+         * deu: na grelha "Todos" o aluno vê-os como no manual, e não
+         * intercalados pelo sort_order de cada sinal.
+         *
+         * A ordem vinha de config/estudo.php e passou a vir da base de dados,
+         * onde as categorias são agora editáveis.
+         */
+        $categorias = SignCategory::raiz()->ativas()->ordenadas()->get();
+        $ordemCategorias = $categorias->pluck('sort_order', 'id')->all();
 
-        $signs = Sign::with('topic')->where('is_active', true)
+        $signs = Sign::with(['topic', 'category', 'subcategory'])->where('is_active', true)
             ->orderBy('sort_order')->orderBy('name')->get()
-            ->sortBy(fn (Sign $sign) => $ordemCategorias[$sign->category] ?? 99, SORT_NUMERIC)
+            ->sortBy(fn (Sign $sign) => $ordemCategorias[$sign->sign_category_id] ?? 99, SORT_NUMERIC)
             ->values();
 
         // Idem para as fichas: a ordem pedagógica é a de config/estudo.php
@@ -110,7 +117,13 @@ class PackagePublisher
 
         return [
             'taxonomia' => [
-                'categoriasSinais' => $this->taxonomy('estudo.categorias_sinais'),
+                // Mantém a forma que o app já lê (slug, nome, descrição,
+                // ícone, ordem); só a fonte mudou de configuração para tabela.
+                'categoriasSinais' => $categorias->map(fn (SignCategory $c) => $c->toPackageArray())->all(),
+                // Novo e opcional: o app ignora-o sem consequência enquanto
+                // não souber o que fazer com subcategorias.
+                'subcategoriasSinais' => SignCategory::whereNotNull('parent_id')->ativas()->ordenadas()->get()
+                    ->map(fn (SignCategory $c) => $c->toPackageArray() + ['categoria' => $c->parent?->slug])->all(),
                 'gruposLicoes' => $this->taxonomy('estudo.grupos_licoes'),
             ],
             'sinais' => $signs->map(fn (Sign $sign) => $sign->toPackageArray())->all(),

@@ -19,8 +19,8 @@
     <input name="q" value="{{ request('q') }}" placeholder="Nome ou significado">
     <select name="category">
         <option value="">Todas as categorias</option>
-        @foreach ($categorias as $slug => $dados)
-            <option value="{{ $slug }}" @selected(request('category') === $slug)>{{ $dados['nome'] }} ({{ $porCategoria[$slug] ?? 0 }})</option>
+        @foreach ($categorias as $categoria)
+            <option value="{{ $categoria->id }}" @selected((int) request('category') === $categoria->id)>{{ $categoria->name }} ({{ $porCategoria[$categoria->id] ?? 0 }})</option>
         @endforeach
     </select>
     <button class="btn light">Pesquisar</button>
@@ -30,7 +30,7 @@
     @forelse ($signs as $sign)
         <article class="card library-item">
             <div class="library-preview"><img src="{{ $sign->file_path }}" alt="{{ $sign->name }}"></div>
-            <span class="status {{ $sign->is_active ? 'active' : 'inactive' }}">{{ $sign->categoriaNome() }}</span>
+            <span class="status {{ $sign->is_active ? 'active' : 'inactive' }}">{{ $sign->categoriaNome() }}</span>@if ($sign->subcategory)<small style="display:block;color:var(--muted)">{{ $sign->subcategory->name }}</small>@endif
             <h3>{{ $sign->name }}</h3>
             <p>{{ str($sign->meaning)->limit(90) }}</p>
 
