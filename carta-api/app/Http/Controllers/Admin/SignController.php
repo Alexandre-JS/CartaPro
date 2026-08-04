@@ -19,9 +19,9 @@ class SignController extends Controller
             'categorias' => config('estudo.categorias_sinais'),
             'porCategoria' => Sign::selectRaw('category, count(*) as total')->groupBy('category')->pluck('total', 'category'),
             'signs' => Sign::query()->with('topic')
-            ->when($request->filled('q'), fn ($query) => $query->where(fn ($nested) => $nested->where('name', 'like', '%'.$request->string('q')->value().'%')->orWhere('meaning', 'like', '%'.$request->string('q')->value().'%')))
-            ->when($request->filled('category'), fn ($query) => $query->where('category', $request->string('category')->value()))
-            ->orderBy('sort_order')->orderBy('name')->paginate(18)->withQueryString(),
+                ->when($request->filled('q'), fn ($query) => $query->where(fn ($nested) => $nested->where('name', 'like', '%'.$request->string('q')->value().'%')->orWhere('meaning', 'like', '%'.$request->string('q')->value().'%')))
+                ->when($request->filled('category'), fn ($query) => $query->where('category', $request->string('category')->value()))
+                ->orderBy('sort_order')->orderBy('name')->paginate(18)->withQueryString(),
         ]);
     }
 
@@ -68,8 +68,34 @@ class SignController extends Controller
         return back()->with('status', 'Sinal removido da biblioteca.');
     }
 
+    /**
+     * Um identificador legível, derivado do nome quando não for escrito.
+     *
+     * Existe porque ninguém que cataloga sinais quer inventar códigos únicos à
+     * mão — e um humano apressado escreve "stop" duas vezes e bate na restrição
+     * de unicidade sem perceber porquê. O sufixo numérico resolve a colisão em
+     * silêncio; quem quiser um identificador próprio continua a poder escrevê-lo.
+     */
+    private function slugAutomatico(string $nome, ?Sign $sign): string
+    {
+        $base = Str::slug($nome) ?: 'sinal';
+        $slug = $base;
+
+        for ($i = 2; Sign::where('slug', $slug)->when($sign?->exists, fn ($q) => $q->whereKeyNot($sign->getKey()))->exists(); $i++) {
+            $slug = $base.'-'.$i;
+        }
+
+        return $slug;
+    }
+
     private function validated(Request $request, ?Sign $sign = null): array
     {
+        // Gerado antes de validar para que a regra de unicidade o veja: o campo
+        // é opcional no formulário, e vazio significa "decide tu".
+        if (blank($request->input('slug')) && filled($request->input('name'))) {
+            $request->merge(['slug' => $this->slugAutomatico((string) $request->input('name'), $sign)]);
+        }
+
         $data = $request->validate([
             'name' => ['required', 'string', 'max:150'],
             'slug' => ['required', 'alpha_dash', 'max:150', Rule::unique('signs')->ignore($sign)],
@@ -80,20 +106,48 @@ class SignController extends Controller
             'article_ref' => ['nullable', 'integer', 'min:1'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
             'is_locked' => ['nullable', 'boolean'],
-            'svg' => [$sign?->exists ? 'nullable' : 'required', 'file', 'mimetypes:image/svg+xml,text/plain', 'max:2048'],
+            /*
+             * SVG e matriciais. O SVG é o formato certo para sinalização —
+             * escala sem perder nitidez — mas obrigar a ele travava quem só
+             * tem um PNG à mão.
+             *
+             * Converter PNG para SVG não é uma opção: passar de pixels para
+             * vectores exige tracing, que nenhuma extensão de PHP faz, e
+             * embrulhar o PNG dentro de um `<svg><image>` daria um ficheiro
+             * ~33% maior sem ganhar escalabilidade nenhuma. Guarda-se cada um
+             * no seu formato; o que mostra a imagem não precisa de saber qual é.
+             */
+            'svg' => [$sign?->exists ? 'nullable' : 'required', 'file', 'mimetypes:image/svg+xml,text/plain,image/png,image/jpeg,image/webp', 'max:2048'],
             'is_active' => ['nullable', 'boolean'],
         ]);
         unset($data['svg']);
         if ($request->hasFile('svg')) {
-            $svg = $request->file('svg')->get();
-            abort_if(
-                ! str_contains(mb_strtolower($svg), '<svg')
-                || preg_match('/<(script|iframe|object|embed|foreignobject)\b|\son\w+\s*=|javascript:|<!entity/i', $svg),
-                422,
-                'O SVG contém elementos inseguros.',
-            );
-            $filename = Str::slug($data['slug']).'-'.now()->format('YmdHis').'.svg';
-            $request->file('svg')->move(public_path('images/signs'), $filename);
+            $ficheiro = $request->file('svg');
+            $extensao = strtolower($ficheiro->getClientOriginalExtension());
+            $eSvg = $extensao === 'svg' || $ficheiro->getMimeType() === 'image/svg+xml';
+
+            if ($eSvg) {
+                /*
+                 * Um SVG é XML executável pelo browser: aceite sem inspeção,
+                 * seria um vector de XSS servido do nosso próprio domínio, com
+                 * a sessão do administrador aberta ao lado.
+                 */
+                $conteudo = $ficheiro->get();
+                abort_if(
+                    ! str_contains(mb_strtolower($conteudo), '<svg')
+                    || preg_match('/<(script|iframe|object|embed|foreignobject)\b|\son\w+\s*=|javascript:|<!entity/i', $conteudo),
+                    422,
+                    'O SVG contém elementos inseguros.',
+                );
+                $extensao = 'svg';
+            } else {
+                // Só confiar na extensão deixava passar um PHP renomeado para
+                // .png; é o conteúdo que decide se isto é mesmo uma imagem.
+                abort_if(@getimagesize($ficheiro->getPathname()) === false, 422, 'O ficheiro não é uma imagem válida.');
+            }
+
+            $filename = Str::slug($data['slug']).'-'.now()->format('YmdHis').'.'.$extensao;
+            $ficheiro->move(public_path('images/signs'), $filename);
             $data['file_path'] = '/images/signs/'.$filename;
         }
         $data['is_active'] = $request->boolean('is_active');
