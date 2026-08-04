@@ -39,9 +39,11 @@ jobs:
 
       - uses: shivammathur/setup-php@v2
         with:
-          # A mesma do servidor (8.3.31). Testar noutra versão daria confiança
-          # sobre um ambiente que não é o nosso.
-          php-version: '8.3'
+          # A mesma do servidor. O site correu em 8.3 até o composer.lock
+          # passar a exigir >=8.4.1 — o vendor construído em 8.4 recusava
+          # arrancar lá e todo o site respondia 500 sem dizer porquê. A versão
+          # daqui, a do servidor e a do lock têm de andar juntas.
+          php-version: '8.4'
           coverage: none
 
       - name: Instalar dependências
