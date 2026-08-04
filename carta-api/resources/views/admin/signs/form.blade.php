@@ -22,10 +22,28 @@
     </div>
 
     <div class="field">
-        <label>Categoria <x-ajuda texto="Agrupa o sinal na biblioteca e no treino. Inclui marcas rodoviárias, semáforos e sinais dos agentes." /></label>
-        <select name="category">
-            @foreach($categorias as $slug => $dados)
-                <option value="{{ $slug }}" @selected(old('category',$sign->category)===$slug)>{{ $dados['nome'] }}</option>
+        <label>Categoria <x-ajuda texto="Obrigatória — agrupa o sinal na biblioteca e no treino. Geres a lista em Categorias de sinais." /></label>
+        <select name="sign_category_id" id="campo-categoria" required>
+            <option value="">Escolhe uma categoria</option>
+            @foreach($categorias as $categoria)
+                <option value="{{ $categoria->id }}" @selected(old('sign_category_id',$sign->sign_category_id) == $categoria->id)>{{ $categoria->name }}</option>
+            @endforeach
+        </select>
+    </div>
+
+    {{-- As opções de todas as categorias são impressas de uma vez e filtradas
+         no browser. Evita ir ao servidor a cada troca de categoria, e o
+         formulário continua a funcionar se o JavaScript falhar — nesse caso o
+         servidor recusa combinações inválidas, que é a garantia que conta. --}}
+    <div class="field">
+        <label>Subcategoria <x-ajuda texto="Opcional. Refina dentro da categoria — só aparecem as subcategorias da categoria escolhida." /></label>
+        <select name="sign_subcategory_id" id="campo-subcategoria">
+            <option value="">Sem subcategoria</option>
+            @foreach($categorias as $categoria)
+                @foreach($categoria->children as $sub)
+                    <option value="{{ $sub->id }}" data-categoria="{{ $categoria->id }}"
+                        @selected(old('sign_subcategory_id',$sign->sign_subcategory_id) == $sub->id)>{{ $sub->name }}</option>
+                @endforeach
             @endforeach
         </select>
     </div>
@@ -77,4 +95,38 @@
 </div>
 <div class="form-actions"><a class="btn light" href="{{ route('admin.signs.index') }}">Cancelar</a><button class="btn">Guardar sinal</button></div>
 </form>
+
+<script>
+// Mostra só as subcategorias da categoria escolhida. Sem isto, a lista traria
+// as subcategorias todas e convidava a combinações que o servidor recusa.
+(function () {
+    const categoria = document.getElementById('campo-categoria');
+    const subcategoria = document.getElementById('campo-subcategoria');
+    if (!categoria || !subcategoria) return;
+
+    const opcoes = Array.from(subcategoria.options).slice(1);
+
+    function filtrar() {
+        const escolhida = categoria.value;
+        let visiveis = 0;
+
+        opcoes.forEach((opcao) => {
+            const pertence = opcao.dataset.categoria === escolhida;
+            opcao.hidden = !pertence;
+            opcao.disabled = !pertence;
+            if (pertence) visiveis++;
+            // Trocar de categoria não pode deixar seleccionada uma
+            // subcategoria da anterior.
+            if (!pertence && opcao.selected) subcategoria.value = '';
+        });
+
+        // Sem subcategorias, o campo não tem nada a oferecer: escondê-lo diz
+        // mais do que mostrá-lo vazio.
+        subcategoria.closest('.field').hidden = visiveis === 0;
+    }
+
+    categoria.addEventListener('change', filtrar);
+    filtrar();
+})();
+</script>
 @endsection

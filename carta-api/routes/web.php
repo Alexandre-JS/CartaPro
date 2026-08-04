@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\PublicationController;
 use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\ResultController;
 use App\Http\Controllers\Admin\SchoolController;
+use App\Http\Controllers\Admin\SignCategoryController;
 use App\Http\Controllers\Admin\SignController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\TopicController;
@@ -77,6 +78,9 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         Route::patch('/mobile-users/{mobileUser}/status', [MobileUserController::class, 'updateStatus'])->name('mobile-users.status');
         Route::resource('topics', TopicController::class)->except(['index', 'show']);
         Route::resource('signs', SignController::class)->except(['index', 'show']);
+        // Categorias e subcategorias de sinais: até aqui viviam em
+        // config/estudo.php e mudá-las exigia um deploy.
+        Route::resource('sign-categories', SignCategoryController::class)->except('show');
         Route::resource('articles', ArticleController::class)->except(['index', 'show']);
         Route::resource('lessons', LessonController::class)->except(['index', 'show']);
         Route::resource('glossary', GlossaryController::class)->only(['store', 'update', 'destroy']);

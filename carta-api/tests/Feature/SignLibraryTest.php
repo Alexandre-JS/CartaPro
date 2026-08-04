@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Sign;
+use App\Models\SignCategory;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -21,11 +22,16 @@ class SignLibraryTest extends TestCase
         );
     }
 
+    private function categoria(): SignCategory
+    {
+        return SignCategory::raiz()->ordenadas()->firstOrFail();
+    }
+
     private function campos(array $extra = []): array
     {
         return array_merge([
             'name' => 'Curva à direita',
-            'category' => array_key_first(config('estudo.categorias_sinais')),
+            'sign_category_id' => $this->categoria()->id,
             'meaning' => 'Curva perigosa para a direita.',
         ], $extra);
     }

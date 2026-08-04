@@ -7,6 +7,7 @@ use App\Models\GlossaryTerm;
 use App\Models\Lesson;
 use App\Models\School;
 use App\Models\Sign;
+use App\Models\SignCategory;
 use App\Models\Topic;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -29,7 +30,7 @@ class StudyPanelTest extends TestCase
 
         Sign::create([
             'name' => 'Curva à direita',
-            'category' => 'perigo',
+            'sign_category_id' => SignCategory::where('slug', 'perigo')->value('id'),
             'meaning' => 'Curva perigosa à direita',
             'file_path' => 'images/signs/curva-direita.svg',
             'is_active' => true,

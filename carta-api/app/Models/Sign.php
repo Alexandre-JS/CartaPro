@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
 
-#[Fillable(['name', 'slug', 'category', 'topic_id', 'meaning', 'description', 'article_ref', 'file_path', 'sort_order', 'is_locked', 'is_active'])]
+#[Fillable(['name', 'slug', 'sign_category_id', 'sign_subcategory_id', 'topic_id', 'meaning', 'description', 'article_ref', 'file_path', 'sort_order', 'is_locked', 'is_active'])]
 class Sign extends Model
 {
     /**
@@ -34,10 +34,20 @@ class Sign extends Model
         return $this->belongsTo(Topic::class);
     }
 
-    /** Rótulo da categoria, a partir de config/estudo.php. */
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(SignCategory::class, 'sign_category_id');
+    }
+
+    /** Nem todo o sinal precisa de refinamento — a subcategoria é opcional. */
+    public function subcategory(): BelongsTo
+    {
+        return $this->belongsTo(SignCategory::class, 'sign_subcategory_id');
+    }
+
     public function categoriaNome(): string
     {
-        return config('estudo.categorias_sinais.'.$this->category.'.nome', ucfirst(str_replace('_', ' ', (string) $this->category)));
+        return (string) ($this->category?->name ?? '—');
     }
 
     /** Forma canónica no pacote offline. */
@@ -46,7 +56,10 @@ class Sign extends Model
         return [
             'slug' => $this->slug,
             'nome' => $this->name,
-            'categoria' => $this->category,
+            'categoria' => $this->category?->slug,
+            // Acrescentado, nunca em substituição: o app lê `categoria` e
+            // continuaria a funcionar se ignorasse este campo.
+            'subcategoria' => $this->subcategory?->slug,
             'tema' => $this->topic?->slug,
             'significado' => $this->meaning,
             'descricao' => $this->description,
