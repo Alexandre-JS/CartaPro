@@ -25,20 +25,13 @@ $app = Application::configure(basePath: dirname(__DIR__))
     })->create();
 
 /*
- * Onde fica a pasta que a web serve.
+ * A pasta pública não se decide aqui.
  *
- * Por omissão o Laravel assume `public/` dentro da aplicação, e em
- * desenvolvimento é isso mesmo. No alojamento partilhado não é: a pasta
- * servida é `public_html/`, e a aplicação vive numa subpasta dela — fora do
- * alcance da web, que é o que protege o .env.
- *
- * Sem esta correção, `public_path()` aponta para dentro da pasta bloqueada.
- * Os ficheiros carregados no painel (os SVG dos sinais) eram gravados onde o
- * servidor nunca os serviria, e o painel mostrava 404 numa imagem que existia
- * em disco.
+ * Houve uma tentativa de a ler de `env('APP_PUBLIC_PATH')` neste ponto, e
+ * falhava em silêncio: quando este ficheiro corre, o .env ainda não foi lido
+ * pelo kernel, e `env()` devolve null sem erro nenhum. Quem a define é o
+ * `public/index.php`, a partir do seu próprio `__DIR__` — que é, por
+ * definição, a pasta que o servidor serve.
  */
-if ($publicPath = env('APP_PUBLIC_PATH')) {
-    $app->usePublicPath($publicPath);
-}
 
 return $app;

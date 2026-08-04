@@ -5,7 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Painel') · CartaPro</title>
     <link rel="icon" type="image/png" href="{{ asset('images/logo/icon CartaPro.png') }}">
-    <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    {{--
+        A data de modificação no endereço obriga o browser — e o CDN à frente
+        dele — a buscar a folha de estilos outra vez quando ela muda. Sem isto
+        o ficheiro é servido de cache indefinidamente: uma correcção de estilo
+        publicada continuava invisível para quem já tinha visitado o painel, e
+        parecia que o deploy não tinha subido.
+    --}}
+    <link rel="stylesheet" href="{{ asset('css/admin.css') }}?v={{ @filemtime(public_path('css/admin.css')) ?: '1' }}">
 </head>
 <body>
 <div class="app-shell">

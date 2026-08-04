@@ -91,6 +91,31 @@ class SignLibraryTest extends TestCase
         $this->assertFileExists(public_path(ltrim($caminho, '/')));
     }
 
+    /**
+     * A guarda que faltava.
+     *
+     * O teste acima passa em qualquer cenário: em desenvolvimento a pasta
+     * pública já é a certa por omissão, portanto ele confirmava algo que era
+     * verdade de qualquer maneira. Em produção a aplicação vive numa subpasta
+     * de `public_html/` e o `public_path()` do Laravel apontava para dentro da
+     * pasta bloqueada — as imagens gravavam onde a web não chega.
+     *
+     * Quem corrige isso é o `public/index.php`, deduzindo a pasta do seu
+     * próprio `__DIR__`. Não dá para exercitar num teste HTTP, porque a suite
+     * arranca a aplicação sem passar por esse ficheiro; o que dá para garantir
+     * é que a linha continua lá — apagá-la traz o 404 de volta em silêncio.
+     */
+    public function test_the_entry_point_declares_its_own_directory_as_the_public_path(): void
+    {
+        $entrada = file_get_contents(base_path('public/index.php'));
+
+        $this->assertStringContainsString(
+            '$app->usePublicPath(__DIR__);',
+            $entrada,
+            'O public/index.php deixou de fixar a pasta pública: em produção as imagens carregadas voltam a dar 404.',
+        );
+    }
+
     /** Nem toda a gente tem o sinal em SVG; um PNG resolve. */
     public function test_raster_images_are_accepted_and_keep_their_format(): void
     {
