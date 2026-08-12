@@ -50,7 +50,7 @@ class ContentController extends Controller
         // `include_locked` deixou de ser aceite do cliente: quem decide é o plano.
         $paid = $this->entitlements->isPaid($request->user());
 
-        $questions = Question::query()->with('topic:id,slug,name')->where('is_active', true)->where('status', 'approved')
+        $questions = Question::query()->with(['topic:id,slug,name', 'sign:id,slug,file_path'])->where('is_active', true)->where('status', 'approved')
             ->whereHas('topic', fn ($query) => $query->where('is_active', true))
             ->when($filters['topic'] ?? null, fn ($query, $topic) => $query->whereHas('topic', fn ($q) => $q->where('slug', $topic)))
             ->when($filters['category'] ?? null, fn ($query, $category) => $query->whereJsonContains('categories', $category))
@@ -112,7 +112,7 @@ class ContentController extends Controller
     /** Usado quando ainda não houve publicação (ambiente novo). */
     private function liveFallbackPayload(): array
     {
-        $questions = Question::with('topic')->where('is_active', true)->where('status', 'approved')
+        $questions = Question::with(['topic', 'sign'])->where('is_active', true)->where('status', 'approved')
             ->whereHas('topic', fn ($query) => $query->where('is_active', true))
             ->orderBy('sort_order')->get();
 

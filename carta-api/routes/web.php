@@ -56,7 +56,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::post('/classrooms/{classroom}/students', [StudentController::class, 'store'])->name('students.store');
     Route::get('/students/{student}', [StudentController::class, 'show'])->name('students.show');
     Route::delete('/students/{student}', [StudentController::class, 'destroy'])->name('students.destroy');
-    Route::resource('exams', ExamController::class)->only(['index', 'create', 'store', 'destroy']);
+    Route::resource('exams', ExamController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
     Route::get('/exams/{exam}', [DetailController::class, 'exam'])->whereNumber('exam')->name('exams.show');
     Route::resource('sessions', ExamSessionController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::get('/sessions/{session}', [DetailController::class, 'session'])->whereNumber('session')->name('sessions.show');
@@ -90,6 +90,8 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         Route::patch('/exams/{exam}/archive', [ExamController::class, 'archive'])->name('exams.archive');
         // Gratuita ou plano completo, sem ter de apagar e recriar a prova.
         Route::patch('/exams/{exam}/plano', [ExamController::class, 'plan'])->name('exams.plan');
+        // Leva ao app uma prova de escola já aplicada, sem lhe tocar.
+        Route::post('/exams/{exam}/copia-publica', [ExamController::class, 'duplicatePublic'])->name('exams.duplicate-public');
         Route::get('/publications', [PublicationController::class, 'index'])->name('publications.index');
         Route::post('/publications', [PublicationController::class, 'publish'])->name('publications.publish');
         Route::patch('/publications/{package}/restore', [PublicationController::class, 'restore'])->name('publications.restore');

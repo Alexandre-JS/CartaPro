@@ -60,19 +60,43 @@ class Question extends Model
     }
 
     /**
+     * Caminho público da imagem, com o banco de sinais a mandar.
+     *
+     * A coluna `image` guardava uma cópia do caminho do sinal no momento em que
+     * a pergunta foi gravada, e ficava a apodrecer: trocar o ficheiro do sinal
+     * no painel — ou carregá-lo pela primeira vez, como acontece com os 144
+     * sinais importados sem imagem — não chegava às perguntas que o usam, que
+     * continuavam a apontar para o caminho antigo ou para nada.
+     *
+     * Com o sinal escolhido, é ele a fonte; a coluna só serve as perguntas com
+     * imagem própria, que não existe em lado nenhum senão ali.
+     */
+    public function imagemPublica(): ?string
+    {
+        $caminho = $this->sign_id ? ($this->sign?->file_path ?: null) : $this->image;
+
+        return $caminho ?: null;
+    }
+
+    /**
      * Forma canónica da pergunta no pacote/API.
      * Único mapeamento — antes estava duplicado em ContentController,
      * MobileController e PublicationController, com risco de divergirem.
      */
     public function toPackageArray(): array
     {
+        $imagem = $this->imagemPublica();
+
         return [
             'id' => $this->external_id,
             'tipo' => $this->type,
             'tema' => $this->topic->slug,
             'categoriaCarta' => $this->categories,
             'enunciado' => $this->statement,
-            'imagem' => $this->image ? url($this->image) : null,
+            'imagem' => $imagem ? url($imagem) : null,
+            // Slug do sinal ilustrado, quando vem da biblioteca: deixa o app
+            // ligar a pergunta à ficha do sinal em vez de mostrar só a imagem.
+            'sinal' => $this->sign_id ? $this->sign?->slug : null,
             'opcoes' => $this->options,
             'correta' => $this->correct_index,
             'explicacao' => $this->explanation,

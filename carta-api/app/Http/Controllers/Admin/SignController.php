@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Sign;
 use App\Models\SignCategory;
 use App\Models\Topic;
+use App\Support\ImagemSegura;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -120,8 +121,13 @@ class SignController extends Controller
              * embrulhar o PNG dentro de um `<svg><image>` daria um ficheiro
              * ~33% maior sem ganhar escalabilidade nenhuma. Guarda-se cada um
              * no seu formato; o que mostra a imagem não precisa de saber qual é.
+             *
+             * Obrigatório ao criar, excepto nos sinais que vieram da importação
+             * do banco do INATRO sem ficheiro: esses existem precisamente para
+             * alguém lhes anexar a imagem mais tarde, e exigi-la aqui impediria
+             * de corrigir o nome ou a categoria enquanto ela não aparece.
              */
-            'svg' => [$sign?->exists ? 'nullable' : 'required', 'file', 'mimetypes:image/svg+xml,text/plain,image/png,image/jpeg,image/webp', 'max:2048'],
+            'svg' => [$sign?->exists ? 'nullable' : 'required', 'file', ImagemSegura::MIMETYPES, 'max:2048'],
             'is_active' => ['nullable', 'boolean'],
         ]);
         unset($data['svg']);
@@ -145,33 +151,7 @@ class SignController extends Controller
         // Ausente do pedido, `validate()` não o devolve — daí o ?? antes do ?:
         $data['sign_subcategory_id'] = ($data['sign_subcategory_id'] ?? null) ?: null;
         if ($request->hasFile('svg')) {
-            $ficheiro = $request->file('svg');
-            $extensao = strtolower($ficheiro->getClientOriginalExtension());
-            $eSvg = $extensao === 'svg' || $ficheiro->getMimeType() === 'image/svg+xml';
-
-            if ($eSvg) {
-                /*
-                 * Um SVG é XML executável pelo browser: aceite sem inspeção,
-                 * seria um vector de XSS servido do nosso próprio domínio, com
-                 * a sessão do administrador aberta ao lado.
-                 */
-                $conteudo = $ficheiro->get();
-                abort_if(
-                    ! str_contains(mb_strtolower($conteudo), '<svg')
-                    || preg_match('/<(script|iframe|object|embed|foreignobject)\b|\son\w+\s*=|javascript:|<!entity/i', $conteudo),
-                    422,
-                    'O SVG contém elementos inseguros.',
-                );
-                $extensao = 'svg';
-            } else {
-                // Só confiar na extensão deixava passar um PHP renomeado para
-                // .png; é o conteúdo que decide se isto é mesmo uma imagem.
-                abort_if(@getimagesize($ficheiro->getPathname()) === false, 422, 'O ficheiro não é uma imagem válida.');
-            }
-
-            $filename = Str::slug($data['slug']).'-'.now()->format('YmdHis').'.'.$extensao;
-            $ficheiro->move(public_path('images/signs'), $filename);
-            $data['file_path'] = '/images/signs/'.$filename;
+            $data['file_path'] = ImagemSegura::guardar($request->file('svg'), 'images/signs', $data['slug']);
         }
         $data['is_active'] = $request->boolean('is_active');
         $data['is_locked'] = $request->boolean('is_locked');

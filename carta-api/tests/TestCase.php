@@ -10,6 +10,41 @@ use Illuminate\Support\Str;
 
 abstract class TestCase extends BaseTestCase
 {
+    /**
+     * Nenhum teste toca numa base de dados que não seja a descartável.
+     *
+     * Isto não é zelo excessivo: já aconteceu. Com a configuração em cache
+     * (`bootstrap/cache/config.php`), o Laravel deixa de avaliar os ficheiros
+     * de `config/` e passa a ignorar as variáveis que o `phpunit.xml` define —
+     * incluindo `DB_CONNECTION=sqlite`. A suite corre na mesma, em silêncio,
+     * contra a base de dados de desenvolvimento, e o `RefreshDatabase` começa
+     * por lhe fazer `migrate:fresh`. Foi assim que a base local foi apagada.
+     *
+     * O sintoma que se vê primeiro são falhas 419 nos testes web, porque o
+     * `APP_ENV` em cache também deixa de ser `testing`. Se isso acontecer:
+     * `php artisan optimize:clear`.
+     *
+     * A verificação vive aqui, e não no `setUp`, por uma questão de ordem: o
+     * `setUp` do framework cria a aplicação e **logo a seguir** corre os traits,
+     * e é aí que o `RefreshDatabase` faz o `migrate:fresh`. Um guarda no `setUp`
+     * chegaria depois do estrago. `refreshApplication` é o último ponto em que a
+     * configuração já existe e ainda ninguém tocou na base de dados.
+     */
+    protected function refreshApplication(): void
+    {
+        parent::refreshApplication();
+
+        $ligacao = config('database.default');
+        $base = config("database.connections.{$ligacao}.database");
+
+        if ($ligacao !== 'sqlite' || ! in_array($base, [':memory:', ''], true)) {
+            $this->fail(
+                "Os testes estão apontados a «{$ligacao}» / «{$base}» em vez de sqlite em memória. "
+                .'A configuração está provavelmente em cache: corra `php artisan optimize:clear` antes de repetir.'
+            );
+        }
+    }
+
     /** Cria uma conta móvel e devolve [utilizador, token em claro]. */
     protected function mobileUser(array $attributes = []): array
     {

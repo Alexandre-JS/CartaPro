@@ -37,7 +37,9 @@
   @if (respondida) {
     <aside class="explanation" [class.success]="escolhida === pergunta.correta">
       <strong>{{ escolhida === pergunta.correta ? 'Resposta correta' : 'Resposta incorreta' }}</strong>
-      <p>{{ pergunta.explicacao }}</p>
+      @if (pergunta.explicacao) {
+        <p>{{ pergunta.explicacao }}</p>
+      }
       @if (pergunta.artigoRef) {
         <span>Artigo {{ pergunta.artigoRef }}</span>
       }

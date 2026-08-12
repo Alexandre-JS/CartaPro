@@ -91,7 +91,7 @@ class ExamSessionController extends Controller
             'Esta prova já foi submetida.',
         );
 
-        $session->load('exam.questions.topic');
+        $session->load(['exam.questions.topic', 'exam.questions.sign']);
         $category = $session->exam->gradingCategory();
         $total = $session->exam->questions->count();
 
@@ -108,7 +108,7 @@ class ExamSessionController extends Controller
                 'id' => $question->external_id,
                 'tema' => $question->topic->slug,
                 'enunciado' => $question->statement,
-                'imagem' => $question->image ? url($question->image) : null,
+                'imagem' => $question->imagemPublica() ? url($question->imagemPublica()) : null,
                 'opcoes' => $question->options,
             ])->values(),
         ]);
@@ -129,7 +129,7 @@ class ExamSessionController extends Controller
             'Esta prova já foi submetida.',
         );
 
-        $session->load('exam.questions.topic');
+        $session->load(['exam.questions.topic', 'exam.questions.sign']);
         $attempt = $this->scorer->score($session, $student, $data['answers'], $data['tempoSegundos'] ?? null);
 
         return response()->json([

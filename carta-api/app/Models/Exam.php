@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 #[Fillable(['school_id', 'created_by', 'name', 'license_category', 'license_categories', 'type', 'selection_mode', 'blueprint', 'topic_ids', 'question_count', 'pass_score', 'duration_minutes', 'is_active', 'is_public', 'is_locked', 'publication_status', 'published_at'])]
 class Exam extends Model
@@ -43,5 +44,19 @@ class Exam extends Model
     public function sessions(): HasMany
     {
         return $this->hasMany(ExamSession::class);
+    }
+
+    /**
+     * Tentativas já submetidas nesta prova, através das sessões.
+     *
+     * Serve para decidir se as perguntas ainda podem ser trocadas: as respostas
+     * são guardadas com o `external_id` da pergunta por chave e o diagnóstico
+     * por tema é recalculado sobre as perguntas *actuais* da prova. Mexer no
+     * conjunto depois de alguém responder não dá erro nenhum — passa a mostrar
+     * a tentativa antiga corrigida contra uma prova que o aluno nunca fez.
+     */
+    public function attempts(): HasManyThrough
+    {
+        return $this->hasManyThrough(ExamAttempt::class, ExamSession::class);
     }
 }

@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Exam;
 use App\Models\Question;
 use App\Models\Topic;
+use App\Models\User;
 use App\Services\EntitlementService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -138,6 +139,28 @@ class ConteudoPagoTest extends TestCase
         $this->assertSame(0, $filtrado['sinaisBloqueados']);
     }
 
+    public function test_ao_abrir_uma_prova_o_app_recebe_os_enunciados_e_nao_a_contagem(): void
+    {
+        $tema = Topic::create(['slug' => 'sinais', 'name' => 'Sinais']);
+        $prova = $this->prova('Exame 10', collect([$this->pergunta($tema->id, 1), $this->pergunta($tema->id, 2)]));
+
+        [, $token] = $this->mobileUser();
+
+        /*
+         * O resumo da prova traz `perguntas` com a contagem e o detalhe tem de
+         * a substituir pela lista. Enquanto isso era feito com `+`, a união de
+         * arrays do PHP mantinha a contagem, a resposta dava 200 com
+         * `perguntas: 2`, e o app rebentava a tentar percorrer um número —
+         * acabando a dizer que a prova não estava descarregada para uso offline.
+         */
+        $resposta = $this->withToken($token)->getJson("/api/v1/mobile/exams/{$prova->id}")->assertOk();
+
+        $resposta->assertJsonCount(2, 'perguntas')
+            ->assertJsonPath('perguntas.0.enunciado', 'Pergunta 1')
+            ->assertJsonPath('perguntas.1.enunciado', 'Pergunta 2');
+        $this->assertIsArray($resposta->json('perguntas'));
+    }
+
     public function test_a_locked_exam_cannot_be_opened_by_a_free_account(): void
     {
         $tema = Topic::create(['slug' => 'sinais', 'name' => 'Sinais']);
@@ -163,7 +186,7 @@ class ConteudoPagoTest extends TestCase
         $tema = Topic::create(['slug' => 'sinais', 'name' => 'Sinais']);
         $prova = $this->prova('Exame 01', collect([$this->pergunta($tema->id, 1)]));
 
-        $admin = \App\Models\User::factory()->create(['role' => 'admin']);
+        $admin = User::factory()->create(['role' => 'admin']);
 
         /*
          * Alternar em vez de editar: as provas não têm formulário de edição, e
@@ -183,7 +206,7 @@ class ConteudoPagoTest extends TestCase
         $prova = $this->prova('Prova da escola', collect([$this->pergunta($tema->id, 1)]));
         $prova->update(['is_public' => false]);
 
-        $admin = \App\Models\User::factory()->create(['role' => 'admin']);
+        $admin = User::factory()->create(['role' => 'admin']);
 
         // Uma prova privada não chega ao aplicativo: não há plano a definir.
         $this->actingAs($admin)->patch(route('admin.exams.plan', $prova))->assertStatus(422);

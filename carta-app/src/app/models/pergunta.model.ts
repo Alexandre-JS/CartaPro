@@ -10,7 +10,7 @@ export interface Pergunta {
     imagem: string | null;
     opcoes: string[];
     correta: number;
-    explicacao: string;
+    explicacao: string | null;
     artigoRef: number | null;
     bloqueado: boolean;
 }
