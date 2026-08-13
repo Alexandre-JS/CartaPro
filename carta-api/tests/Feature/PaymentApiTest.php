@@ -4,12 +4,12 @@ namespace Tests\Feature;
 
 use App\Models\Payment;
 use App\Models\Unlock;
-use App\Providers\PaymentServiceProvider;
 use App\Services\Payments\GatewayManager;
 use App\Services\Payments\PaymentGateway;
 use App\Services\Payments\PaymentResult;
 use App\Services\Payments\PaymentService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
 use RuntimeException;
 use Tests\TestCase;
 
@@ -29,6 +29,19 @@ class PaymentApiTest extends TestCase
             'payments.plans.completo.dias' => 90,
             'payments.plans.completo.periodo' => '3 meses',
         ]);
+    }
+
+    public function test_payment_endpoints_are_unavailable_when_payments_are_disabled(): void
+    {
+        config(['payments.enabled' => false]);
+        [, $token] = $this->mobileUser(['phone' => '841234567']);
+
+        $this->withToken($token)->getJson('/api/v1/mobile/payments/plans')->assertNotFound();
+        $this->withToken($token)->postJson('/api/v1/mobile/payments', [
+            'plan' => 'completo',
+            'method' => 'mpesa',
+        ])->assertNotFound();
+        $this->postJson('/api/v1/webhooks/debitopay')->assertNotFound();
     }
 
     public function test_catalogue_exposes_price_and_the_number_that_will_be_charged(): void
@@ -97,7 +110,7 @@ class PaymentApiTest extends TestCase
     {
         $payment = $this->pagamentoPendenteEmola();
 
-        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->expectException(ValidationException::class);
         app(PaymentService::class)->reembolsar($payment);
     }
 
@@ -232,7 +245,6 @@ class PaymentApiTest extends TestCase
         $this->expectException(RuntimeException::class);
         (new GatewayManager($app))->para('mpesa');
     }
-
 
     // ---- Dois métodos, e a carteira que pode não ser a da conta ----
 

@@ -55,7 +55,7 @@ class PackagePublisher
 
     public function buildPayload(): array
     {
-        $questions = Question::with('topic')
+        $questions = Question::with(['topic', 'sign'])
             ->where('status', 'approved')->where('is_active', true)
             ->whereHas('topic', fn ($query) => $query->where('is_active', true))
             ->orderBy('sort_order')->get();

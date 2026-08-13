@@ -4,6 +4,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Disponibilidade
+    |--------------------------------------------------------------------------
+    |
+    | Mantém toda a superfície de cobrança inacessível enquanto a integração
+    | não estiver pronta. Ativar pagamentos exige uma decisão explícita no
+    | .env de produção; apenas configurar credenciais não chega.
+    |
+    */
+
+    'enabled' => (bool) env('PAYMENTS_ENABLED', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Fornecedor ativo
     |--------------------------------------------------------------------------
     |

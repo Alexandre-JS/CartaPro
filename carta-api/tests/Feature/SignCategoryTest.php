@@ -13,6 +13,16 @@ class SignCategoryTest extends TestCase
 {
     use RefreshDatabase;
 
+    /** @var array<int, string> */
+    private array $ficheirosAntesDoTeste = [];
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->ficheirosAntesDoTeste = glob(public_path('images/signs/*')) ?: [];
+    }
+
     private function admin(): User
     {
         return User::factory()->create();
@@ -28,7 +38,8 @@ class SignCategoryTest extends TestCase
 
     protected function tearDown(): void
     {
-        foreach (glob(public_path('images/signs/*')) ?: [] as $ficheiro) {
+        $criadosPeloTeste = array_diff(glob(public_path('images/signs/*')) ?: [], $this->ficheirosAntesDoTeste);
+        foreach ($criadosPeloTeste as $ficheiro) {
             @unlink($ficheiro);
         }
 

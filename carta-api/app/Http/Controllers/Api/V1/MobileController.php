@@ -212,7 +212,7 @@ class MobileController extends Controller
     public function exam(Request $request, Exam $exam): JsonResponse
     {
         abort_unless($exam->is_active && $exam->is_public && $exam->publication_status === 'published', 404);
-        $exam->load('questions.topic');
+        $exam->load(['questions.topic', 'questions.sign']);
 
         $paid = $this->entitlements->isPaid($request->user());
 
@@ -240,10 +240,18 @@ class MobileController extends Controller
 
         abort_if($questions->isEmpty(), 404, 'Esta prova ainda não tem perguntas.');
 
-        return response()->json($this->examSummary($exam, $paid) + [
+        /*
+         * `array_merge` e não `+`: o resumo já traz `perguntas` com a contagem,
+         * e a união de arrays em PHP mantém o valor da esquerda. Com `+`, a
+         * lista de perguntas era descartada em silêncio e o app recebia
+         * `perguntas: 25` onde esperava os enunciados — falhava a abrir a prova
+         * e caía no modo offline, a queixar-se de que a prova não tinha sido
+         * descarregada. A resposta dava 200; só o conteúdo é que estava errado.
+         */
+        return response()->json(array_merge($this->examSummary($exam, $paid), [
             'perguntas' => $questions->map(fn ($question) => $question->toPackageArray())->values(),
             'perguntasBloqueadas' => $exam->questions->count() - $questions->count(),
-        ]);
+        ]));
     }
 
     private function examSummary(Exam $exam, bool $paid): array
