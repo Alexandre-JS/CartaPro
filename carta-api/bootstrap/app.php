@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\AuthenticateApiToken;
 use App\Http\Middleware\AuthenticateMobileToken;
+use App\Http\Middleware\EnsurePaymentsEnabled;
 use App\Http\Middleware\EnsureRole;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -16,7 +17,12 @@ $app = Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->alias(['role' => EnsureRole::class, 'api.auth' => AuthenticateApiToken::class, 'mobile.auth' => AuthenticateMobileToken::class]);
+        $middleware->alias([
+            'role' => EnsureRole::class,
+            'api.auth' => AuthenticateApiToken::class,
+            'mobile.auth' => AuthenticateMobileToken::class,
+            'payments.enabled' => EnsurePaymentsEnabled::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

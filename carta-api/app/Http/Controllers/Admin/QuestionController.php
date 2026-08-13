@@ -20,20 +20,33 @@ class QuestionController extends Controller
 {
     public function index(Request $request): View
     {
+        $perPage = in_array($request->integer('per_page'), [15, 30, 50], true) ? $request->integer('per_page') : 15;
+        $sort = in_array($request->input('sort'), ['latest', 'oldest', 'updated', 'topic'], true) ? $request->input('sort') : 'latest';
+        $topic = $request->string('topic')->trim()->value();
+
         $questions = Question::with(['topic', 'author', 'school'])
             ->when($request->user()->isSchool(), fn ($query) => $query->where('school_id', $request->user()->school_id))
             ->when($request->filled('q'), fn ($query) => $query->where(fn ($nested) => $nested
                 ->where('statement', 'like', '%'.$request->string('q')->value().'%')
                 ->orWhere('external_id', 'like', '%'.$request->string('q')->value().'%')))
-            ->when($request->filled('topic'), fn ($query) => $query->where('topic_id', $request->integer('topic')))
+            ->when($topic !== '', fn ($query) => ctype_digit($topic)
+                ? $query->where('topic_id', (int) $topic)
+                : $query->whereHas('topic', fn ($topicQuery) => $topicQuery->where('name', 'like', '%'.$topic.'%')))
             ->when($request->filled('type'), fn ($query) => $query->where('type', $request->string('type')->value()))
             ->when($request->filled('category'), fn ($query) => $query->whereJsonContains('categories', $request->string('category')->value()))
-            ->when($request->filled('status'), fn ($query) => $query->where('status', $request->string('status')->value()))
-            ->latest()->paginate(15)->withQueryString();
+            ->when($request->filled('status'), fn ($query) => $query->where('status', $request->string('status')->value()));
+
+        match ($sort) {
+            'oldest' => $questions->oldest(),
+            'updated' => $questions->latest('updated_at'),
+            'topic' => $questions->orderBy('topic_id')->orderBy('sort_order')->orderBy('id'),
+            default => $questions->latest(),
+        };
+
+        $questions = $questions->paginate($perPage)->withQueryString();
 
         return view('admin.questions.index', [
             'questions' => $questions,
-            'topics' => Topic::orderBy('name')->get(),
             'categories' => LicenseCategory::where('is_active', true)->orderBy('sort_order')->get(),
         ]);
     }

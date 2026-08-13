@@ -9,14 +9,18 @@
 # workflow autoriza o push para o mesmo repositório. O FTP foi abandonado
 # porque nunca chegou a ter credenciais e o SSH não está disponível no plano.
 #
-# O deploy depende dos testes. Com pagamentos reais em produção, um merge que
-# parta o gateway não pode chegar ao servidor por não termos olhado.
+# O deploy depende dos testes. As rotas de cobrança ficam desligadas por
+# PAYMENTS_ENABLED=false até a integração estar pronta para produção.
 
 name: Deploy API
 
 on:
   push:
     branches: [main]
+    # Alterações da app móvel não publicam nem consomem minutos de CI da API.
+    paths:
+      - 'carta-api/**'
+      - '.github/workflows/deploy.yml'
   # Permite publicar à mão a partir do separador Actions, sem um commit novo.
   workflow_dispatch:
 
@@ -30,6 +34,9 @@ permissions:
 
 jobs:
   testes:
+    # No acionamento manual o GitHub permite escolher uma branch. Apenas main
+    # pode ser transformada no artefacto de produção.
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -121,6 +128,26 @@ jobs:
 
           printf 'carta-api/.env\n' > artefacto/.gitignore
 
+      - name: Validar o artefacto
+        # Falha antes de publicar se alguma pasta do monorepo ou ficheiro
+        # sensível entrar por engano. O servidor recebe só o public da API e a
+        # aplicação carta-api já com as dependências de produção.
+        run: |
+          test -f artefacto/index.php
+          test -f artefacto/carta-api/artisan
+          test -f artefacto/carta-api/vendor/autoload.php
+          test ! -e artefacto/carta-app
+          test ! -e artefacto/carta-api/tests
+          test ! -e artefacto/carta-api/node_modules
+          test ! -e artefacto/carta-api/.env
+
+          if find artefacto -type f -name '.env*' -print -quit | grep -q .; then
+            echo 'Erro: o artefacto contém um ficheiro de ambiente.' >&2
+            exit 1
+          fi
+
+          echo "Tamanho do artefacto: $(du -sh artefacto | cut -f1)"
+
       - name: Publicar no branch deploy
         # Histórico descartável de propósito: o branch é um artefacto, não
         # código-fonte, e guardar builds antigos só incharia o repositório.
@@ -141,5 +168,5 @@ jobs:
         run: |
           sleep 45
           codigo=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 \
-            https://ivory-shark-126778.hostingersite.com/api/v1/topics)
-          echo "GET /api/v1/topics devolveu $codigo (esperado: 200)"
+            https://ivory-shark-126778.hostingersite.com/up)
+          echo "GET /up devolveu $codigo (esperado: 200)"

@@ -74,6 +74,32 @@ class ExamEditingTest extends TestCase
             ->assertSee('Guardar alterações');
     }
 
+    public function test_o_seletor_de_temas_pesquisa_em_paginas_sem_renderizar_o_catalogo_inteiro(): void
+    {
+        collect(range(1, 40))->each(fn (int $index) => Topic::create([
+            'name' => sprintf('Tema extenso %02d', $index),
+            'slug' => sprintf('tema-extenso-%02d', $index),
+            'sort_order' => $index,
+            'is_active' => true,
+        ]));
+
+        $this->actingAs($this->admin)->get(route('admin.exams.create'))
+            ->assertOk()
+            ->assertSee('Escolher temas')
+            ->assertDontSee('Tema extenso 40');
+
+        $this->actingAs($this->admin)->getJson(route('admin.exams.topic-options'))
+            ->assertOk()
+            ->assertJsonCount(30, 'data')
+            ->assertJsonPath('next_page', 2)
+            ->assertJsonPath('total', 41);
+
+        $this->actingAs($this->admin)->getJson(route('admin.exams.topic-options', ['q' => 'Tema extenso 40']))
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.name', 'Tema extenso 40');
+    }
+
     public function test_edita_a_configuracao_da_prova(): void
     {
         $exam = $this->criar();

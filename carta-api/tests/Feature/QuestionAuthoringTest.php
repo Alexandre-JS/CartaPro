@@ -62,13 +62,50 @@ class QuestionAuthoringTest extends TestCase
         $this->actingAs($this->admin)->get(route('admin.questions.create'))
             ->assertOk()
             ->assertSee('Gerado automaticamente')
-            ->assertSee('Da biblioteca de sinais');
+            ->assertSee('Da biblioteca de sinais')
+            ->assertSee('Selecionar sinal')
+            ->assertSee('Pesquisar pelo nome ou significado')
+            ->assertSee('Paragem obrigatória');
 
         $this->actingAs($this->admin)->post(route('admin.questions.store'), $this->payload());
 
         $this->actingAs($this->admin)->get(route('admin.questions.edit', Question::firstOrFail()))
             ->assertOk()
             ->assertSee('velocidade-001');
+    }
+
+    public function test_o_banco_pesquisa_temas_sem_renderizar_o_catalogo_e_controla_a_paginacao(): void
+    {
+        $prioridade = Topic::create(['name' => 'Prioridade', 'slug' => 'prioridade', 'is_active' => true]);
+        collect(range(1, 35))->each(fn (int $index) => Question::create([
+            'topic_id' => $prioridade->id,
+            'external_id' => sprintf('prioridade-%03d', $index),
+            'type' => 'teorico',
+            'categories' => ['ligeiro'],
+            'statement' => 'Pergunta de prioridade '.$index,
+            'options' => ['Certa', 'Errada'],
+            'correct_index' => 0,
+            'status' => 'approved',
+            'is_active' => true,
+            'sort_order' => $index,
+        ]));
+        collect(range(1, 40))->each(fn (int $index) => Topic::create([
+            'name' => sprintf('Tema sem perguntas %02d', $index),
+            'slug' => sprintf('tema-sem-perguntas-%02d', $index),
+            'is_active' => true,
+        ]));
+
+        $this->actingAs($this->admin)->get(route('admin.questions.index', [
+            'topic' => 'Prioridade',
+            'per_page' => 30,
+            'sort' => 'topic',
+        ]))
+            ->assertOk()
+            ->assertSee('Filtros')
+            ->assertDontSee('Tema sem perguntas 40')
+            ->assertViewHas('questions', fn ($questions) => $questions->total() === 35
+                && $questions->count() === 30
+                && $questions->perPage() === 30);
     }
 
     public function test_o_identificador_e_gerado_a_partir_do_tema(): void

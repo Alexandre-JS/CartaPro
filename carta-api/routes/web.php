@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\GlossaryController;
 use App\Http\Controllers\Admin\LessonController;
 use App\Http\Controllers\Admin\LicenseCategoryController;
 use App\Http\Controllers\Admin\MobileUserController;
+use App\Http\Controllers\Admin\PaymentAdminController;
 use App\Http\Controllers\Admin\PublicationController;
 use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\ResultController;
@@ -19,7 +20,6 @@ use App\Http\Controllers\Admin\SignCategoryController;
 use App\Http\Controllers\Admin\SignController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\TopicController;
-use App\Http\Controllers\Admin\PaymentAdminController;
 use App\Http\Controllers\Admin\UnlockController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
@@ -56,6 +56,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::post('/classrooms/{classroom}/students', [StudentController::class, 'store'])->name('students.store');
     Route::get('/students/{student}', [StudentController::class, 'show'])->name('students.show');
     Route::delete('/students/{student}', [StudentController::class, 'destroy'])->name('students.destroy');
+    Route::get('/exams/topic-options', [ExamController::class, 'topicOptions'])->name('exams.topic-options');
     Route::resource('exams', ExamController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
     Route::get('/exams/{exam}', [DetailController::class, 'exam'])->whereNumber('exam')->name('exams.show');
     Route::resource('sessions', ExamSessionController::class)->only(['index', 'store', 'update', 'destroy']);
@@ -101,7 +102,9 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         Route::patch('/unlocks/{unlock}/associar', [UnlockController::class, 'bind'])->name('unlocks.bind');
         // Devolução em 7 dias: retira o acesso ao mesmo tempo que se devolve o
         // dinheiro na carteira, que continua a ser um passo manual.
-        Route::patch('/pagamentos/{payment}/devolver', [PaymentAdminController::class, 'refund'])->name('pagamentos.devolver');
+        Route::patch('/pagamentos/{payment}/devolver', [PaymentAdminController::class, 'refund'])
+            ->middleware('payments.enabled')
+            ->name('pagamentos.devolver');
         Route::get('/unlocks/{unlock}', [DetailController::class, 'unlock'])->whereNumber('unlock')->name('unlocks.show');
     });
     Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');

@@ -9,6 +9,7 @@ use App\Models\School;
 use App\Models\Topic;
 use App\Services\ExamBlueprint;
 use App\Support\Grading;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -40,6 +41,35 @@ class ExamController extends Controller
         return view('admin.exams.form', $this->formData($request, $exam->load('questions')));
     }
 
+    /** Pesquisa paginada para o seletor de temas, sem despejar o catálogo inteiro no HTML. */
+    public function topicOptions(Request $request): JsonResponse
+    {
+        $type = $request->string('type')->value();
+        $category = $request->string('category')->value();
+        $user = $request->user();
+
+        $topics = Topic::where('is_active', true)
+            ->when($request->filled('q'), fn ($query) => $query->where('name', 'like', '%'.$request->string('q')->value().'%'))
+            ->withCount(['questions as available_questions_count' => fn ($query) => $query
+                ->where('status', 'approved')->where('is_active', true)
+                ->when(in_array($type, ['teorico', 'pratico'], true), fn ($nested) => $nested->where('type', $type))
+                ->when($category !== '', fn ($nested) => $nested->whereJsonContains('categories', $category))
+                ->when($user->isSchool(), fn ($nested) => $nested->where(fn ($scope) => $scope
+                    ->whereNull('school_id')->orWhere('school_id', $user->school_id)))])
+            ->orderBy('sort_order')->orderBy('name')
+            ->paginate(30);
+
+        return response()->json([
+            'data' => $topics->getCollection()->map(fn (Topic $topic) => [
+                'id' => $topic->id,
+                'name' => $topic->name,
+                'question_count' => $topic->available_questions_count,
+            ])->values(),
+            'next_page' => $topics->hasMorePages() ? $topics->currentPage() + 1 : null,
+            'total' => $topics->total(),
+        ]);
+    }
+
     private function formData(Request $request, Exam $exam): array
     {
         $examScope = fn ($query) => $query->when($request->user()->isSchool(), fn ($nested) => $nested->where('school_id', $request->user()->school_id));
@@ -49,6 +79,9 @@ class ExamController extends Controller
                 ->whereNull('school_id')->orWhere('school_id', $request->user()->school_id)))
             ->orderBy('topic_id')->orderBy('sort_order')->get();
 
+        $selectedTopicIds = collect($request->old('blueprint_topic_ids', $exam->blueprint['topic_ids'] ?? []))
+            ->map(fn ($id) => (int) $id)->filter()->unique()->values();
+
         return [
             'exam' => $exam,
             // Provas já respondidas não deixam trocar as perguntas — ver
@@ -56,8 +89,11 @@ class ExamController extends Controller
             'attemptCount' => $exam->exists ? $exam->attempts()->count() : 0,
             'schools' => School::where('is_active', true)->orderBy('name')->get(),
             'questions' => $questions,
-            // Para o modo por critérios (blueprint).
-            'topics' => Topic::where('is_active', true)->orderBy('sort_order')->get(['id', 'name', 'slug']),
+            // Apenas os escolhidos entram no HTML; o restante catálogo é pesquisado sob demanda.
+            'selectedTopics' => Topic::whereIn('id', $selectedTopicIds)
+                ->withCount(['questions as available_questions_count' => fn ($query) => $query
+                    ->where('status', 'approved')->where('is_active', true)])
+                ->orderBy('name')->get(['id', 'name']),
             'defaultQuestionCount' => Grading::questionCount(),
             'passPercentage' => Grading::passPercentage(),
         ];
