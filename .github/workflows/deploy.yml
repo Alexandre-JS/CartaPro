@@ -114,7 +114,6 @@ jobs:
             --exclude='.env.*' \
             --exclude='/tests' \
             --exclude='node_modules' \
-            --exclude='/composer.json' \
             --exclude='/composer.lock' \
             --exclude='/package.json' \
             --exclude='/vite.config.js' \
@@ -181,7 +180,7 @@ jobs:
           test ! -e artefacto/carta-api/tests
           test ! -e artefacto/carta-api/node_modules
           test ! -e artefacto/carta-api/.env
-          test ! -e artefacto/carta-api/composer.json
+          test -f artefacto/carta-api/composer.json
           test ! -e artefacto/carta-api/composer.lock
 
           if find artefacto -type f -name '.env*' -print -quit | grep -q .; then
@@ -265,15 +264,13 @@ jobs:
           exit 1
 
       - name: Finalizar banco de dados e caches
-        env:
-          DEPLOY_FINALIZE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          curl --fail --silent --show-error --retry 2 \
-            --request POST \
-            --header "Authorization: Bearer $DEPLOY_FINALIZE_TOKEN" \
-            --header 'Accept: application/json' \
-            --header "X-Deploy-Version: $GITHUB_SHA" \
-            "$APP_URL/deploy-finalize.php"
+          ssh -i ~/.ssh/hostinger_deploy -p 65002 \
+            u901633551@213.130.145.17 \
+            "cd '$HOSTINGER_DEPLOY_PATH/carta-api' && \
+             /opt/alt/php84/usr/bin/php artisan optimize:clear && \
+             /opt/alt/php84/usr/bin/php artisan migrate --force --no-interaction && \
+             /opt/alt/php84/usr/bin/php artisan optimize --no-interaction"
 
       - name: Confirmar que a API responde
         run: |
