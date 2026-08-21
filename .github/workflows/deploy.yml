@@ -66,6 +66,7 @@ jobs:
   publicar:
     needs: testes
     runs-on: ubuntu-latest
+    environment: cartapro
     env:
       APP_URL: ${{ vars.DEPLOY_APP_URL || 'https://ivory-shark-126778.hostingersite.com' }}
       HOSTINGER_DEPLOY_PATH: /home/u901633551/domains/ivory-shark-126778.hostingersite.com/public_html
