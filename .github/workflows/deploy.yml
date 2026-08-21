@@ -3,11 +3,13 @@
 # O Hostinger sabe fazer `git pull`, mas não corre composer nem build nenhum.
 # Então o build corre aqui, nas máquinas do GitHub, e o resultado é empurrado
 # para o branch `deploy`: uma árvore pronta a servir, com vendor/ incluído.
-# O webhook do Hostinger (configurado no GitHub) faz o pull a seguir.
+# O próprio workflow chama o webhook privado do Hostinger a seguir. Isto é
+# intencional: pushes feitos com GITHUB_TOKEN não voltam a disparar automações
+# dependentes de eventos do GitHub de forma fiável.
 #
-# Este modelo não precisa de segredos nenhuns: o GITHUB_TOKEN do próprio
-# workflow autoriza o push para o mesmo repositório. O FTP foi abandonado
-# porque nunca chegou a ter credenciais e o SSH não está disponível no plano.
+# O GITHUB_TOKEN autoriza o push e, por ser temporário, também autentica a
+# finalização. Só HOSTINGER_DEPLOY_WEBHOOK precisa de ser configurado como
+# secret do repositório. FTP e SSH não são usados.
 #
 # O deploy depende dos testes. As rotas de cobrança ficam desligadas por
 # PAYMENTS_ENABLED=false até a integração estar pronta para produção.
@@ -64,8 +66,19 @@ jobs:
   publicar:
     needs: testes
     runs-on: ubuntu-latest
+    env:
+      APP_URL: ${{ vars.DEPLOY_APP_URL || 'https://ivory-shark-126778.hostingersite.com' }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Validar configuração de publicação
+        env:
+          HOSTINGER_DEPLOY_WEBHOOK: ${{ secrets.HOSTINGER_DEPLOY_WEBHOOK }}
+        run: |
+          test -n "$HOSTINGER_DEPLOY_WEBHOOK" || {
+            echo 'Secret HOSTINGER_DEPLOY_WEBHOOK não configurado.' >&2
+            exit 1
+          }
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -80,6 +93,8 @@ jobs:
         run: composer install --no-dev --optimize-autoloader --no-interaction --no-progress
 
       - name: Montar o artefacto
+        env:
+          DEPLOY_FINALIZE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # A árvore espelha o public_html do servidor:
         #
         #   /            → conteúdo de carta-api/public (o que a web serve)
@@ -100,6 +115,15 @@ jobs:
             --exclude='.env.*' \
             --exclude='/tests' \
             --exclude='node_modules' \
+            --exclude='/composer.json' \
+            --exclude='/composer.lock' \
+            --exclude='/package.json' \
+            --exclude='/vite.config.js' \
+            --exclude='/.npmrc' \
+            --exclude='/phpunit.xml' \
+            --exclude='/.phpunit.result.cache' \
+            --exclude='/README.md' \
+            --exclude='/*.md' \
             carta-api/ artefacto/carta-api/
 
           # storage/logs não vem no checkout (o repo só guarda o esqueleto).
@@ -126,7 +150,23 @@ jobs:
           </IfModule>
           HTACCESS
 
-          printf 'carta-api/.env\n' > artefacto/.gitignore
+          cat > artefacto/.gitignore <<'PERSISTENT'
+          carta-api/.env
+          images/questions/*
+          !images/questions/.gitkeep
+          images/signs/*
+          !images/signs/.gitkeep
+          PERSISTENT
+
+          # A versão é pública e permite confirmar que o Hostinger instalou
+          # exatamente este build, sem executar PHP ou consultar a base.
+          printf '%s\n' "$GITHUB_SHA" > artefacto/deploy-version.txt
+
+          # Só o hash entra no artefacto. O token continua guardado nos Secrets
+          # do GitHub e autentica a migração/cache após a cópia dos ficheiros.
+          test -n "$DEPLOY_FINALIZE_TOKEN"
+          printf '%s' "$DEPLOY_FINALIZE_TOKEN" \
+            | sha256sum | cut -d' ' -f1 > artefacto/carta-api/.deploy-token.sha256
 
       - name: Validar o artefacto
         # Falha antes de publicar se alguma pasta do monorepo ou ficheiro
@@ -136,10 +176,14 @@ jobs:
           test -f artefacto/index.php
           test -f artefacto/carta-api/artisan
           test -f artefacto/carta-api/vendor/autoload.php
+          test -s artefacto/deploy-version.txt
+          test -s artefacto/carta-api/.deploy-token.sha256
           test ! -e artefacto/carta-app
           test ! -e artefacto/carta-api/tests
           test ! -e artefacto/carta-api/node_modules
           test ! -e artefacto/carta-api/.env
+          test ! -e artefacto/carta-api/composer.json
+          test ! -e artefacto/carta-api/composer.lock
 
           if find artefacto -type f -name '.env*' -print -quit | grep -q .; then
             echo 'Erro: o artefacto contém um ficheiro de ambiente.' >&2
@@ -149,6 +193,7 @@ jobs:
           echo "Tamanho do artefacto: $(du -sh artefacto | cut -f1)"
 
       - name: Publicar no branch deploy
+        id: publicar-deploy
         # Histórico descartável de propósito: o branch é um artefacto, não
         # código-fonte, e guardar builds antigos só incharia o repositório.
         working-directory: artefacto
@@ -157,16 +202,72 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
+          # Imagens distribuídas com o código entram no build; novos uploads
+          # feitos no servidor continuam ignorados e sobrevivem ao git pull.
+          git add -f images/questions images/signs
           git commit -q -m "deploy: build de ${GITHUB_SHA::7}"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" deploy
 
-      - name: Confirmar que a API responde
-        # Informativo, não bloqueante: o pull do Hostinger chega via webhook e
-        # o tempo dele não é nosso — falhar aqui num dia lento seria alarme
-        # falso sobre um deploy que está bem.
-        continue-on-error: true
+      - name: Acionar o deploy no Hostinger
+        env:
+          HOSTINGER_DEPLOY_WEBHOOK: ${{ secrets.HOSTINGER_DEPLOY_WEBHOOK }}
+          DEPLOY_SHA: ${{ steps.publicar-deploy.outputs.sha }}
         run: |
-          sleep 45
+          test -n "$HOSTINGER_DEPLOY_WEBHOOK"
+
+          payload=$(jq -cn \
+            --arg ref 'refs/heads/deploy' \
+            --arg before '0000000000000000000000000000000000000000' \
+            --arg after "$DEPLOY_SHA" \
+            --arg clone_url "https://github.com/${GITHUB_REPOSITORY}.git" \
+            --arg full_name "$GITHUB_REPOSITORY" \
+            '{
+              ref: $ref,
+              before: $before,
+              after: $after,
+              repository: {clone_url: $clone_url, full_name: $full_name},
+              pusher: {name: "github-actions[bot]"}
+            }')
+
+          curl --fail --silent --show-error --retry 3 \
+            --request POST \
+            --header 'Content-Type: application/x-www-form-urlencoded' \
+            --data-urlencode "payload=$payload" \
+            "$HOSTINGER_DEPLOY_WEBHOOK"
+
+      - name: Aguardar a versão no servidor
+        run: |
+          for tentativa in $(seq 1 30); do
+            versao=$(curl --silent --show-error --max-time 15 \
+              "$APP_URL/deploy-version.txt?t=$GITHUB_RUN_ID-$tentativa" || true)
+
+            if [ "$versao" = "$GITHUB_SHA" ]; then
+              echo "Build $GITHUB_SHA instalado no Hostinger."
+              exit 0
+            fi
+
+            echo "Tentativa $tentativa/30: Hostinger ainda devolve ${versao:-sem versão}."
+            sleep 10
+          done
+
+          echo 'O Hostinger não instalou o build esperado dentro de 5 minutos.' >&2
+          exit 1
+
+      - name: Finalizar banco de dados e caches
+        env:
+          DEPLOY_FINALIZE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl --fail --silent --show-error --retry 2 \
+            --request POST \
+            --header "Authorization: Bearer $DEPLOY_FINALIZE_TOKEN" \
+            --header 'Accept: application/json' \
+            --header "X-Deploy-Version: $GITHUB_SHA" \
+            "$APP_URL/deploy-finalize.php"
+
+      - name: Confirmar que a API responde
+        run: |
           codigo=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 \
-            https://ivory-shark-126778.hostingersite.com/up)
+            "$APP_URL/up")
           echo "GET /up devolveu $codigo (esperado: 200)"
+          test "$codigo" = '200'
