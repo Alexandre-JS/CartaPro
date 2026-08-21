@@ -213,8 +213,27 @@ jobs:
           HOSTINGER_SSH_PRIVATE_KEY: ${{ secrets.HOSTINGER_SSH_PRIVATE_KEY }}
         run: |
           install -m 700 -d ~/.ssh
-          printf '%s\n' "$HOSTINGER_SSH_PRIVATE_KEY" > ~/.ssh/hostinger_deploy
+
+          # O campo de secret pode conter a chave OpenSSH completa ou apenas
+          # o bloco Base64 entre BEGIN/END. Normalizamos os dois formatos para
+          # evitar o pouco elucidativo "error in libcrypto" do cliente SSH.
+          if [[ "$HOSTINGER_SSH_PRIVATE_KEY" == *"BEGIN OPENSSH PRIVATE KEY"* ]]; then
+            printf '%s\n' "$HOSTINGER_SSH_PRIVATE_KEY" \
+              | tr -d '\r' > ~/.ssh/hostinger_deploy
+          else
+            {
+              echo '-----BEGIN OPENSSH PRIVATE KEY-----'
+              printf '%s' "$HOSTINGER_SSH_PRIVATE_KEY" \
+                | tr -d '[:space:]' | fold -w 70
+              echo '-----END OPENSSH PRIVATE KEY-----'
+            } > ~/.ssh/hostinger_deploy
+          fi
+
           chmod 600 ~/.ssh/hostinger_deploy
+          ssh-keygen -y -f ~/.ssh/hostinger_deploy > /dev/null || {
+            echo 'HOSTINGER_SSH_PRIVATE_KEY não contém uma chave OpenSSH privada válida.' >&2
+            exit 1
+          }
           ssh-keyscan -p 65002 -H 213.130.145.17 >> ~/.ssh/known_hosts
 
       - name: Instalar o artefacto no Hostinger
