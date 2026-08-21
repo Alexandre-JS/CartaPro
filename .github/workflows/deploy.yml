@@ -3,13 +3,13 @@
 # O Hostinger sabe fazer `git pull`, mas não corre composer nem build nenhum.
 # Então o build corre aqui, nas máquinas do GitHub, e o resultado é empurrado
 # para o branch `deploy`: uma árvore pronta a servir, com vendor/ incluído.
-# O próprio workflow chama o webhook privado do Hostinger a seguir. Isto é
-# intencional: pushes feitos com GITHUB_TOKEN não voltam a disparar automações
-# dependentes de eventos do GitHub de forma fiável.
+# O próprio workflow instala o artefacto no Hostinger por SSH. O SSH é apenas
+# o canal entre os dois servidores: depois da configuração inicial, cada merge
+# em main continua a ser publicado automaticamente, sem intervenção manual.
 #
 # O GITHUB_TOKEN autoriza o push e, por ser temporário, também autentica a
-# finalização. Só HOSTINGER_DEPLOY_WEBHOOK precisa de ser configurado como
-# secret do repositório. FTP e SSH não são usados.
+# finalização. O acesso ao servidor usa uma chave exclusiva guardada nos
+# Secrets do GitHub; passwords, FTP e webhooks não são usados.
 #
 # O deploy depende dos testes. As rotas de cobrança ficam desligadas por
 # PAYMENTS_ENABLED=false até a integração estar pronta para produção.
@@ -68,17 +68,15 @@ jobs:
     runs-on: ubuntu-latest
     env:
       APP_URL: ${{ vars.DEPLOY_APP_URL || 'https://ivory-shark-126778.hostingersite.com' }}
+      HOSTINGER_DEPLOY_PATH: /home/u901633551/domains/ivory-shark-126778.hostingersite.com/public_html
     steps:
       - uses: actions/checkout@v4
 
       - name: Validar configuração de publicação
         env:
-          HOSTINGER_DEPLOY_WEBHOOK: ${{ secrets.HOSTINGER_DEPLOY_WEBHOOK }}
+          HOSTINGER_SSH_PRIVATE_KEY: ${{ secrets.HOSTINGER_SSH_PRIVATE_KEY }}
         run: |
-          test -n "$HOSTINGER_DEPLOY_WEBHOOK" || {
-            echo 'Secret HOSTINGER_DEPLOY_WEBHOOK não configurado.' >&2
-            exit 1
-          }
+          test -n "$HOSTINGER_SSH_PRIVATE_KEY" || { echo 'Secret HOSTINGER_SSH_PRIVATE_KEY não configurado.' >&2; exit 1; }
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -209,32 +207,24 @@ jobs:
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" deploy
 
-      - name: Acionar o deploy no Hostinger
+      - name: Configurar acesso SSH ao Hostinger
         env:
-          HOSTINGER_DEPLOY_WEBHOOK: ${{ secrets.HOSTINGER_DEPLOY_WEBHOOK }}
-          DEPLOY_SHA: ${{ steps.publicar-deploy.outputs.sha }}
+          HOSTINGER_SSH_PRIVATE_KEY: ${{ secrets.HOSTINGER_SSH_PRIVATE_KEY }}
         run: |
-          test -n "$HOSTINGER_DEPLOY_WEBHOOK"
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$HOSTINGER_SSH_PRIVATE_KEY" > ~/.ssh/hostinger_deploy
+          chmod 600 ~/.ssh/hostinger_deploy
+          ssh-keyscan -p 65002 -H 213.130.145.17 >> ~/.ssh/known_hosts
 
-          payload=$(jq -cn \
-            --arg ref 'refs/heads/deploy' \
-            --arg before '0000000000000000000000000000000000000000' \
-            --arg after "$DEPLOY_SHA" \
-            --arg clone_url "https://github.com/${GITHUB_REPOSITORY}.git" \
-            --arg full_name "$GITHUB_REPOSITORY" \
-            '{
-              ref: $ref,
-              before: $before,
-              after: $after,
-              repository: {clone_url: $clone_url, full_name: $full_name},
-              pusher: {name: "github-actions[bot]"}
-            }')
-
-          curl --fail --silent --show-error --retry 3 \
-            --request POST \
-            --header 'Content-Type: application/x-www-form-urlencoded' \
-            --data-urlencode "payload=$payload" \
-            "$HOSTINGER_DEPLOY_WEBHOOK"
+      - name: Instalar o artefacto no Hostinger
+        run: |
+          rsync -az --delete \
+            --filter='protect carta-api/.env' \
+            --filter='protect images/questions/***' \
+            --filter='protect images/signs/***' \
+            -e 'ssh -i ~/.ssh/hostinger_deploy -p 65002' \
+            artefacto/ \
+            "u901633551@213.130.145.17:$HOSTINGER_DEPLOY_PATH/"
 
       - name: Aguardar a versão no servidor
         run: |
