@@ -24,9 +24,28 @@ use App\Http\Controllers\Admin\UnlockController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StudentExamController;
+use App\Http\Controllers\Website\CandidateController;
+use App\Http\Controllers\Website\HomeController;
+use App\Http\Controllers\Website\SchoolLandingController;
 use Illuminate\Support\Facades\Route;
 
-Route::redirect('/', '/admin');
+Route::get('/', HomeController::class)->name('website.home');
+Route::get('/candidatos', CandidateController::class)->name('website.candidates');
+Route::get('/escolas', SchoolLandingController::class)->name('website.schools');
+Route::get('/sitemap.xml', function () {
+    $urls = collect([
+        ['loc' => route('website.home'), 'priority' => '1.0'],
+        ['loc' => route('website.candidates'), 'priority' => '0.9'],
+        ['loc' => route('website.schools'), 'priority' => '0.9'],
+    ]);
+
+    return response()->view('website.sitemap', compact('urls'))
+        ->header('Content-Type', 'application/xml; charset=UTF-8');
+})->name('website.sitemap');
+Route::get('/robots.txt', function () {
+    return response("User-agent: *\nAllow: /\nDisallow: /admin/\nSitemap: ".route('website.sitemap')."\n", 200)
+        ->header('Content-Type', 'text/plain; charset=UTF-8');
+})->name('website.robots');
 Route::get('/prova/{code}', [StudentExamController::class, 'entry'])->name('student-exam.entry');
 Route::post('/prova/{code}/entrar', [StudentExamController::class, 'enter'])->name('student-exam.enter');
 Route::get('/prova/{code}/realizar/{student}', [StudentExamController::class, 'take'])->middleware('signed')->name('student-exam.take');
