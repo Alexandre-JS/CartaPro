@@ -43,6 +43,8 @@ class AdminAuthenticationTest extends TestCase
             ->assertSee('content="#111544"', false)
             ->assertSee('data-admin-loading-overlay', false)
             ->assertSee('data-admin-loading-bar', false)
+            ->assertSee('class="admin-context-platform"', false)
+            ->assertSee('Governação do conteúdo, utilizadores e operação global.')
             ->assertSee('id="admin-content"', false);
     }
 
@@ -71,6 +73,8 @@ class AdminAuthenticationTest extends TestCase
             ->assertSee('ProntoVia Escolas')
             ->assertSee('Área da escola')
             ->assertSee('Ensino e acompanhamento')
+            ->assertSee('class="admin-context-school"', false)
+            ->assertSee('Turmas, alunos, provas e evolução da sua escola.')
             ->assertDontSee('Operação da plataforma');
     }
 

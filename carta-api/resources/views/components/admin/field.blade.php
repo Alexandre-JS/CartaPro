@@ -24,7 +24,7 @@
     ]);
 @endphp
 
-<div @class(['field', 'full' => $full, 'field-has-error' => $message])>
+<div {{ $attributes->only('class')->class(['field', 'full' => $full, 'field-has-error' => $message]) }}>
     <label for="{{ $id }}">{{ $label }} @if($required)<span class="field-required" aria-hidden="true">*</span>@endif</label>
     @if($as === 'select')
         <select {{ $control }}>{{ $slot }}</select>

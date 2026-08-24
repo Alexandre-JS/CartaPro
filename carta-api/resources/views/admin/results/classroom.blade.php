@@ -16,7 +16,7 @@
         <h2>Onde reforçar na próxima aula</h2>
         <p>Temas ordenados pela taxa de acerto da turma, somando todas as provas aplicadas.</p>
     </div>
-    <a class="btn light" href="{{ route('admin.results.index', ['classroom_id' => $classroom->id]) }}">Ver provas individuais</a>
+    <x-admin.button variant="secondary" :href="route('admin.results.index', ['classroom_id' => $classroom->id])">Ver provas individuais</x-admin.button>
 </div>
 
 <section class="card table-card">
@@ -29,10 +29,10 @@
                 <td><strong>{{ $topic['taxa'] }}%</strong></td>
                 <td>{{ $topic['acertos'] }}/{{ $topic['total'] }}</td>
                 <td>{{ $topic['erros'] }}</td>
-                <td><span class="status {{ $index === 0 ? 'review' : 'inactive' }}">{{ $index === 0 ? 'Reforçar primeiro' : 'Acompanhar' }}</span></td>
+                <td><x-admin.state :type="$index === 0 ? 'review' : 'neutral'">{{ $index === 0 ? 'Reforçar primeiro' : 'Acompanhar' }}</x-admin.state></td>
             </tr>
         @empty
-            <tr><td class="empty" colspan="5">Ainda não há provas submetidas nesta turma.</td></tr>
+            <x-admin.empty-state table :colspan="5" title="Ainda não há provas submetidas" description="Os temas prioritários surgem após as primeiras avaliações da turma." />
         @endforelse
         </tbody>
     </table>
@@ -53,7 +53,7 @@
                 <td>{{ $session['aprovacoes'] }}/{{ $session['submissoes'] }}</td>
             </tr>
         @empty
-            <tr><td class="empty" colspan="5">Nenhuma sessão com resultados.</td></tr>
+            <x-admin.empty-state table :colspan="5" title="Nenhuma sessão com resultados" />
         @endforelse
         </tbody>
     </table>
@@ -79,11 +79,11 @@
                 <td>{{ $student['mediaPercentagem'] }}%<br><small>{{ $student['mediaValores'] }} valores</small></td>
                 <td>{{ $student['notasValidas'] }}</td>
                 <td>{{ $student['faltam'] }}</td>
-                <td><span class="status {{ $label[1] }}">{{ $label[0] }}</span></td>
-                <td class="actions"><a class="btn light small" href="{{ route('admin.students.show', $student['id']) }}">Histórico</a></td>
+                <td><x-admin.state :type="$label[1]">{{ $label[0] }}</x-admin.state></td>
+                <td class="actions"><x-admin.button variant="secondary" size="small" :href="route('admin.students.show', $student['id'])">Histórico</x-admin.button></td>
             </tr>
         @empty
-            <tr><td class="empty" colspan="7">Esta turma ainda não tem alunos ativos.</td></tr>
+            <x-admin.empty-state table :colspan="7" icon="people" title="Esta turma ainda não tem alunos ativos" />
         @endforelse
         </tbody>
     </table>

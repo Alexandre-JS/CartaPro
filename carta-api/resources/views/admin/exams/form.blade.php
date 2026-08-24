@@ -9,10 +9,10 @@
 @php($aplicada = $exam->exists && ! $exam->is_public && $exam->sessions()->exists())
 <form class="card form-card exam-form" method="POST" action="{{ $exam->exists ? route('admin.exams.update', $exam) : route('admin.exams.store') }}">@csrf @if($exam->exists)@method('PUT')@endif
 <div class="form-grid">
-    <div class="field exam-name"><label>Nome da prova</label><input name="name" value="{{ old('name', $exam->name) }}" required></div>
+    <x-admin.field class="exam-name" name="name" label="Nome da prova" :value="$exam->name" required />
     @if(auth()->user()->isAdmin())<div class="field"><label>Visibilidade</label><select name="visibility" id="visibility" @disabled($aplicada)><option value="public" @selected(old('visibility', $exam->is_public ? 'public' : null) === 'public')>Pública — aplicativo</option><option value="private" @selected(old('visibility', $exam->is_public ? 'public' : 'private') === 'private')>Privada — escola</option></select>@if($aplicada)<input type="hidden" name="visibility" value="private"><small>Já aplicada em turmas: para a levar ao telemóvel use «Publicar cópia no app» na listagem, que mantém esta prova e os resultados da escola.</small>@else<small>Pública torna a prova visível no aplicativo, desligando-a da escola. Depois de gravar, falta carregar em «Publicar no app».</small>@endif</div><div class="field" id="school-field"><label>Escola da prova privada</label><select name="school_id"><option value="">Selecione a escola</option>@foreach($schools as $school)<option value="{{ $school->id }}" @selected(old('school_id', $exam->school_id) == $school->id)>{{ $school->name }}</option>@endforeach</select></div><div class="field full" id="plan-field"><div class="checks"><label><input type="checkbox" name="is_locked" value="1" @checked(old('is_locked', $exam->is_locked))> Só para o plano completo <small>— o aluno gratuito vê a prova, mas não a abre.</small></label></div></div>@else<input type="hidden" name="visibility" value="private">@endif
     <div class="field"><label>Tipo das perguntas</label><select name="type" id="question-type" @disabled($selada)><option value="teorico" @selected(old('type', $exam->type) === 'teorico')>Teóricas</option><option value="pratico" @selected(old('type', $exam->type) === 'pratico')>Práticas</option></select>@if($selada)<input type="hidden" name="type" value="{{ $exam->type }}">@endif</div>
-    <div class="field"><label>Duração (minutos)</label><input type="number" name="duration_minutes" min="1" max="300" value="{{ old('duration_minutes', $exam->duration_minutes ?? \App\Support\Grading::durationMinutes()) }}" required></div>
+    <x-admin.field name="duration_minutes" label="Duração (minutos)" type="number" min="1" max="300" :value="$exam->duration_minutes ?? \App\Support\Grading::durationMinutes()" required />
     <div class="field"><label>Regra de aprovação</label><input value="{{ $passPercentage }}% — {{ \App\Support\Grading::passScore($defaultQuestionCount) }} acertos em {{ $defaultQuestionCount }} ({{ \App\Support\Grading::passValues() }} valores)" disabled><small>Definida em config/grading.php e calculada proporcionalmente à quantidade escolhida.</small></div>
 
 @if($selada)
@@ -77,7 +77,7 @@
     <div class="topic-picker-footer"><span id="topic-result-status"></span><button class="btn light small" id="load-more-topics" type="button" hidden>Carregar mais</button><button class="btn small" id="apply-topics" type="button">Concluir</button></div>
 </dialog>
 @if(session('warning'))<p class="alert warning">{{ session('warning') }}</p>@endif
-<div class="form-actions"><a class="btn light" href="{{ route('admin.exams.index') }}">Cancelar</a><button class="btn">{{ $exam->exists ? 'Guardar alterações' : 'Criar prova' }}</button></div>
+<div class="form-actions"><x-admin.button variant="secondary" :href="route('admin.exams.index')">Cancelar</x-admin.button><x-admin.button type="submit" loading-label="A guardar…">{{ $exam->exists ? 'Guardar alterações' : 'Criar prova' }}</x-admin.button></div>
 </form>
 <script>
 (function(){

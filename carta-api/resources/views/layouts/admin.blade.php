@@ -46,7 +46,7 @@
     --}}
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}?v={{ @filemtime(public_path('css/admin.css')) ?: '1' }}">
 </head>
-<body>
+<body class="admin-context-{{ $adminIsPlatform ? 'platform' : 'school' }}" data-admin-context="{{ $adminIsPlatform ? 'platform' : 'school' }}">
 <a class="admin-skip-link" href="#admin-content">Saltar para o conteúdo</a>
 <div class="admin-loading-bar" data-admin-loading-bar hidden aria-hidden="true"><span></span></div>
 <div class="admin-loading-overlay" data-admin-loading-overlay hidden role="status" aria-live="polite" aria-atomic="true">
@@ -95,6 +95,10 @@
             <nav class="breadcrumbs" aria-label="Caminho da página"><a href="{{ route('admin.dashboard') }}">Início</a><span aria-hidden="true">/</span>@if($adminSectionLabel !== $adminPageTitle)<span>{{ $adminSectionLabel }}</span><span aria-hidden="true">/</span>@endif<strong aria-current="page">{{ $adminPageTitle }}</strong></nav>
         @endunless
         <main class="content" id="admin-content">
+            <div class="context-banner" role="note">
+                <span class="context-banner-icon" aria-hidden="true">{{ $adminIsPlatform ? 'P' : 'E' }}</span>
+                <span><strong>{{ $adminContextLabel }}</strong><small>{{ $adminIsPlatform ? 'Governação do conteúdo, utilizadores e operação global.' : 'Turmas, alunos, provas e evolução da sua escola.' }}</small></span>
+            </div>
             @if(session('status'))<div class="alert" role="status"><strong>Operação concluída.</strong><span>{{ session('status') }}</span></div>@endif
             @if($errors->any())<div class="errors" role="alert" tabindex="-1" data-error-summary><strong>Existem dados que precisam da sua atenção:</strong><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
             @yield('content')
