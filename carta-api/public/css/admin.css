@@ -75,3 +75,93 @@ button:focus-visible,a:focus-visible{outline:3px solid rgba(35,154,63,.2);outlin
 .question-bank-filters{margin-bottom:14px;padding:12px}.question-bank-search{display:grid;grid-template-columns:minmax(280px,1fr) auto auto auto;gap:8px}.question-bank-search>input{min-width:0;height:40px;padding:0 12px;border:1px solid #cfd9d1;border-radius:7px}.filter-count{display:grid;min-width:18px;height:18px;place-items:center;border-radius:9px;color:#fff;background:var(--green-800);font-size:9px}.question-bank-advanced{display:grid;grid-template-columns:repeat(6,minmax(120px,1fr)) auto;align-items:end;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}.question-bank-advanced .field{gap:4px}.question-bank-advanced .field label{font-size:9px;text-transform:uppercase}.question-bank-advanced input,.question-bank-advanced select{height:38px;min-height:38px;padding:7px 9px}.question-filter-apply{height:38px}.question-bank-table .data-table{min-width:900px}.question-bank-table th:first-child{width:38%}.question-bank-table td{padding-block:11px}.question-main{display:grid;gap:3px}.question-main>strong{font-size:12px;line-height:1.4}.question-code{color:var(--green-800)!important;font-size:9px;font-weight:800;text-transform:uppercase}.question-meta{display:block;margin-top:2px;color:var(--muted);font-size:10px}.question-bank-table td.actions{white-space:nowrap}.question-bank-table td.actions form{display:inline-flex}
 @media(max-width:1050px){.question-bank-advanced{grid-template-columns:repeat(3,minmax(150px,1fr))}.question-filter-apply{width:100%}}
 @media(max-width:700px){.question-bank-search{grid-template-columns:1fr 1fr}.question-bank-search>input{grid-column:1/-1}.question-bank-search>.btn{width:100%}.question-bank-advanced{grid-template-columns:1fr 1fr}.question-filter-apply{grid-column:1/-1}.question-bank-table .data-table{min-width:820px}}
+
+/* ProntoVia — primeira fase da nova identidade: sistema cromático do painel. */
+:root{
+    --pv-indigo:#1a1f5c;
+    --pv-indigo-dark:#111544;
+    --pv-indigo-soft:#30377b;
+    --pv-cyan:#00b8f0;
+    --pv-cyan-ink:#007a9e;
+    --pv-cyan-soft:#dff8ff;
+    --pv-orange:#ff8a00;
+    --pv-orange-soft:#fff0dd;
+    --pv-success:#18723a;
+    --pv-success-soft:#e4f5e9;
+    --green-900:var(--pv-indigo-dark);
+    --green-800:var(--pv-indigo);
+    --green-600:var(--pv-cyan-ink);
+    --green-100:var(--pv-cyan-soft);
+    --ink:#171b34;
+    --muted:#667085;
+    --line:#dfe3ec;
+    --page:#f3f5f9;
+    --yellow:#d98900;
+    --red:#c7353a;
+    --blue:#1976d2;
+    --shadow:0 3px 10px rgba(26,31,92,.07);
+}
+html,body{color:var(--ink);background:var(--page)}
+::selection{color:#fff;background:var(--pv-indigo)}
+.sidebar{background:var(--pv-indigo-dark);scrollbar-color:var(--pv-indigo-soft) transparent}
+.brand{display:grid;justify-items:start;gap:5px;margin-bottom:24px}
+.brand .admin-brand-logo{width:150px;height:auto;border-radius:0;object-fit:contain;box-shadow:none}
+.brand>small{color:#dfe3f4;font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+.nav-label{color:#aeb5d4}
+.nav a:hover{background:var(--pv-indigo-soft)}
+.nav a.active{color:#fff;background:var(--pv-cyan-ink)}
+.nav .badge{color:#332000;background:var(--pv-orange)}
+.logout:hover{background:var(--pv-indigo-soft)}
+.topbar{border-color:var(--line);background:#fff}
+.page-heading h1,.toolbar h2,.panel h3{color:var(--pv-indigo)}
+.avatar{background:var(--pv-indigo)}
+.search input,.filters input,.filters select,.field input,.field select,.field textarea{border-color:#cfd5e2}
+.search input:focus,.filters input:focus,.filters select:focus,.field input:focus,.field select:focus,.field textarea:focus,input:focus,select:focus,textarea:focus{border-color:var(--pv-cyan-ink);outline:3px solid rgba(0,122,158,.15)}
+button:focus-visible,a:focus-visible{outline:3px solid var(--pv-cyan-ink);outline-offset:2px}
+.btn{border-color:var(--pv-indigo);background:var(--pv-indigo)}
+.btn:hover{border-color:var(--pv-indigo-soft);background:var(--pv-indigo-soft)}
+.btn.light{border-color:#cfd5e2;color:var(--pv-indigo);background:#fff}
+.btn.light:hover{border-color:var(--pv-indigo);background:#f5f6fa}
+.card{border-color:var(--line)}
+.data-table th{color:#505774;background:#f5f6fa}
+.data-table td{border-color:#e7e9f0}
+.data-table tbody tr:hover{background:#f7f8fc}
+.tabs a.active{color:var(--pv-indigo);border-color:var(--pv-cyan-ink)}
+.activity-icon,.ajuda:hover .ajuda-marca,.ajuda:focus .ajuda-marca{color:var(--pv-indigo);background:var(--pv-cyan-soft)}
+.form-section-head>span{background:var(--pv-indigo)}
+.form-section-head,.form-section#conteudo .form-section-head{background:#f7f8fc}
+.question-form-guide a:hover,.question-choice:hover,.topic-result:hover{background:#f5f7fc}
+.question-form-guide a>b,.topic-result-mark{color:var(--pv-cyan-ink);background:var(--pv-cyan-soft)}
+.selected-topic,.question-choice .question-unused,.question-code,.sign-choice-copy small{color:var(--pv-cyan-ink)}
+.selected-topic{border-color:#a9d7e3}
+.topic-selector,.library-preview,.detail-image,.selected-sign-preview,.sign-choice-image,.image-preview-field{background:#f5f6fa}
+.topic-result.selected,.publication-options>label:has(input:checked),.question-option.correct{border-color:#9fd0dc;background:#eefaff}
+.sign-choice:hover{border-color:#79b9ca;background:#f2fbfd}
+.file-selection{color:var(--pv-cyan-ink);border-color:#a9d7e3;background:var(--pv-cyan-soft)}
+
+/* Estados semânticos continuam verdes; marca e sucesso não são a mesma coisa. */
+.metric-icon.green{color:var(--pv-success);background:var(--pv-success-soft)}
+.status.approved,.status.active{color:var(--pv-success);background:var(--pv-success-soft)}
+.dot.green{background:var(--pv-success)}
+.donut{background:conic-gradient(var(--pv-success) 0 var(--approved),var(--yellow) var(--approved) var(--review),var(--red) var(--review) 360deg)}
+.correct-mark{color:var(--pv-success)}
+.answer-card.answer-correct{border-left-color:var(--pv-success)!important}
+.alert{color:var(--pv-success);border-color:#b9dfc6;background:var(--pv-success-soft)}
+
+/* Feedback transversal: imediato no topo; bloqueio apenas quando a espera deixa de ser instantânea. */
+.admin-skip-link{position:fixed;z-index:100;top:-60px;left:1rem;padding:.7rem 1rem;color:#fff;background:var(--pv-indigo);text-decoration:none}
+.admin-skip-link:focus{top:0}
+.admin-loading-bar{position:fixed;z-index:90;top:0;right:0;left:0;height:3px;overflow:hidden;background:var(--pv-cyan-soft)}
+.admin-loading-bar span{display:block;width:32%;height:100%;background:var(--pv-cyan);animation:admin-loading-bar 1.1s ease-in-out infinite}
+.admin-loading-overlay{position:fixed;z-index:80;inset:0;display:grid;align-content:center;justify-items:center;color:var(--pv-indigo);background:rgba(243,245,249,.92)}
+.admin-loading-indicator{display:flex;width:66px;height:66px;gap:6px;align-items:center;justify-content:center;border-radius:50%;background:var(--pv-indigo)}
+.admin-loading-indicator span{width:4px;height:13px;background:#fff;animation:admin-loading-pulse .8s ease-in-out infinite}
+.admin-loading-indicator span:nth-child(2){height:25px;animation-delay:.12s}
+.admin-loading-indicator span:nth-child(3){background:var(--pv-cyan);animation-delay:.24s}
+.admin-loading-overlay strong{margin-top:1rem;font-size:14px}
+.admin-loading-overlay small{margin-top:.25rem;color:var(--muted);font-size:11px}
+.admin-loading-overlay[hidden],.admin-loading-bar[hidden]{display:none!important}
+body[aria-busy="true"]{cursor:progress}
+@keyframes admin-loading-bar{0%{transform:translateX(-110%)}100%{transform:translateX(330%)}}
+@keyframes admin-loading-pulse{0%,100%{transform:scaleY(.65);opacity:.65}50%{transform:scaleY(1);opacity:1}}
+@media(prefers-reduced-motion:reduce){.admin-loading-bar span,.admin-loading-indicator span{animation:none}.admin-loading-bar span{width:100%}}

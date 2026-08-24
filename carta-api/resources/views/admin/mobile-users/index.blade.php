@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 @section('title','Utilizadores do aplicativo')
 @section('page-title','Utilizadores do aplicativo')
-@section('page-subtitle','Contas, planos e atividade dos cidadãos no CartaPro')
+@section('page-subtitle','Contas, planos e atividade dos candidatos no ProntoVia')
 @section('content')
 <div class="toolbar"><div><h2>Contas mobile</h2><p>{{ $users->total() }} utilizadores registados</p></div></div>
 <form class="filters"><input name="q" value="{{ request('q') }}" placeholder="Nome, email ou telefone"><select name="status"><option value="">Todos os estados</option><option value="active" @selected(request('status') === 'active')>Ativos</option><option value="inactive" @selected(request('status') === 'inactive')>Inativos</option></select><button class="btn light">Filtrar</button></form>

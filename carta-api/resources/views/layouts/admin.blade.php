@@ -1,10 +1,12 @@
 <!doctype html>
-<html lang="pt">
+<html lang="pt-MZ">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Painel') · CartaPro</title>
-    <link rel="icon" type="image/png" href="{{ asset('images/logo/icon CartaPro.png') }}">
+    <meta name="theme-color" content="#111544">
+    <title>@yield('title', 'Painel') · ProntoVia</title>
+    <link rel="icon" type="image/webp" href="{{ asset('images/prontovia/iconProntovia.webp') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/prontovia/iconProntovia.png') }}">
     {{--
         A data de modificação no endereço obriga o browser — e o CDN à frente
         dele — a buscar a folha de estilos outra vez quando ela muda. Sem isto
@@ -15,9 +17,16 @@
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}?v={{ @filemtime(public_path('css/admin.css')) ?: '1' }}">
 </head>
 <body>
+<a class="admin-skip-link" href="#admin-content">Saltar para o conteúdo</a>
+<div class="admin-loading-bar" data-admin-loading-bar hidden aria-hidden="true"><span></span></div>
+<div class="admin-loading-overlay" data-admin-loading-overlay hidden role="status" aria-live="polite" aria-atomic="true">
+    <div class="admin-loading-indicator" aria-hidden="true"><span></span><span></span><span></span></div>
+    <strong data-admin-loading-message>A processar…</strong>
+    <small>Aguarde sem fechar esta página.</small>
+</div>
 <div class="app-shell">
     <aside class="sidebar" id="sidebar">
-        <a class="brand" href="{{ route('admin.dashboard') }}"><img src="{{ asset('images/logo/icon CartaPro.png') }}" alt=""><span><strong>Carta<b>Pro</b></strong><small>Painel de gestão</small></span></a>
+        <a class="brand" href="{{ route('admin.dashboard') }}"><img class="admin-brand-logo" src="{{ asset('images/prontovia/Prontovia-white.png') }}" width="1640" height="664" alt="ProntoVia"><small>Painel de gestão</small></a>
         <span class="nav-label">Menu principal</span>
         <nav class="nav">
             <a class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}"><svg viewBox="0 0 24 24"><path d="M3 11 12 3l9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Dashboard</a>
@@ -41,11 +50,11 @@
     </aside>
     <section class="workspace">
         <header class="topbar">
-            <div class="page-heading"><button class="menu-button" type="button" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button><div><h1>@yield('page-title', 'Dashboard')</h1><p>@yield('page-subtitle', 'Gestão de conteúdo CartaPro')</p></div></div>
+            <div class="page-heading"><button class="menu-button" type="button" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button><div><h1>@yield('page-title', 'Dashboard')</h1><p>@yield('page-subtitle', 'Gestão ProntoVia')</p></div></div>
             <form class="search" action="{{ route('admin.questions.index') }}"><input name="q" value="{{ request('q') }}" placeholder="Pesquisar perguntas"><button aria-label="Pesquisar">⌕</button></form>
             <div class="admin-user"><span class="avatar">{{ str(auth()->user()->name)->substr(0, 1)->upper() }}</span><div><strong>{{ auth()->user()->name }}</strong><small>{{ auth()->user()->isAdmin() ? 'Administrador' : auth()->user()->school?->name }}</small></div></div>
         </header>
-        <main class="content">
+        <main class="content" id="admin-content">
             @if(session('status'))<div class="alert">{{ session('status') }}</div>@endif
             @if($errors->any())<div class="errors"><strong>Verifique os dados:</strong><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
             @yield('content')
@@ -53,6 +62,54 @@
     </section>
 </div>
 <script>
+var adminLoadingBar = document.querySelector('[data-admin-loading-bar]');
+var adminLoadingOverlay = document.querySelector('[data-admin-loading-overlay]');
+var adminLoadingMessage = document.querySelector('[data-admin-loading-message]');
+var adminLoadingTimer;
+
+function beginAdminLoading(message, delayedOverlay) {
+    if (adminLoadingBar) adminLoadingBar.hidden = false;
+    document.body.setAttribute('aria-busy', 'true');
+    if (adminLoadingMessage && message) adminLoadingMessage.textContent = message;
+    window.clearTimeout(adminLoadingTimer);
+    adminLoadingTimer = window.setTimeout(function () {
+        if (adminLoadingOverlay) adminLoadingOverlay.hidden = false;
+    }, delayedOverlay === false ? 0 : 450);
+}
+
+function resetAdminLoading() {
+    window.clearTimeout(adminLoadingTimer);
+    if (adminLoadingBar) adminLoadingBar.hidden = true;
+    if (adminLoadingOverlay) adminLoadingOverlay.hidden = true;
+    document.body.removeAttribute('aria-busy');
+    document.querySelectorAll('[data-loading-original]').forEach(function (button) {
+        button.innerHTML = button.dataset.loadingOriginal;
+        button.disabled = false;
+        button.removeAttribute('data-loading-original');
+    });
+}
+
+window.addEventListener('pageshow', resetAdminLoading);
+document.addEventListener('submit', function (event) {
+    window.setTimeout(function () {
+        if (event.defaultPrevented) return;
+        var button = event.submitter || event.target.querySelector('button[type="submit"],input[type="submit"]');
+        if (button && button.tagName === 'BUTTON' && !button.dataset.loadingOriginal) {
+            button.dataset.loadingOriginal = button.innerHTML;
+            button.textContent = 'A processar…';
+            button.disabled = true;
+        }
+        beginAdminLoading('A guardar alterações…');
+    }, 0);
+});
+document.addEventListener('click', function (event) {
+    var link = event.target.closest('a[href]');
+    if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target || link.hasAttribute('download')) return;
+    var destination = new URL(link.href, window.location.href);
+    if (destination.origin !== window.location.origin || (destination.pathname === window.location.pathname && destination.search === window.location.search && destination.hash)) return;
+    beginAdminLoading('A abrir a página…');
+});
+
 document.querySelectorAll('form[action*="/admin/"]').forEach(function (form) {
     if (/\/admin\/(exams|sessions|classrooms|unlocks)\/\d+$/.test(form.action) && form.parentElement.tagName === 'TD') form.parentElement.classList.add('actions');
 });

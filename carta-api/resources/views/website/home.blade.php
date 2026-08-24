@@ -91,7 +91,7 @@
     </div>
 </section>
 
-<section class="pv-section pv-readiness-section">
+<section class="pv-section pv-readiness-section pv-has-background-image pv-readiness-photo" style="--pv-background-image: url('{{ asset('images/prontovia/EXAMES.jpg') }}')">
     <div class="container">
         <div class="row align-items-center gy-5 gx-lg-5">
             <div class="col-lg-5">
@@ -107,14 +107,35 @@
                 @endif
             </div>
             <div class="col-lg-7">
-                <div class="pv-readiness-panel pv-reveal">
-                    <div class="pv-panel-top"><div><span>Visão de preparação</span><strong>Prontidão geral</strong></div><div class="pv-score">78<small>%</small></div></div>
-                    <div class="pv-progress-track"><span style="width:78%"></span></div>
-                    <div class="pv-topic-list">
-                        @foreach([['Sinais', 91], ['Prioridade', 64], ['Velocidade', 84], ['Manobras', 59]] as [$topic, $score])
-                            <div class="pv-topic-row"><span>{{ $topic }}</span><div class="pv-progress-track"><span style="width:{{ $score }}%"></span></div><strong>{{ $score }}%</strong></div>
-                        @endforeach
+                <div class="pv-readiness-dashboard pv-reveal" aria-label="Exemplo da visão de preparação no ProntoVia">
+                    <div class="pv-readiness-dashboard-head"><span><i class="bi bi-speedometer2" aria-hidden="true"></i></span><div><small>Visão de preparação</small><strong>O seu progresso num só lugar</strong></div></div>
+                    <div class="pv-readiness-dashboard-main">
+                        <div class="pv-readiness-gauge">
+                            <svg viewBox="0 0 220 220" role="img" aria-label="Prontidão: 78 por cento">
+                                <circle class="pv-gauge-track" cx="110" cy="110" r="88"></circle>
+                                <circle class="pv-gauge-value" cx="110" cy="110" r="88" pathLength="100"></circle>
+                            </svg>
+                            <div><small>Você está</small><strong>78<sup>%</sup></strong><span>Preparado</span><em><i class="bi bi-check-circle-fill" aria-hidden="true"></i> No caminho certo</em></div>
+                        </div>
+                        <div class="pv-performance-chart">
+                            <div class="pv-chart-title"><span><i class="bi bi-bar-chart-fill" aria-hidden="true"></i> Evolução do desempenho</span><strong>78%</strong></div>
+                            <svg viewBox="0 0 360 170" role="img" aria-label="Desempenho crescente de 18 para 78 por cento em cinco momentos">
+                                <g class="pv-chart-grid"><line x1="35" y1="20" x2="340" y2="20"/><line x1="35" y1="55" x2="340" y2="55"/><line x1="35" y1="90" x2="340" y2="90"/><line x1="35" y1="125" x2="340" y2="125"/></g>
+                                <polyline class="pv-chart-line" points="38,118 108,96 178,76 248,53 330,26"/>
+                                <g class="pv-chart-points"><circle cx="38" cy="118" r="5"/><circle cx="108" cy="96" r="5"/><circle cx="178" cy="76" r="5"/><circle cx="248" cy="53" r="5"/><circle cx="330" cy="26" r="5"/></g>
+                                <g class="pv-chart-labels"><text x="30" y="151">1.º</text><text x="100" y="151">2.º</text><text x="170" y="151">3.º</text><text x="240" y="151">4.º</text><text x="316" y="151">Atual</text></g>
+                            </svg>
+                        </div>
                     </div>
+                    <div class="pv-readiness-dashboard-bottom">
+                        <div class="pv-readiness-topics">
+                            @foreach([['traffic-light','Sinais',91,'blue'],['sign-yield','Prioridade',64,'orange'],['speedometer','Velocidade',84,'cyan'],['car-front','Manobras',59,'violet']] as [$icon,$topic,$score,$tone])
+                                <div class="pv-readiness-topic pv-topic-{{ $tone }}"><span><i class="bi bi-{{ $icon }}" aria-hidden="true"></i></span><div><small>{{ $topic }}</small><strong>{{ $score }}%</strong><div class="pv-topic-meter"><i style="width:{{ $score }}%"></i></div></div></div>
+                            @endforeach
+                        </div>
+                        <div class="pv-learning-path"><strong>O seu caminho</strong><ol><li class="is-complete"><i class="bi bi-check2"></i><span>Fundamentos<small>Concluído</small></span></li><li class="is-complete"><i class="bi bi-check2"></i><span>Conteúdos<small>Concluído</small></span></li><li class="is-current"><i class="bi bi-circle"></i><span>Simulados<small>Em andamento</small></span></li><li><i class="bi bi-circle"></i><span>Preparação final<small>Pendente</small></span></li></ol></div>
+                    </div>
+                    <small class="pv-dashboard-disclaimer">Dados ilustrativos. A prontidão organiza o estudo e não garante aprovação oficial.</small>
                 </div>
             </div>
         </div>
@@ -154,14 +175,32 @@
                 <a class="pv-btn pv-btn-light" href="{{ route('website.schools') }}">Ver como a escola pode crescer</a>
             </div>
             <div class="col-lg-7">
-                <div class="pv-school-dashboard pv-reveal">
-                    <div class="pv-dashboard-bar"><span></span><span></span><span></span><strong>Turma A · Visão geral</strong></div>
-                    <div class="pv-dashboard-stats"><div><small>Alunos</small><strong>24</strong></div><div><small>Média da turma</small><strong>73%</strong></div><div><small>Sessões</small><strong>08</strong></div></div>
-                    <div class="pv-dashboard-body"><div class="pv-chart"><span style="height:38%"></span><span style="height:51%"></span><span style="height:47%"></span><span style="height:68%"></span><span style="height:79%"></span></div><div class="pv-dashboard-list"><span>Gestão de turmas</span><span>Resultados por tema</span><span>Evolução da turma</span></div></div>
-                    <small>Dados meramente ilustrativos</small>
-                </div>
+                {{-- Imagem experimental: substituir pelo dashboard definitivo mantendo o mesmo nome/caminho. --}}
+                <figure class="pv-school-dashboard-image pv-reveal">
+                    <img src="{{ asset('images/prontovia/dashboard-grafic.png') }}" width="1014" height="636" loading="lazy" alt="Exemplo visual temporário de um painel de acompanhamento">
+                    <figcaption>Imagem experimental para avaliação do enquadramento visual.</figcaption>
+                </figure>
             </div>
         </div>
+    </div>
+</section>
+
+<section class="pv-section pv-partners" aria-labelledby="partners-title">
+    <div class="container">
+        <div class="pv-partners-heading"><div><span class="pv-kicker">Escolas parceiras</span><h2 id="partners-title">Encontre uma escola que investe no acompanhamento.</h2><p>Conheça instituições que apresentam os seus serviços no ProntoVia.</p></div><span class="pv-sponsored-label"><i class="bi bi-megaphone" aria-hidden="true"></i> Conteúdo publicitário</span></div>
+        @if(count(config('prontovia.partners', [])))
+            <div class="pv-partner-list">
+                @foreach(config('prontovia.partners') as $partner)
+                    <a class="pv-partner-item" href="{{ $partner['url'] }}" target="_blank" rel="sponsored noopener noreferrer">
+                        @if($partner['logo'])<img src="{{ asset($partner['logo']) }}" alt="Logótipo da {{ $partner['name'] }}" loading="lazy">@else<span class="pv-partner-monogram" aria-hidden="true">{{ mb_substr($partner['name'], 0, 1) }}</span>@endif
+                        <span><strong>{{ $partner['name'] }}</strong>@if($partner['location'])<small><i class="bi bi-geo-alt" aria-hidden="true"></i> {{ $partner['location'] }}</small>@endif</span>
+                        <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
+                    </a>
+                @endforeach
+            </div>
+        @else
+            <div class="pv-partner-empty"><div><strong>A sua escola pode aparecer aqui.</strong><p>Apresente a sua instituição a candidatos que procuram preparar-se melhor.</p></div><a class="pv-btn pv-btn-primary" href="{{ route('website.schools') }}#contacto">Tornar-se escola parceira</a></div>
+        @endif
     </div>
 </section>
 

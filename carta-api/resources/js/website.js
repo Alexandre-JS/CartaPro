@@ -43,3 +43,58 @@ if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-mot
 } else {
     revealItems.forEach((item) => item.classList.add('is-visible'));
 }
+
+const cookieBanner = document.querySelector('[data-pv-cookie-banner]');
+const consentKey = 'prontovia_cookie_consent';
+const readConsent = () => {
+    try { return window.localStorage.getItem(consentKey); } catch { return null; }
+};
+const saveConsent = (choice) => {
+    try { window.localStorage.setItem(consentKey, choice); } catch { /* A preferência continua na sessão atual. */ }
+    const secure = window.location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = `pv_cookie_consent=${choice}; Max-Age=31536000; Path=/; SameSite=Lax${secure}`;
+    cookieBanner?.setAttribute('hidden', '');
+    document.dispatchEvent(new CustomEvent('prontovia:consent', { detail: { choice } }));
+};
+
+if (cookieBanner && !readConsent()) cookieBanner.removeAttribute('hidden');
+document.querySelector('[data-pv-cookie-essential]')?.addEventListener('click', () => saveConsent('essential'));
+document.querySelector('[data-pv-cookie-all]')?.addEventListener('click', () => saveConsent('all'));
+document.querySelector('[data-pv-cookie-settings]')?.addEventListener('click', () => {
+    cookieBanner?.removeAttribute('hidden');
+    cookieBanner?.querySelector('button')?.focus();
+});
+
+const assistant = document.querySelector('[data-pv-assistant]');
+const assistantPanel = assistant?.querySelector('#pvAssistantPanel');
+const assistantToggle = assistant?.querySelector('[data-pv-assistant-toggle]');
+const assistantAnswer = assistant?.querySelector('[data-pv-answer]');
+const setAssistantOpen = (open) => {
+    if (!assistantPanel || !assistantToggle) return;
+    assistantPanel.toggleAttribute('hidden', !open);
+    assistantToggle.setAttribute('aria-expanded', String(open));
+    if (open) assistantPanel.querySelector('button')?.focus();
+    else assistantToggle.focus();
+};
+
+assistantToggle?.addEventListener('click', () => setAssistantOpen(assistantPanel?.hasAttribute('hidden')));
+assistant?.querySelector('[data-pv-assistant-close]')?.addEventListener('click', () => setAssistantOpen(false));
+assistant?.querySelectorAll('[data-pv-assistant-answer]').forEach((button) => {
+    button.addEventListener('click', () => {
+        if (!assistantAnswer) return;
+        const answers = {
+            candidate: ['Comece pela aplicação: nela pode estudar, praticar e acompanhar o seu progresso.', assistant.dataset.candidateUrl, 'Conhecer ou baixar a aplicação'],
+            school: ['O ProntoVia Escolas ajuda a gerir turmas, aplicar testes e transformar resultados em acompanhamento.', assistant.dataset.schoolUrl, 'Falar sobre a minha escola'],
+            support: ['Consulte as perguntas frequentes ou contacte a equipa de suporte.', assistant.dataset.supportUrl, 'Obter ajuda'],
+        };
+        const [copy, url, label] = answers[button.dataset.pvAssistantAnswer];
+        assistantAnswer.replaceChildren();
+        const paragraph = document.createElement('p');
+        paragraph.textContent = copy;
+        const link = document.createElement('a');
+        link.href = url;
+        link.className = 'pv-btn pv-btn-primary pv-btn-small';
+        link.textContent = label;
+        assistantAnswer.append(paragraph, link);
+    });
+});

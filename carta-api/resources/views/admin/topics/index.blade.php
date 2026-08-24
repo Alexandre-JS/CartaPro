@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 @section('title','Temas')
 @section('page-title','Temas')
-@section('page-subtitle','Organize as áreas de aprendizagem do CartaPro.')
+@section('page-subtitle','Organize as áreas de aprendizagem do ProntoVia.')
 @section('content')
 <div class="toolbar"><div><h2>Temas de estudo</h2><p>{{ $topics->total() }} temas cadastrados</p></div><a class="btn" href="{{ route('admin.topics.create') }}">＋ Novo tema</a></div>
 <section class="card table-card"><table class="data-table"><thead><tr><th>Ordem</th><th>Tema</th><th>Perguntas</th><th>Estado</th><th>Ações</th></tr></thead><tbody>

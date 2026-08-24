@@ -14,7 +14,7 @@
             'description' => 'Plataforma educativa de preparação teórica para candidatos à condução e de acompanhamento para escolas.',
             'email' => config('prontovia.support_email') ?: null,
             'telephone' => config('prontovia.contact_phone') ?: null,
-            'logo' => asset('images/prontovia/favicon.svg'),
+            'logo' => asset('images/prontovia/prontovia.png'),
             'sameAs' => array_values(array_filter(config('prontovia.social', []))),
         ],
         [
@@ -61,7 +61,9 @@
     <link rel="canonical" href="{{ $pageUrl }}">
     <link rel="alternate" hreflang="pt-MZ" href="{{ $pageUrl }}">
     <link rel="sitemap" type="application/xml" href="{{ route('website.sitemap') }}">
-    <link rel="icon" type="image/svg+xml" href="{{ asset('images/prontovia/favicon.svg') }}">
+    <link rel="icon" type="image/webp" sizes="258x245" href="{{ asset('images/prontovia/iconProntovia.webp') }}">
+    <link rel="icon" type="image/png" sizes="258x245" href="{{ asset('images/prontovia/iconProntovia.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/prontovia/iconProntovia.png') }}">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="ProntoVia">
     <meta property="og:locale" content="pt_MZ">
@@ -80,7 +82,7 @@
 <a class="pv-skip-link" href="#conteudo">Saltar para o conteúdo</a>
 <div class="pv-page-loader" data-pv-loader role="status" aria-live="polite" aria-label="A carregar ProntoVia">
     <div class="pv-loader-road" aria-hidden="true"><span></span><span></span><span></span></div>
-    <strong>Pronto<span>Via</span></strong>
+    <img class="pv-loader-logo" src="{{ asset('images/prontovia/prontovia.png') }}" width="710" height="141" alt="ProntoVia">
     <small>A preparar o seu percurso…</small>
 </div>
 <aside class="pv-utility-bar" aria-label="Informações de contacto">
@@ -102,15 +104,14 @@
     <nav class="navbar navbar-expand-lg pv-navbar" aria-label="Navegação principal">
         <div class="container">
             <a class="pv-brand" href="{{ route('website.home') }}" aria-label="ProntoVia — Início">
-                <span class="pv-brand-mark" aria-hidden="true"><span></span></span>
-                <span>Pronto<span>Via</span></span>
+                <img class="pv-brand-logo" src="{{ asset('images/prontovia/prontovia.png') }}" width="710" height="141" alt="ProntoVia">
             </a>
             <button class="navbar-toggler pv-menu-toggle" type="button" data-bs-toggle="offcanvas" data-bs-target="#pvMenu" aria-controls="pvMenu" aria-label="Abrir menu">
                 <i class="bi bi-list" aria-hidden="true"></i>
             </button>
             <div class="offcanvas offcanvas-end pv-offcanvas" tabindex="-1" id="pvMenu" aria-labelledby="pvMenuLabel">
                 <div class="offcanvas-header">
-                    <span class="pv-brand" id="pvMenuLabel"><span class="pv-brand-mark" aria-hidden="true"><span></span></span><span>Pronto<span>Via</span></span></span>
+                    <span class="pv-brand" id="pvMenuLabel"><img class="pv-brand-logo" src="{{ asset('images/prontovia/prontovia.png') }}" width="710" height="141" alt="ProntoVia"></span>
                     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fechar menu"></button>
                 </div>
                 <div class="offcanvas-body align-items-lg-center">
@@ -140,11 +141,30 @@
     @yield('content')
 </main>
 
+<div class="pv-assistant" data-pv-assistant data-candidate-url="{{ config('prontovia.android_url') ?: route('website.candidates') }}" data-school-url="{{ route('website.schools') }}#contacto" data-support-url="{{ config('prontovia.support_email') ? 'mailto:'.config('prontovia.support_email') : route('website.home').'#faq' }}">
+    <section class="pv-assistant-panel" id="pvAssistantPanel" aria-labelledby="pvAssistantTitle" hidden>
+        <div class="pv-assistant-head"><div><small>Assistente ProntoVia</small><h2 id="pvAssistantTitle">Como podemos orientar?</h2></div><button type="button" data-pv-assistant-close aria-label="Fechar assistente"><i class="bi bi-x-lg" aria-hidden="true"></i></button></div>
+        <p class="pv-assistant-intro">Escolha o que procura. Este assistente apresenta informação do site e não recolhe a conversa.</p>
+        <div class="pv-assistant-options">
+            <button type="button" data-pv-assistant-answer="candidate"><i class="bi bi-phone" aria-hidden="true"></i> Quero preparar-me</button>
+            <button type="button" data-pv-assistant-answer="school"><i class="bi bi-buildings" aria-hidden="true"></i> Represento uma escola</button>
+            <button type="button" data-pv-assistant-answer="support"><i class="bi bi-question-circle" aria-hidden="true"></i> Preciso de ajuda</button>
+        </div>
+        <div class="pv-assistant-answer" data-pv-answer aria-live="polite"></div>
+    </section>
+    <button class="pv-assistant-toggle" type="button" data-pv-assistant-toggle aria-expanded="false" aria-controls="pvAssistantPanel"><i class="bi bi-chat-dots" aria-hidden="true"></i><span>Posso ajudar?</span></button>
+</div>
+
+<section class="pv-cookie-banner" data-pv-cookie-banner aria-labelledby="pvCookieTitle" hidden>
+    <div><span class="pv-cookie-icon"><i class="bi bi-shield-check" aria-hidden="true"></i></span><div><h2 id="pvCookieTitle">A sua privacidade, com escolhas claras.</h2><p>Usamos armazenamento necessário para guardar as suas preferências. Cookies opcionais de medição só serão ativados com a sua autorização.</p><details><summary>Ver categorias</summary><p><strong>Necessários:</strong> funcionamento e segurança. <strong>Medição:</strong> compreender o uso do site quando esta integração for configurada.</p></details></div></div>
+    <div class="pv-cookie-actions"><button class="pv-btn pv-btn-secondary pv-btn-small" type="button" data-pv-cookie-essential>Apenas necessários</button><button class="pv-btn pv-btn-primary pv-btn-small" type="button" data-pv-cookie-all>Aceitar todos</button></div>
+</section>
+
 <footer class="pv-footer">
     <div class="container">
         <div class="row gy-5">
             <div class="col-lg-4">
-                <a class="pv-brand pv-brand-footer" href="{{ route('website.home') }}"><span class="pv-brand-mark" aria-hidden="true"><span></span></span><span>Pronto<span>Via</span></span></a>
+                <a class="pv-brand pv-brand-footer" href="{{ route('website.home') }}" aria-label="ProntoVia — Início"><img class="pv-brand-logo-dark" src="{{ asset('images/prontovia/Prontovia-white.png') }}" width="1640" height="664" alt="ProntoVia"></a>
                 <p class="pv-footer-tagline">Aprenda. Pratique. Esteja pronto.</p>
                 <p class="pv-footer-about">Uma plataforma educativa para acompanhar cada etapa da sua preparação para conduzir.</p>
             </div>
@@ -174,6 +194,7 @@
                 <h2>Legal</h2>
                 <span>Termos</span>
                 <span>Privacidade</span>
+                <button class="pv-footer-cookie" type="button" data-pv-cookie-settings>Definições de cookies</button>
             </div>
         </div>
         <div class="pv-footer-bottom">

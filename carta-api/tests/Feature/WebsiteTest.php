@@ -58,6 +58,42 @@ class WebsiteTest extends TestCase
             ->assertSee(asset('images/prontovia/home-hero.webp'), false);
     }
 
+    public function test_school_value_section_uses_the_selected_background_image(): void
+    {
+        config()->set('prontovia.images.schools_section', 'images/prontovia/backgrouseccao.png');
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('Melhores decisões para os alunos. Mais valor para a escola.')
+            ->assertSee(asset('images/prontovia/backgrouseccao.png'), false);
+    }
+
+    public function test_default_home_hero_uses_the_person_background_image(): void
+    {
+        config()->set('prontovia.images.home_hero', 'images/prontovia/pessoa-que.avif');
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('pv-has-background-image', false)
+            ->assertSee(asset('images/prontovia/pessoa-que.avif'), false);
+    }
+
+    public function test_audience_pages_use_only_their_featured_hero_backgrounds(): void
+    {
+        config()->set('prontovia.images.candidate_hero', 'images/prontovia/pessoa-que.avif');
+        config()->set('prontovia.images.school_hero', 'images/prontovia/backgrouseccao.png');
+
+        $this->get('/candidatos')
+            ->assertOk()
+            ->assertSee('pv-candidate-hero', false)
+            ->assertSee(asset('images/prontovia/pessoa-que.avif'), false);
+
+        $this->get('/escolas')
+            ->assertOk()
+            ->assertSee('pv-school-hero', false)
+            ->assertSee(asset('images/prontovia/backgrouseccao.png'), false);
+    }
+
     public function test_configured_contact_details_and_android_download_are_rendered(): void
     {
         config()->set('prontovia.support_email', 'equipa@example.test');
@@ -84,7 +120,8 @@ class WebsiteTest extends TestCase
                 ->assertSee('<meta name="description"', false)
                 ->assertSee('<meta property="og:title"', false)
                 ->assertSee('<script type="application/ld+json">', false)
-                ->assertSee('"@type":"WebPage"', false);
+                ->assertSee('"@type":"WebPage"', false)
+                ->assertSee(asset('images/prontovia/prontovia.png'), false);
         }
     }
 
@@ -128,5 +165,83 @@ class WebsiteTest extends TestCase
             ->assertSee('Demonstre acompanhamento')
             ->assertSee('Diferencie a escola')
             ->assertSee('não promete matrículas');
+    }
+
+    public function test_privacy_controls_and_local_assistant_are_available_on_public_pages(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('data-pv-cookie-banner', false)
+            ->assertSee('Apenas necessários')
+            ->assertSee('Aceitar todos')
+            ->assertSee('Definições de cookies')
+            ->assertSee('data-pv-assistant', false)
+            ->assertSee('Este assistente apresenta informação do site e não recolhe a conversa.');
+    }
+
+    public function test_configured_school_partner_is_identified_as_sponsored(): void
+    {
+        config()->set('prontovia.partners', [[
+            'name' => 'Escola Exemplo',
+            'url' => 'https://escola.example.test',
+            'logo' => null,
+            'location' => 'Maputo',
+        ]]);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('Escola Exemplo')
+            ->assertSee('Maputo')
+            ->assertSee('Conteúdo publicitário')
+            ->assertSee('rel="sponsored noopener noreferrer"', false);
+    }
+
+    public function test_logo_variants_are_used_on_their_intended_backgrounds(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('images/prontovia/prontovia.png', false)
+            ->assertSee('images/prontovia/Prontovia-white.png', false)
+            ->assertSee('pv-brand-logo-dark', false);
+    }
+
+    public function test_prontovia_icon_is_exposed_as_webp_favicon_with_png_fallback(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('type="image/webp"', false)
+            ->assertSee('images/prontovia/iconProntovia.webp', false)
+            ->assertSee('images/prontovia/iconProntovia.png', false)
+            ->assertSee('rel="apple-touch-icon"', false);
+    }
+
+    public function test_experimental_school_dashboard_image_is_rendered_responsively(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('images/prontovia/dashboard-grafic.png', false)
+            ->assertSee('pv-school-dashboard-image', false)
+            ->assertSee('Imagem experimental para avaliação');
+    }
+
+    public function test_readiness_section_uses_the_exam_photo_as_a_protected_background(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('pv-readiness-photo', false)
+            ->assertSee('images/prontovia/EXAMES.jpg', false);
+    }
+
+    public function test_readiness_dashboard_exposes_progress_topics_and_learning_path(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('pv-readiness-dashboard', false)
+            ->assertSee('Prontidão: 78 por cento')
+            ->assertSee('Evolução do desempenho')
+            ->assertSee('Sinais')
+            ->assertSee('Prioridade')
+            ->assertSee('Simulados')
+            ->assertSee('Em andamento');
     }
 }

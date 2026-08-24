@@ -22,7 +22,7 @@
     @endif
 </section>
 @if(auth()->user()->isAdmin())
-<div class="toolbar" style="margin-top:22px"><div><h2>Utilizadores do aplicativo</h2><p>Uso real do CartaPro mobile.</p></div></div>
+<div class="toolbar" style="margin-top:22px"><div><h2>Utilizadores da aplicação</h2><p>Utilização real da aplicação ProntoVia.</p></div></div>
 <section class="metric-grid">
     <article class="card metric-card"><span class="metric-icon blue">♟</span><div><span>Contas mobile</span><strong>{{ $mobileUsersCount }}</strong></div></article>
     <article class="card metric-card"><span class="metric-icon green">✓</span><div><span>Contas ativas</span><strong>{{ $activeMobileUsersCount }}</strong></div></article>

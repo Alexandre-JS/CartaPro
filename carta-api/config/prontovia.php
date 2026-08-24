@@ -12,10 +12,10 @@ return [
     'social_image' => env('PRONTOVIA_SOCIAL_IMAGE'),
     'images' => [
         // Caminhos relativos a public/, por exemplo: images/prontovia/home-hero.webp.
-        'home_hero' => env('PRONTOVIA_HOME_HERO_IMAGE'),
-        'candidate_hero' => env('PRONTOVIA_CANDIDATE_HERO_IMAGE'),
-        'school_hero' => env('PRONTOVIA_SCHOOL_HERO_IMAGE'),
-        'schools_section' => env('PRONTOVIA_SCHOOLS_SECTION_IMAGE'),
+        'home_hero' => env('PRONTOVIA_HOME_HERO_IMAGE', 'images/prontovia/pessoa-que.avif'),
+        'candidate_hero' => env('PRONTOVIA_CANDIDATE_HERO_IMAGE', 'images/prontovia/pessoa-que.avif'),
+        'school_hero' => env('PRONTOVIA_SCHOOL_HERO_IMAGE', 'images/prontovia/backgrouseccao.png'),
+        'schools_section' => env('PRONTOVIA_SCHOOLS_SECTION_IMAGE', 'images/prontovia/backgrouseccao.png'),
     ],
     'social' => [
         'facebook' => env('PRONTOVIA_FACEBOOK_URL'),
