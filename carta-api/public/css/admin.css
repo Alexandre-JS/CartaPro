@@ -189,3 +189,11 @@ body[aria-busy="true"]{cursor:progress}
     .topbar-search-placeholder{display:none}
     .breadcrumbs{padding-inline:18px}
 }
+
+/* Componentes administrativos reutilizáveis. */
+.btn.ghost{border-color:transparent;color:var(--pv-indigo);background:transparent}.btn.ghost:hover{border-color:var(--line);background:#f5f6fa}
+.field-required{color:var(--red)}.field-has-error input,.field-has-error select,.field-has-error textarea{border-color:var(--red)}.field-error{color:#a52228!important;font-weight:700!important}.field-hint{line-height:1.45}
+.state-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.empty-state{display:grid;justify-items:center;gap:7px;max-width:480px;margin:auto;padding:34px 22px;color:var(--muted);text-align:center}.empty-state-icon{width:30px;height:30px;margin-bottom:3px;fill:var(--pv-cyan-ink)}.empty-state strong{color:var(--pv-indigo);font-size:13px}.empty-state p{margin:0;font-size:11px}.empty-state-action{margin-top:8px}.empty .empty-state{padding:8px}
+.admin-dialog{width:min(560px,calc(100% - 32px));padding:0;border:0;border-radius:10px;color:var(--ink);background:#fff;box-shadow:0 22px 70px rgba(17,21,68,.24)}.admin-dialog--small{width:min(440px,calc(100% - 32px))}.admin-dialog::backdrop{background:rgba(17,21,68,.58)}.admin-dialog-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:20px 22px;border-bottom:1px solid var(--line)}.admin-dialog-head h2{margin:0;color:var(--pv-indigo);font-size:18px}.admin-dialog-head p{margin:4px 0 0;color:var(--muted);font-size:11px}.admin-dialog-close{display:grid;flex:0 0 36px;width:36px;height:36px;place-items:center;border:1px solid var(--line);border-radius:7px;color:var(--pv-indigo);background:#fff;font-size:20px;cursor:pointer}.admin-dialog-body{padding:20px 22px}.admin-dialog-body>p:first-child{margin-top:0}.admin-dialog-body>p:last-child{margin-bottom:0}.admin-dialog-footer{display:flex;align-items:center;justify-content:flex-end;gap:9px;padding:15px 22px;border-top:1px solid var(--line);background:#f8f9fb}.admin-dialog-footer form{margin:0}
+@media(max-width:560px){.admin-dialog-footer{align-items:stretch;flex-direction:column-reverse}.admin-dialog-footer form,.admin-dialog-footer .btn{width:100%}}

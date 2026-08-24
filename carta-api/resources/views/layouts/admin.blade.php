@@ -141,6 +141,26 @@ adminSidebar?.querySelectorAll('.nav a').forEach(function (link) {
 });
 document.querySelector('[data-error-summary]')?.focus();
 
+document.querySelectorAll('[data-dialog-open]').forEach(function (trigger) {
+    trigger.addEventListener('click', function () {
+        var dialog = document.getElementById(trigger.dataset.dialogOpen);
+        if (!dialog) return;
+        if (!trigger.id) trigger.id = 'dialog-trigger-' + Math.random().toString(36).slice(2);
+        dialog.dataset.returnFocus = trigger.id;
+        dialog.showModal();
+        dialog.querySelector('[data-dialog-close], button, a, input, select, textarea')?.focus();
+    });
+});
+document.querySelectorAll('.admin-dialog').forEach(function (dialog) {
+    dialog.querySelectorAll('[data-dialog-close]').forEach(function (button) {
+        button.addEventListener('click', function () { dialog.close(); });
+    });
+    dialog.addEventListener('click', function (event) { if (event.target === dialog) dialog.close(); });
+    dialog.addEventListener('close', function () {
+        if (dialog.dataset.returnFocus) document.getElementById(dialog.dataset.returnFocus)?.focus();
+    });
+});
+
 function beginAdminLoading(message, delayedOverlay) {
     if (adminLoadingBar) adminLoadingBar.hidden = false;
     document.body.setAttribute('aria-busy', 'true');
