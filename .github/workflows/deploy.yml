@@ -69,7 +69,7 @@ jobs:
       # Sem preparar ambiente: o .env.testing está no repositório e o Laravel
       # prefere-o quando APP_ENV=testing, que é o que o phpunit.xml define.
       - name: Testes
-        run: php artisan test --stop-on-failure -vvv
+        run: php artisan test --stop-on-failure
 
   publicar:
     needs: testes
