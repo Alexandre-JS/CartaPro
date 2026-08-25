@@ -63,8 +63,20 @@ jobs:
           extensions: sqlite3, pdo_sqlite
           coverage: none
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: carta-api/package-lock.json
+
       - name: Instalar dependências
         run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Instalar dependências frontend
+        run: npm ci --ignore-scripts
+
+      - name: Construir assets para os testes
+        run: npm run build
 
       # Sem preparar ambiente: o .env.testing está no repositório e o Laravel
       # prefere-o quando APP_ENV=testing, que é o que o phpunit.xml define.
@@ -95,9 +107,23 @@ jobs:
           php-version: '8.4'
           coverage: none
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: carta-api/package-lock.json
+
       - name: Construir para produção
         working-directory: carta-api
         run: composer install --no-dev --optimize-autoloader --no-interaction --no-progress
+
+      - name: Instalar dependências frontend
+        working-directory: carta-api
+        run: npm ci --ignore-scripts
+
+      - name: Construir assets frontend
+        working-directory: carta-api
+        run: npm run build
 
       - name: Montar o artefacto
         # A árvore espelha o public_html do servidor:
