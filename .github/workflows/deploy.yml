@@ -40,10 +40,27 @@ jobs:
     # pode ser transformada no artefacto de produção.
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: cartapro_test
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
     env:
       APP_ENV: testing
-      DB_CONNECTION: sqlite
-      DB_DATABASE: ':memory:'
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: cartapro_test
+      DB_USERNAME: root
+      DB_PASSWORD: root
       CACHE_STORE: array
       SESSION_DRIVER: array
       QUEUE_CONNECTION: sync
@@ -60,14 +77,16 @@ jobs:
           # arrancar lá e todo o site respondia 500 sem dizer porquê. A versão
           # daqui, a do servidor e a do lock têm de andar juntas.
           php-version: '8.4'
-          extensions: sqlite3, pdo_sqlite
+          extensions: pdo_mysql
           coverage: none
 
       - name: Instalar dependências
         run: composer install --prefer-dist --no-interaction --no-progress
 
-      # Sem preparar ambiente: o .env.testing está no repositório e o Laravel
-      # prefere-o quando APP_ENV=testing, que é o que o phpunit.xml define.
+      - name: Preparar base de dados de testes
+        run: php artisan migrate --force --no-interaction
+
+      # O CI usa MySQL para validar o mesmo motor do servidor de produção.
       - name: Testes
         run: php artisan test --stop-on-failure -vvv
 
