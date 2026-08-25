@@ -1,0 +1,5 @@
+carta-api/.env
+images/questions/*
+!images/questions/.gitkeep
+images/signs/*
+!images/signs/.gitkeep
