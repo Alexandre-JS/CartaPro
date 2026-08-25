@@ -84,7 +84,7 @@ class ResultController extends Controller
                 });
 
             fclose($output);
-        }, 'resultados-cartapro.csv', ['Content-Type' => 'text/csv']);
+        }, 'resultados-prontovia.csv', ['Content-Type' => 'text/csv']);
     }
 
     private function query(Request $request): Builder

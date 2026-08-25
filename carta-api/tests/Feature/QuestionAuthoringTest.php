@@ -24,7 +24,7 @@ class QuestionAuthoringTest extends TestCase
     {
         parent::setUp();
 
-        $this->admin = User::create(['name' => 'Admin', 'email' => 'admin@cartapro.test', 'password' => 'segredo123', 'role' => 'admin', 'is_active' => true]);
+        $this->admin = User::create(['name' => 'Admin', 'email' => 'admin@prontovia.test', 'password' => 'segredo123', 'role' => 'admin', 'is_active' => true]);
         $this->topic = Topic::create(['name' => 'Velocidade', 'slug' => 'velocidade', 'is_active' => true]);
         LicenseCategory::create(['name' => 'Ligeiro', 'slug' => 'ligeiro', 'sort_order' => 1, 'is_active' => true]);
     }

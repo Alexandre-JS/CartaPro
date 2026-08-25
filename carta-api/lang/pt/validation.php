@@ -104,10 +104,10 @@ return [
 
     'custom' => [
         'email' => [
-            'unique' => 'Este email já tem conta CartaPro. Entre em vez de criar uma nova conta.',
+            'unique' => 'Este email já tem conta ProntoVia. Entre em vez de criar uma nova conta.',
         ],
         'phone' => [
-            'unique' => 'Este número já tem conta CartaPro. Entre em vez de criar uma nova conta.',
+            'unique' => 'Este número já tem conta ProntoVia. Entre em vez de criar uma nova conta.',
         ],
         'password' => [
             'min' => 'A palavra-passe tem de ter pelo menos :min caracteres.',

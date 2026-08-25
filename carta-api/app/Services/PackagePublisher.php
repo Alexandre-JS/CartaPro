@@ -36,7 +36,7 @@ class PackagePublisher
     {
         $payload = $this->buildPayload();
 
-        $relativePath = self::DIRECTORY.'/cartapro-'.$payload['versao'].'.json';
+        $relativePath = self::DIRECTORY.'/prontovia-'.$payload['versao'].'.json';
         Storage::disk(self::DISK)->put($relativePath, json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 
         ContentPackage::where('status', 'published')->update(['status' => 'archived']);

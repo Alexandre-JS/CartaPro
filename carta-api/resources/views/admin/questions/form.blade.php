@@ -114,7 +114,7 @@ const picker=document.getElementById('sign-picker'),choices=[...document.querySe
 let uploadedPreview='';
 function imageDiagnostic(level,message,details={}){
     const logger=console[level]||console.log;
-    logger.call(console,`[CartaPro:imagem] ${message}`,{pagina:location.href,...details});
+    logger.call(console,`[ProntoVia:imagem] ${message}`,{pagina:location.href,...details});
 }
 function monitorImage(image,context){
     const loaded=()=>{if(image===preview){preview.hidden=false;previewError.hidden=true;}imageDiagnostic('info','Imagem carregada',{context,src:image.currentSrc||image.src,largura:image.naturalWidth,altura:image.naturalHeight});};

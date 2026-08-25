@@ -52,7 +52,7 @@ class MpesaGateway implements PaymentGateway
             'input_ServiceProviderCode' => $this->config['service_provider_code'],
             'input_ThirdPartyConversationID' => $payment->conversation_id,
             'input_TransactionReference' => $payment->reference,
-            'input_PurchasedItemsDesc' => 'CartaPro '.$payment->plan,
+            'input_PurchasedItemsDesc' => 'ProntoVia '.$payment->plan,
         ]);
 
         return $this->interpretar($resposta);

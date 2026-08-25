@@ -24,9 +24,9 @@ class EssenciaisSeeder extends Seeder
 {
     public function run(): void
     {
-        User::firstOrCreate(['email' => 'admin@cartapro.co.mz'], [
-            'name' => 'Administrador CartaPro',
-            'password' => 'CartaPro@2026',
+        User::firstOrCreate(['email' => 'admin@prontovia.co.mz'], [
+            'name' => 'Administrador ProntoVia',
+            'password' => 'ProntoVia@2026',
         ]);
 
         collect([

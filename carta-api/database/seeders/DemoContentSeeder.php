@@ -13,7 +13,7 @@ class DemoContentSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = User::where('email', 'admin@cartapro.co.mz')->firstOrFail();
+        $admin = User::where('email', 'admin@prontovia.co.mz')->firstOrFail();
         $topics = Topic::whereIn('slug', ['velocidade', 'sinais_perigo', 'prioridade'])->get()->keyBy('slug');
         $articles = Article::whereIn('number', [7, 18, 24, 30, 31])->get()->keyBy('number');
         $sign = Sign::where('slug', 'curva-perigosa')->first();

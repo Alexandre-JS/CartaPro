@@ -49,7 +49,7 @@ abstract class TestCase extends BaseTestCase
     protected function mobileUser(array $attributes = []): array
     {
         $user = MobileUser::create(array_merge([
-            'name' => 'Aluno CartaPro',
+            'name' => 'Aluno ProntoVia',
             'email' => 'aluno'.Str::random(6).'@example.test',
             'phone' => '84'.random_int(1000000, 9999999),
             'password' => 'segredo123',

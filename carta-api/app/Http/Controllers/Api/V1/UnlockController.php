@@ -58,7 +58,7 @@ class UnlockController extends Controller
             abort(
                 $claimedElsewhere ? 409 : 404,
                 $claimedElsewhere
-                    ? 'Este número já desbloqueou outra conta CartaPro. Usa essa conta ou fala connosco.'
+                    ? 'Este número já desbloqueou outra conta ProntoVia. Usa essa conta ou fala connosco.'
                     : 'Ainda não encontrámos uma activação para este número. Podes desbloquear já no app, em segundos.',
             );
         }
@@ -72,7 +72,7 @@ class UnlockController extends Controller
             'expires_at' => now()->addMinutes(10),
         ]);
 
-        $this->sms->send(Phone::format($normalized), "CartaPro: o seu codigo de activacao e {$code}. Valido por 10 minutos.");
+        $this->sms->send(Phone::format($normalized), "ProntoVia: o seu codigo de activacao e {$code}. Valido por 10 minutos.");
 
         return response()->json([
             'estado' => 'codigo_enviado',

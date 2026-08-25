@@ -2,6 +2,7 @@
 
 **Versão:** 1.1  
 **Estado:** Direção estratégica aprovada para refatoração  
+**Estado operacional:** Plataforma ainda não publicada (não live); alterações estruturais podem ser feitas antes do lançamento.
 **Origem:** Evolução do projeto CartaPro  
 **Marca principal:** ProntoVia  
 **Produtos:** ProntoVia, ProntoVia+, ProntoVia Escolas  
@@ -971,24 +972,42 @@ Prioridades:
 
 # 30. Plano de refatoração
 
+## 30.0 Acompanhamento da execução
+
+Este plano é atualizado no fecho de cada fase. A validação automatizada é
+executada uma vez no final da fase, evitando repetir a suite completa após cada
+funcionalidade.
+
+Legenda: `[x]` concluído, `[ ]` pendente.
+
 ## Fase 0 — Proteção do estado atual
 
-- backup;
-- tag/release da versão atual;
-- corrigir endpoint temporário;
-- rever secrets;
-- corrigir base SQLite de desenvolvimento;
-- validar testes atuais.
+- [x] backup lógico através do histórico Git existente;
+- [x] tag/release da versão atual (`prontovia-admin-shell-baseline-20260824`);
+- [x] remover o endpoint temporário de finalização do deploy; a finalização é feita por SSH;
+- [x] rever secrets: credenciais reais permanecem fora do Git e o ambiente de teste contém apenas valores descartáveis;
+- [x] isolar os testes em SQLite na memória e impedir execução acidental noutra base de dados;
+- [x] validar os testes atuais no fecho da fase (174 testes/781 asserções na API e 44 testes na app).
+
+**Estado da Fase 0:** concluída em 25 de agosto de 2026.
 
 ## Fase 1 — Fundação ProntoVia
 
-- novo branding;
-- nova identidade visual;
-- textos;
-- assets;
-- domínio;
-- nomenclatura;
-- estrutura inicial do website.
+- [x] aplicar o branding ProntoVia no backend Laravel;
+- [x] consolidar a identidade visual existente no website, autenticação, painel e provas web;
+- [x] alinhar textos e mensagens públicas, administrativas, API, SMS e pagamentos;
+- [x] centralizar os assets ProntoVia usados pelo backend e retirar referências aos assets CartaPro;
+- [x] preparar os domínios ProntoVia na configuração de exemplo;
+- [x] alinhar a nomenclatura operacional do backend, preservando aliases temporários dos comandos antigos;
+- [x] manter a estrutura inicial independente do website em `Website/` e `resources/views/website/`;
+- [ ] aplicar branding, assets, `appId` e armazenamento ProntoVia na aplicação móvel — adiado por decisão de escopo.
+- [x] validar os testes do backend no fecho da fase (174 testes/781 asserções).
+
+**Escopo desta execução:** backend Laravel. A aplicação móvel será tratada numa
+etapa própria para evitar misturar superfícies e aumentar o custo de validação.
+
+**Estado da Fase 1 no backend:** concluída em 25 de agosto de 2026. A parcela
+mobile permanece pendente e não integra o escopo desta execução.
 
 ## Fase 2 — Website institucional
 

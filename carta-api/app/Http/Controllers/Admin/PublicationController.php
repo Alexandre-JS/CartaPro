@@ -67,7 +67,7 @@ class PublicationController extends Controller
         // Pacotes anteriores à mudança de disco: serve o payload guardado.
         return response()->streamDownload(function () use ($package): void {
             echo json_encode($package->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        }, 'cartapro-'.$package->version.'.json', ['Content-Type' => 'application/json']);
+        }, 'prontovia-'.$package->version.'.json', ['Content-Type' => 'application/json']);
     }
 
 }

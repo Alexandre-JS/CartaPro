@@ -1,4 +1,4 @@
--- CartaPro: importa somente perguntas, respostas e artigos do banco INATRO.
+-- ProntoVia: importa somente perguntas, respostas e artigos do banco INATRO.
 -- Gerado automaticamente; não cria nem altera temas, sinais ou provas.
 -- Seguro para repetir: external_id identifica e actualiza a mesma pergunta.
 -- As perguntas entram aprovadas para poderem ser usadas na criação de provas.
@@ -6,7 +6,7 @@
 SET NAMES utf8mb4;
 START TRANSACTION;
 
-SET @cartapro_antes := (
+SET @prontovia_antes := (
     SELECT COUNT(*) FROM questions WHERE external_id REGEXP '^inatro-e[0-9]{2}-q[0-9]{2}$'
 );
 
@@ -544,16 +544,16 @@ ON DUPLICATE KEY UPDATE
     sort_order = VALUES(sort_order),
     updated_at = NOW();
 
-SET @cartapro_depois := (
+SET @prontovia_depois := (
     SELECT COUNT(*) FROM questions WHERE external_id REGEXP '^inatro-e[0-9]{2}-q[0-9]{2}$'
 );
 
 COMMIT;
 
 SELECT
-    @cartapro_antes AS perguntas_antes,
-    @cartapro_depois AS perguntas_depois,
-    @cartapro_depois - @cartapro_antes AS perguntas_inseridas;
+    @prontovia_antes AS perguntas_antes,
+    @prontovia_depois AS perguntas_depois,
+    @prontovia_depois - @prontovia_antes AS perguntas_inseridas;
 
 -- Estes resultados devem retornar zero linhas. Se retornarem dados, corrija
 -- os temas/artigos no painel e execute novamente este mesmo ficheiro.

@@ -66,7 +66,7 @@ class UnlockController extends Controller
 
         return back()->with('status', $this->associarConta($unlock)
             ? 'Desbloqueio associado à conta '.$unlock->fresh()->mobileUser->email.'.'
-            : 'Não existe nenhuma conta CartaPro com este número. O aluno tem de se registar primeiro.');
+            : 'Não existe nenhuma conta ProntoVia com este número. O aluno tem de se registar primeiro.');
     }
 
     public function destroy(Unlock $unlock): RedirectResponse

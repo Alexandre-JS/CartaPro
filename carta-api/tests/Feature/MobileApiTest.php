@@ -12,7 +12,7 @@ class MobileApiTest extends TestCase
     public function test_mobile_user_can_register_and_sync_offline_progress(): void
     {
         $registration = $this->postJson('/api/v1/mobile/register', [
-            'name' => 'Aluno CartaPro', 'email' => 'aluno@example.test', 'phone' => '841112223', 'password' => 'segredo123',
+            'name' => 'Aluno ProntoVia', 'email' => 'aluno@example.test', 'phone' => '841112223', 'password' => 'segredo123',
         ])->assertCreated()->assertJsonPath('user.email', 'aluno@example.test');
         $token = $registration->json('token');
         $clientId = fake()->uuid();

@@ -65,7 +65,7 @@
 document.querySelectorAll('.library-preview').forEach(function (preview) {
     const image = preview.querySelector('img');
     if (! image) {
-        console.warn('[CartaPro:sinais] Ficheiro indisponível', {
+        console.warn('[ProntoVia:sinais] Ficheiro indisponível', {
             nome: preview.dataset.signName,
             caminhoGuardado: preview.dataset.storedImage || null,
             pagina: location.href,
@@ -73,7 +73,7 @@ document.querySelectorAll('.library-preview').forEach(function (preview) {
         return;
     }
     const loaded = function () {
-        console.info('[CartaPro:sinais] Imagem carregada', {
+        console.info('[ProntoVia:sinais] Imagem carregada', {
             nome: image.alt,
             src: image.currentSrc || image.src,
             largura: image.naturalWidth,
@@ -81,7 +81,7 @@ document.querySelectorAll('.library-preview').forEach(function (preview) {
         });
     };
     const failed = function (event) {
-        console.error('[CartaPro:sinais] Falha ao carregar imagem', {
+        console.error('[ProntoVia:sinais] Falha ao carregar imagem', {
             nome: image.alt,
             src: image.currentSrc || image.src,
             baseUrl: document.baseURI,
@@ -93,7 +93,7 @@ document.querySelectorAll('.library-preview').forEach(function (preview) {
     image.addEventListener('error', failed, { once: true });
     if (image.complete) image.naturalWidth > 0 ? loaded() : failed();
 });
-console.info('[CartaPro:sinais] Biblioteca iniciada', {
+console.info('[ProntoVia:sinais] Biblioteca iniciada', {
     imagensRenderizadas: document.querySelectorAll('.library-preview img').length,
     imagensEmFalta: document.querySelectorAll('.library-preview .missing-image').length,
 });

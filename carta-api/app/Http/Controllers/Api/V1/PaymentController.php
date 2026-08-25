@@ -16,7 +16,7 @@ use Illuminate\Http\Request;
  * Pagamento dentro do app.
  *
  * Antes disto, o ecrã de desbloqueio pedia ao aluno que pagasse "para o número
- * indicado pela CartaPro" — sem mostrar número nem preço, e sem forma de
+ * indicado pelo ProntoVia" — sem mostrar número nem preço, e sem forma de
  * comunicar que tinha pago. Todo o pagamento vivia fora do software.
  */
 class PaymentController extends Controller

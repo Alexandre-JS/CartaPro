@@ -107,7 +107,7 @@ return [
     |
     | `garantia` sai vazia de propósito. Prometer devolução do dinheiro é um
     | compromisso comercial que só o dono do negócio pode assumir — inventá-lo
-    | seria vincular a CartaPro a algo que ninguém decidiu.
+    | seria vincular o ProntoVia a algo que ninguém decidiu.
     |
     */
 
@@ -229,7 +229,7 @@ return [
         /*
          * O nosso vocabulário para o deles. A DebitoPay também expõe 'payfast'
          * (cartões e EFT em ZAR, África do Sul); não está ligado porque a
-         * CartaPro vende em MZN e o PayFast só aceita carteiras em ZAR — abri-lo
+         * ProntoVia vende em MZN e o PayFast só aceita carteiras em ZAR — abri-lo
          * exigia uma carteira e um preço numa segunda moeda, que é decisão de
          * negócio, não de código. O driver cobra-o sem alterações no dia em que
          * existir esse método com a sua carteira.
