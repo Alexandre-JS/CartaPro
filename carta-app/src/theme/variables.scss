@@ -1,129 +1,110 @@
 /*
- * CartaPro design tokens
- * Fonte: src/assets/icon/identidade visual.png
- *
- * Use os tokens semanticos (--app-*) nos componentes. Os tokens --ion-color-*
- * existem para que os componentes Ionic recebam a mesma identidade visual.
+ * ProntoVia Mobile — tokens de fundação.
+ * Os aliases --app-* mantêm compatibilidade durante a migração visual.
  */
 :root {
-  /* Paleta oficial da marca */
-  --app-color-green: #43b649;
-  --app-color-green-dark: #218b38;
-  --app-color-green-light: #eaf7ec;
-  --app-color-yellow: #f5c518;
-  --app-color-red: #e31e24;
-  --app-color-road-gray: #666666;
-  --app-color-light-gray: #f5f6f7;
-  --app-color-white: #ffffff;
+  --pv-indigo: #1a1f5c;
+  --pv-indigo-dark: #1a1f5c;
+  --pv-cyan: #00b8f0;
+  --pv-orange: #ff8a00;
+  --pv-progress: #43b649;
+  --pv-white: #ffffff;
+  --pv-bg: #f4f6f8;
+  --pv-surface: var(--pv-white);
+  --pv-text: #161616;
+  --pv-text-secondary: #525252;
+  --pv-muted: #8d9199;
+  --pv-border: #e0e2e6;
+  --pv-success: var(--pv-progress);
+  --pv-warning: #ff8a00;
+  --pv-danger: #ff8a00;
+  --pv-info: #00b8f0;
+  --pv-radius-button: 8px;
+  --pv-radius-input: 8px;
+  --pv-radius-card: 12px;
+  --pv-space-page: 16px;
+  --pv-space-section: 24px;
+  --pv-font-family: "IBM Plex Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --pv-type-display: 28px;
+  --pv-type-title: 20px;
+  --pv-type-heading: 16px;
+  --pv-type-body: 14px;
+  --pv-type-label: 12px;
+  --pv-type-caption: 11px;
+  --pv-line-body: 1.45;
 
-  /* Uso semantico */
-  --app-color-brand: var(--app-color-green);
-  --app-color-brand-strong: var(--app-color-green-dark);
-  --app-color-brand-soft: var(--app-color-green-light);
-  --app-color-success: var(--app-color-green-dark);
-  --app-color-warning: var(--app-color-yellow);
-  --app-color-danger: var(--app-color-red);
-  --app-color-text: #202124;
-  --app-color-text-muted: var(--app-color-road-gray);
-  --app-color-background: var(--app-color-light-gray);
-  --app-color-surface: var(--app-color-white);
-  --app-color-border: #dfe3e6;
+  --app-color-green: var(--pv-indigo);
+  --app-color-green-dark: var(--pv-indigo-dark);
+  --app-color-green-light: var(--pv-bg);
+  --app-color-yellow: var(--pv-orange);
+  --app-color-red: var(--pv-danger);
+  --app-color-road-gray: var(--pv-text-secondary);
+  --app-color-light-gray: var(--pv-bg);
+  --app-color-white: var(--pv-white);
+  --app-color-brand: var(--pv-indigo);
+  --app-color-brand-strong: var(--pv-indigo-dark);
+  --app-color-brand-soft: var(--pv-bg);
+  --app-color-success: var(--pv-success);
+  --app-color-warning: var(--pv-warning);
+  --app-color-danger: var(--pv-danger);
+  --app-color-text: var(--pv-text);
+  --app-color-text-muted: var(--pv-text-secondary);
+  --app-color-background: var(--pv-bg);
+  --app-color-surface: var(--pv-surface);
+  --app-color-border: var(--pv-border);
+  --app-color-page: var(--pv-bg);
+  --app-color-surface-subtle: var(--pv-bg);
+  --app-color-border-subtle: var(--pv-border);
+  --app-color-divider: var(--pv-border);
+  --app-color-track: var(--pv-border);
+  --app-color-disabled: var(--pv-muted);
+  --app-color-success-text: var(--pv-cyan);
+  --app-color-success-soft: var(--pv-bg);
+  --app-color-success-border: var(--pv-border);
+  --app-color-warning-text: var(--pv-orange);
+  --app-color-warning-soft: var(--pv-bg);
+  --app-color-warning-border: var(--pv-border);
+  --app-color-danger-text: var(--pv-orange);
+  --app-color-danger-soft: var(--pv-bg);
+  --app-color-danger-border: var(--pv-border);
+  --app-color-info: var(--pv-info);
+  --app-color-info-soft: var(--pv-bg);
+  --app-color-accent: var(--pv-cyan);
+  --app-color-accent-soft: var(--pv-bg);
+  --app-color-brand-panel: var(--pv-indigo);
+  --app-color-action: var(--pv-indigo);
 
-  /* Superficies e divisores */
-  --app-color-page: #edf2ee;
-  --app-color-surface-subtle: #f8fbf8;
-  --app-color-border-subtle: #e1e7e2;
-  --app-color-divider: #eef1ef;
-  --app-color-track: #e4e8e5;
-  --app-color-disabled: #b6bdb8;
-
-  /* Estados: cada familia tem texto, fundo suave e borda */
-  --app-color-success-text: #176a2a;
-  --app-color-success-soft: #e8f7ea;
-  --app-color-success-border: rgb(33 139 56 / 45%);
-  --app-color-warning-text: #7a5600;
-  --app-color-warning-soft: #fff9e8;
-  --app-color-warning-border: #e7ce7d;
-  --app-color-danger-text: #b9171d;
-  --app-color-danger-soft: #fdeaea;
-  --app-color-danger-border: rgb(227 30 36 / 38%);
-
-  /* Acentos auxiliares para distinguir metricas, sem competir com a marca */
-  --app-color-info: #176fa8;
-  --app-color-info-soft: #e2f1fb;
-  --app-color-accent: #7354a0;
-  --app-color-accent-soft: #eee7f8;
-
-  /* Cores solidas para cabecalhos e acoes com texto branco */
-  --app-color-brand-panel: #176a2a;
-  --app-color-action: #176a2a;
-
-  /* Ionic: primary / verde principal */
-  --ion-color-primary: #43b649;
-  --ion-color-primary-rgb: 67, 182, 73;
-  --ion-color-primary-contrast: #000000;
-  --ion-color-primary-contrast-rgb: 0, 0, 0;
-  --ion-color-primary-shade: #3ba040;
-  --ion-color-primary-tint: #56bd5b;
-
-  /* Ionic: secondary / verde escuro */
-  --ion-color-secondary: #218b38;
-  --ion-color-secondary-rgb: 33, 139, 56;
-  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-primary: var(--pv-indigo);
+  --ion-color-primary-rgb: 26, 31, 92;
+  --ion-color-primary-contrast: var(--pv-white);
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #1a1f5c;
+  --ion-color-primary-tint: #1a1f5c;
+  --ion-color-secondary: var(--pv-cyan);
+  --ion-color-secondary-rgb: 0, 184, 240;
+  --ion-color-secondary-contrast: var(--pv-white);
   --ion-color-secondary-contrast-rgb: 255, 255, 255;
-  --ion-color-secondary-shade: #1d7a31;
-  --ion-color-secondary-tint: #379746;
-
-  /* Ionic: success / respostas corretas */
-  --ion-color-success: #218b38;
-  --ion-color-success-rgb: 33, 139, 56;
-  --ion-color-success-contrast: #ffffff;
-  --ion-color-success-contrast-rgb: 255, 255, 255;
-  --ion-color-success-shade: #1d7a31;
-  --ion-color-success-tint: #379746;
-
-  /* Ionic: warning / atencao e respostas pendentes */
-  --ion-color-warning: #f5c518;
-  --ion-color-warning-rgb: 245, 197, 24;
-  --ion-color-warning-contrast: #000000;
-  --ion-color-warning-contrast-rgb: 0, 0, 0;
-  --ion-color-warning-shade: #d8ad15;
-  --ion-color-warning-tint: #f6cb2f;
-
-  /* Ionic: danger / erros e respostas incorretas */
-  --ion-color-danger: #e31e24;
-  --ion-color-danger-rgb: 227, 30, 36;
-  --ion-color-danger-contrast: #ffffff;
-  --ion-color-danger-contrast-rgb: 255, 255, 255;
-  --ion-color-danger-shade: #c81a20;
-  --ion-color-danger-tint: #e6353a;
-
-  /* Neutros globais do Ionic */
-  --ion-color-light: #f5f6f7;
-  --ion-color-light-rgb: 245, 246, 247;
-  --ion-color-light-contrast: #202124;
-  --ion-color-light-contrast-rgb: 32, 33, 36;
-  --ion-color-light-shade: #d8d9d9;
-  --ion-color-light-tint: #f6f7f8;
-
-  --ion-color-medium: #666666;
-  --ion-color-medium-rgb: 102, 102, 102;
-  --ion-color-medium-contrast: #ffffff;
-  --ion-color-medium-contrast-rgb: 255, 255, 255;
-  --ion-color-medium-shade: #5a5a5a;
-  --ion-color-medium-tint: #757575;
-
-  --ion-color-dark: #202124;
-  --ion-color-dark-rgb: 32, 33, 36;
-  --ion-color-dark-contrast: #ffffff;
-  --ion-color-dark-contrast-rgb: 255, 255, 255;
-  --ion-color-dark-shade: #1c1d20;
-  --ion-color-dark-tint: #36373a;
-
-  --ion-background-color: var(--app-color-background);
-  --ion-background-color-rgb: 245, 246, 247;
-  --ion-text-color: var(--app-color-text);
-  --ion-text-color-rgb: 32, 33, 36;
-  --ion-font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", sans-serif;
+  --ion-color-secondary-shade: #00b8f0;
+  --ion-color-secondary-tint: #00b8f0;
+  --ion-color-tertiary: var(--pv-orange);
+  --ion-color-tertiary-rgb: 255, 138, 0;
+  --ion-color-tertiary-contrast: var(--pv-text);
+  --ion-color-success: var(--pv-success);
+  --ion-color-success-rgb: 0, 184, 240;
+  --ion-color-success-contrast: var(--pv-text);
+  --ion-color-warning: var(--pv-warning);
+  --ion-color-warning-rgb: 255, 138, 0;
+  --ion-color-warning-contrast: var(--pv-text);
+  --ion-color-danger: var(--pv-danger);
+  --ion-color-danger-rgb: 255, 138, 0;
+  --ion-color-danger-contrast: var(--pv-text);
+  --ion-color-light: var(--pv-bg);
+  --ion-color-light-contrast: var(--pv-text);
+  --ion-color-medium: var(--pv-text-secondary);
+  --ion-color-medium-contrast: var(--pv-white);
+  --ion-color-dark: var(--pv-text);
+  --ion-color-dark-contrast: var(--pv-white);
+  --ion-background-color: var(--pv-bg);
+  --ion-text-color: var(--pv-text);
+  --ion-font-family: var(--pv-font-family);
 }

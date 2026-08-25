@@ -17,7 +17,6 @@
           <p>{{ aprovado ? 'Exame concluído com sucesso.' : 'Estás cada vez mais perto.' }}</p>
         }
       </div>
-      <span class="confetti" aria-hidden="true">✦ · ✧ · ✦</span>
     </header>
 
     <section class="result-content">
@@ -44,6 +43,14 @@
         </dl>
       </article>
 
+      <section class="readiness-card" [class.ready]="estadoProntidao === 'pronto'" [class.nearly]="estadoProntidao === 'quase'" [class.not-ready]="estadoProntidao === 'preparacao'" aria-live="polite">
+        <div class="readiness-heading"><span class="readiness-dot"></span><div><span>Prontidão</span><h2>{{ tituloProntidao }}</h2></div></div>
+        <p>{{ mensagemProntidao }}</p>
+        @if (fracos.length) {
+          <div class="priority-row"><ion-icon name="school-outline" aria-hidden="true"></ion-icon><span><small>Prioridade agora</small><strong>{{ nomeTema(fracos[0].tema) }}</strong></span><button type="button" (click)="repetirAdaptativo()">Praticar</button></div>
+        }
+      </section>
+
       @if (acertosSuspeitos > 0) {
         <p class="guess-warning" role="status">
           {{ acertosSuspeitos }} resposta(s) certa(s) foram dadas em menos de 3 segundos.
@@ -57,6 +64,14 @@
         </button>
         <button type="button" class="primary-button" (click)="novoExame()">Novo exame</button>
       </div>
+
+      @if (publico) {
+        <aside class="account-cta" aria-label="Guardar progresso">
+          <ion-icon name="school-outline" aria-hidden="true"></ion-icon>
+          <div><strong>Queres guardar este progresso?</strong><p>Cria uma conta grátis para manter o histórico e continuar noutro dispositivo.</p></div>
+          <a routerLink="/registo">Criar conta</a>
+        </aside>
+      }
 
       @if (mostrarCorrecoes) {
         <section class="corrections-section">

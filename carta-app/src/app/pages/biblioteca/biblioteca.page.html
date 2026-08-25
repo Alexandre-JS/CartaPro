@@ -1,0 +1,18 @@
+<ion-content [fullscreen]="true" class="library-page">
+  <main class="library-shell">
+    <app-app-header titulo="Biblioteca" subtitulo="Material de estudo" [voltarPara]="'/estudos'" />
+    <section class="library-content">
+      <p class="library-intro">Escolhe um material para ler com calma e consultar sempre que precisares.</p>
+      <div class="library-list">
+        @for (material of materiais; track material.rota) {
+          <a class="library-card" [routerLink]="material.rota">
+            <span class="library-icon"><ion-icon [name]="material.icone" aria-hidden="true"></ion-icon></span>
+            <span><strong>{{ material.titulo }}</strong><small>{{ material.descricao }}</small><em>{{ material.total }} itens disponíveis</em></span>
+            <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
+          </a>
+        }
+      </div>
+    </section>
+    <app-bottom-nav ativo="estudos"></app-bottom-nav>
+  </main>
+</ion-content>

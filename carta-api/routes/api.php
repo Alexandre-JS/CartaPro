@@ -46,14 +46,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/sessions/{code}/perguntas', [ExamSessionController::class, 'questions'])->middleware('throttle:60,1');
     Route::post('/sessions/{code}/submeter', [ExamSessionController::class, 'submit'])->middleware('throttle:20,1');
 
-    /*
-    |--------------------------------------------------------------------------
-    | App do aluno — exige sessão móvel
-    |--------------------------------------------------------------------------
-    | Todo o conteúdo vive aqui: o pacote transporta a resposta correta e a
-    | explicação de cada pergunta, pelo que não pode ser servido anonimamente.
-    | O plano (gratis/pago) é decidido no servidor pelo EntitlementService.
-    */
+    /* App do aluno — a conta é necessária para dados pessoais e sincronização. */
     Route::middleware('mobile.auth')->group(function () {
         Route::prefix('mobile')->group(function () {
             Route::get('/me', [MobileController::class, 'me']);
@@ -85,6 +78,10 @@ Route::prefix('v1')->group(function () {
                 ->middleware(['payments.enabled', 'throttle:30,1']);
         });
 
+    });
+
+    /* Conteúdo Free: pode ser explorado sem conta; o servidor filtra o Plus. */
+    Route::middleware('mobile.optional')->group(function () {
         Route::get('/topics', [ContentController::class, 'topics']);
         Route::get('/questions', [ContentController::class, 'questions']);
         Route::get('/content-package', [ContentController::class, 'package']);
@@ -92,6 +89,10 @@ Route::prefix('v1')->group(function () {
         Route::get('/articles', [ContentController::class, 'articles']);
         Route::get('/categories', [ContentController::class, 'categories']);
         Route::get('/packages', [ContentController::class, 'packages']);
+    });
+
+    /* Histórico, escola, aprendizagem personalizada e tarefas exigem conta. */
+    Route::middleware('mobile.auth')->group(function () {
         Route::get('/school-memberships', [SchoolMembershipController::class, 'index']);
         Route::patch('/school-memberships/{membership}/accept', [SchoolMembershipController::class, 'accept'])->whereNumber('membership');
         Route::patch('/school-memberships/{membership}/leave', [SchoolMembershipController::class, 'leave'])->whereNumber('membership');

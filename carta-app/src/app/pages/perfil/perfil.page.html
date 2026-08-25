@@ -1,5 +1,6 @@
 <ion-content [fullscreen]="true" class="profile-page">
   <main class="profile-shell">
+    <app-app-header titulo="Perfil" subtitulo="A tua conta" [mostrarPerfil]="false" />
     <header class="profile-hero">
       <!-- O selo do plano só aparece depois de o servidor responder: mostrar
            "Plano Gratuito" por omissão dizia a um assinante que não tinha
@@ -73,6 +74,18 @@
           <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
         </a>
       }
+
+      <a class="plan-row" routerLink="/escola">
+        <span class="setting-icon"><ion-icon name="school-outline" aria-hidden="true"></ion-icon></span>
+        <div><strong>Minha Escola</strong><small>Turma, tarefas e acompanhamento</small></div>
+        <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
+      </a>
+
+      <button type="button" class="plan-row notification-row" (click)="alternarNotificacoes()">
+        <span class="setting-icon"><ion-icon name="notifications-outline" aria-hidden="true"></ion-icon></span>
+        <div><strong>Notificações de revisão</strong><small>{{ notificacoesAtivas ? 'Ativas neste dispositivo' : 'Desativadas' }}</small></div>
+        <span class="toggle-state" [class.on]="notificacoesAtivas">{{ notificacoesAtivas ? 'Ativas' : 'Off' }}</span>
+      </button>
 
       <button type="button" class="logout-button" (click)="sair()"><ion-icon name="log-out-outline" aria-hidden="true"></ion-icon>Terminar sessão</button>
     </section>

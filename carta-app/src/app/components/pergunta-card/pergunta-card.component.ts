@@ -17,6 +17,8 @@ export class PerguntaCardComponent {
     @Input({ required: true }) pergunta!: Pergunta;
     @Input() respondida = false;
     @Input() escolhida: number | null = null;
+    /** Em exames a correção só aparece no resultado final. */
+    @Input() mostrarFeedback = true;
     @Output() escolha = new EventEmitter<number>();
 
     private readonly temas = inject(TemasService);

@@ -13,6 +13,7 @@ import { RegrasService } from '../../core/regras.service';
 import { PerguntaCardComponent } from '../../components/pergunta-card/pergunta-card.component';
 import { TAMANHO_SIMULADO } from '../../config/simulado.config';
 import { ExameApiService } from '../../core/exame-api.service';
+import { AuthService } from '../../core/auth.service';
 
 @Component({
     standalone: true,
@@ -36,6 +37,8 @@ export class SimuladoPage implements OnInit, OnDestroy {
     notaPassagem = 0;
     retomado = false;
     carregando = true;
+    publico = false;
+    iniciada = false;
 
     private temporizador?: ReturnType<typeof setInterval>;
     private finalizando = false;
@@ -61,6 +64,7 @@ export class SimuladoPage implements OnInit, OnDestroy {
         private readonly content: ContentService,
         private readonly regras: RegrasService,
         private readonly examesApi: ExameApiService,
+        private readonly auth: AuthService,
     ) {
         addIcons({ arrowBackOutline, arrowForwardOutline, documentTextOutline, timeOutline });
     }
@@ -69,7 +73,12 @@ export class SimuladoPage implements OnInit, OnDestroy {
         const parametros = this.route.snapshot.queryParamMap;
         this.categoria = (parametros.get('categoria') || 'ligeiro') as CategoriaCarta;
         const adaptativo = parametros.get('modo') === 'adaptativo';
+        this.publico = parametros.get('publico') === '1' || !(await this.auth.token());
         this.numeroExame = Number(parametros.get('exame')) || 0;
+        if (this.numeroExame && !(await this.auth.token())) {
+            await this.router.navigateByUrl('/entrar');
+            return;
+        }
         this.origem = this.numeroExame ? 'exame' : 'simulado';
         this.chaveEstado = this.numeroExame ? `exame:${this.numeroExame}` : `simulado:${this.categoria}:${adaptativo ? 'adaptativo' : 'normal'}`;
 
@@ -78,14 +87,17 @@ export class SimuladoPage implements OnInit, OnDestroy {
         const retomavel = await this.storage.obterSimuladoEmCurso(this.chaveEstado);
         if (retomavel && (await this.retomar(retomavel))) {
             this.retomado = true;
+            this.iniciada = true;
         } else {
             await this.iniciarNovo(adaptativo);
         }
 
         this.carregando = false;
-        this.perguntaMostradaEm = Date.now();
-        this.atualizarTempo();
-        this.arrancarTemporizador();
+        if (this.iniciada) {
+            this.perguntaMostradaEm = Date.now();
+            this.atualizarTempo();
+            this.arrancarTemporizador();
+        }
     }
 
     ngOnDestroy(): void {
@@ -128,6 +140,22 @@ export class SimuladoPage implements OnInit, OnDestroy {
         return this.segundosRestantes <= 60;
     }
 
+    get tempoTotalFormatado(): string {
+        return this.formatar(this.duracaoTotalSegundos);
+    }
+
+    iniciarSimulado(): void {
+        if (this.iniciada || !this.perguntas.length) {
+            return;
+        }
+        this.iniciada = true;
+        this.iniciadoEm = Date.now();
+        this.perguntaMostradaEm = Date.now();
+        this.atualizarTempo();
+        this.arrancarTemporizador();
+        void this.guardarEstado();
+    }
+
     get ultimaPergunta(): boolean {
         return this.indice === this.perguntas.length - 1;
     }
@@ -164,7 +192,8 @@ export class SimuladoPage implements OnInit, OnDestroy {
         this.acertos += acertou ? 1 : 0;
         this.processandoResposta = false;
 
-        await this.guardarEstado();
+        // O estado só é persistido quando o aluno inicia; a tela de preparação
+        // não deve criar uma prova retomável nem começar o cronómetro.
     }
 
     async avancar(): Promise<void> {
@@ -191,7 +220,7 @@ export class SimuladoPage implements OnInit, OnDestroy {
     }
 
     sair(): Promise<boolean> {
-        return this.router.navigateByUrl('/exames');
+        return this.router.navigateByUrl(this.publico ? '/estudos' : '/exames');
     }
 
     private async iniciarNovo(adaptativo: boolean): Promise<void> {
@@ -212,8 +241,6 @@ export class SimuladoPage implements OnInit, OnDestroy {
         this.acertos = 0;
         this.indice = 0;
         this.iniciadoEm = Date.now();
-
-        await this.guardarEstado();
     }
 
     /** Reconstrói uma prova interrompida a partir dos ids guardados. */
@@ -334,7 +361,7 @@ export class SimuladoPage implements OnInit, OnDestroy {
         await this.storage.limparSimuladoEmCurso(this.chaveEstado);
         void this.storage.sincronizarAgora().catch(() => undefined);
 
-        await this.router.navigate(['/resultado']);
+        await this.router.navigate(['/resultado'], { queryParams: this.publico ? { publico: 1 } : undefined });
     }
 
     private formatar(segundos: number): string {

@@ -17,24 +17,24 @@
         type="button"
         class="option"
         [class.selected]="escolhida === indice"
-        [class.correct]="respondida && indice === pergunta.correta"
-        [class.incorrect]="respondida && escolhida === indice && indice !== pergunta.correta"
+        [class.correct]="mostrarFeedback && respondida && indice === pergunta.correta"
+        [class.incorrect]="mostrarFeedback && respondida && escolhida === indice && indice !== pergunta.correta"
         [disabled]="respondida"
         role="radio"
         [attr.aria-checked]="escolhida === indice"
         (click)="escolha.emit(indice)">
         <span class="option-letter">{{ letras[indice] }}</span>
         <span class="option-text">{{ opcao }}</span>
-        @if (respondida && indice === pergunta.correta) {
+        @if (mostrarFeedback && respondida && indice === pergunta.correta) {
           <ion-icon name="checkmark-circle" aria-label="Resposta correta"></ion-icon>
-        } @else if (respondida && escolhida === indice) {
+        } @else if (mostrarFeedback && respondida && escolhida === indice) {
           <ion-icon name="close-circle" aria-label="Resposta incorreta"></ion-icon>
         }
       </button>
     }
   </div>
 
-  @if (respondida) {
+  @if (respondida && mostrarFeedback) {
     <aside class="explanation" [class.success]="escolhida === pergunta.correta">
       <strong>{{ escolhida === pergunta.correta ? 'Resposta correta' : 'Resposta incorreta' }}</strong>
       @if (pergunta.explicacao) {

@@ -5,7 +5,7 @@ import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
 import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
 import { addIcons } from 'ionicons';
-import { bulbOutline, chevronForwardOutline, documentTextOutline, lockClosedOutline, timeOutline, warningOutline } from 'ionicons/icons';
+import { bookOutline, bulbOutline, checkmarkCircleOutline, chevronForwardOutline, documentTextOutline, lockClosedOutline, notificationsOutline, refreshOutline, timeOutline, warningOutline } from 'ionicons/icons';
 import { AcessoService } from '../../core/acesso.service';
 import { ContentService } from '../../core/content.service';
 import { ProgressoService } from '../../core/progresso.service';
@@ -14,6 +14,7 @@ import { RegrasService } from '../../core/regras.service';
 import { StorageService } from '../../core/storage.service';
 import { TemasService } from '../../core/temas.service';
 import { TreinoSinaisService } from '../../core/treino-sinais.service';
+import { AuthService } from '../../core/auth.service';
 import { CategoriaCarta } from '../../models/pergunta.model';
 import { HistoricoExame, ProgressoTema } from '../../models/progresso.model';
 
@@ -45,6 +46,7 @@ export class InicioPage implements OnInit {
     /** Perguntas por trás do cadeado (0 quando o plano é completo). */
     bloqueadas = 0;
     plano: 'gratis' | 'pago' = 'gratis';
+    autenticado = false;
 
     constructor(
         private readonly content: ContentService,
@@ -55,11 +57,13 @@ export class InicioPage implements OnInit {
         private readonly regras: RegrasService,
         private readonly acesso: AcessoService,
         private readonly treino: TreinoSinaisService,
+        private readonly auth: AuthService,
     ) {
-        addIcons({ bulbOutline, chevronForwardOutline, documentTextOutline, lockClosedOutline, timeOutline, warningOutline });
+        addIcons({ bookOutline, bulbOutline, checkmarkCircleOutline, chevronForwardOutline, documentTextOutline, lockClosedOutline, notificationsOutline, refreshOutline, timeOutline, warningOutline });
     }
 
     async ngOnInit(): Promise<void> {
+        this.autenticado = !!(await this.auth.token());
         const categoriaGuardada = await this.storage.obterCategoria();
         if (categoriaGuardada) {
             this.categoria = categoriaGuardada as CategoriaCarta;
@@ -98,6 +102,16 @@ export class InicioPage implements OnInit {
         return this.passos.slice(1);
     }
 
+    get prontidao(): number {
+        if (!this.autenticado || !this.historico.length) return 0;
+        const ultimo = this.historico[0];
+        return ultimo.total ? Math.round((ultimo.acertos / ultimo.total) * 100) : 0;
+    }
+
+    get tituloProntidao(): string {
+        return this.autenticado ? (this.historico.length ? 'Em preparação' : 'A começar') : 'Cria conta para acompanhar';
+    }
+
     /**
      * Ordena as tarefas por urgência real: primeiro o que a memória está prestes
      * a perder (revisões), depois o tema mais fraco, depois os sinais falhados.
@@ -121,7 +135,7 @@ export class InicioPage implements OnInit {
         if (recomendacao && !(revisoesPendentes && recomendacao.acao === 'revisar')) {
             fila.push({
                 titulo: this.nomeTema(recomendacao.tema),
-                motivo: recomendacao.motivo,
+                motivo: `${recomendacao.motivo} · ${recomendacao.totalPerguntas} perguntas · ${recomendacao.minutosEstimados} min`,
                 icone: 'bulb-outline',
                 accao: recomendacao.acao === 'reforcar' ? 'Reforçar' : 'Estudar',
                 rota: ['/estudo', recomendacao.tema],

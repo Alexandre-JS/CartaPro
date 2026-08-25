@@ -10,7 +10,7 @@
   margin: 0 auto;
   overflow: hidden;
   background-color: transparent;
-  box-shadow: 0 0 42px rgb(32 33 36 / 10%);
+  box-shadow: 0 0 42px rgb(22 22 22 / 10%);
 }
 
 .register-header {
@@ -41,7 +41,7 @@
 .back-button ion-icon { font-size: 1.35rem; }
 
 .brand-lockup { display: flex; align-items: center; justify-content: center; gap: 8px; }
-.brand-icon { width: 58px; height: 58px; border-radius: 15px; object-fit: cover; box-shadow: 0 5px 14px rgb(32 33 36 / 12%); }
+.brand-icon { width: 58px; height: 58px; border-radius: 15px; object-fit: cover; box-shadow: 0 5px 14px rgb(22 22 22 / 12%); }
 .brand-name { font-size: 1.9rem; font-weight: 600; line-height: 1; letter-spacing: -1.5px; }
 .brand-name strong { color: var(--app-color-green-dark); font-weight: 600; }
 .brand-lockup p { margin: 5px 0 0; font-size: .6rem; white-space: nowrap; }
@@ -69,7 +69,7 @@
   border: 1px solid var(--app-color-border);
   border-radius: 10px;
 }
-.form-field:focus-within { border-color: var(--app-color-green); box-shadow: 0 0 0 3px rgb(67 182 73 / 12%); }
+.form-field:focus-within { border-color: var(--app-color-green); box-shadow: 0 0 0 3px rgb(26 31 92 / 12%); }
 .form-field.field-error { border-color: var(--app-color-red); }
 .form-field ion-icon { margin-right: 12px; color: var(--app-color-road-gray); font-size: 1.12rem; }
 ion-note { display: block; margin: 5px 4px 0; font-size: .7rem; }
@@ -77,7 +77,7 @@ ion-note { display: block; margin: 5px 4px 0; font-size: .7rem; }
 .register-button {
   --background: var(--app-color-action);
   --border-radius: 9px;
-  --box-shadow: 0 7px 16px rgb(33 139 56 / 20%);
+  --box-shadow: 0 7px 16px rgb(26 31 92 / 20%);
   --color: var(--app-color-white);
   height: 50px;
   margin: 18px 0 0;
@@ -85,14 +85,14 @@ ion-note { display: block; margin: 5px 4px 0; font-size: .7rem; }
   text-transform: none;
 }
 
-.login-link { margin: 18px 0 0; text-align: center; color: #fff; font-size: .78rem; }
-.login-link a { color: #fff; font-weight: 600; text-decoration: none; }
+.login-link { margin: 18px 0 0; text-align: center; color: var(--pv-white); font-size: .78rem; }
+.login-link a { color: var(--pv-white); font-weight: 600; text-decoration: none; }
 
 @media (min-width: 700px) {
   .register-shell { min-height: min(920px, calc(100vh - 48px)); margin-block: 24px; border-radius: 28px; }
 }
 
 /* Lista de erros devolvidos pela API (um por campo). */
-.api-errors { display: grid; gap: 6px; margin-top: 10px; padding: 11px 13px; border: 1px solid #e9a3a6; border-radius: 10px; background: #fff2f2; }
+.api-errors { display: grid; gap: 6px; margin-top: 10px; padding: 11px 13px; border: 1px solid var(--pv-bg); border-radius: 10px; background: var(--pv-bg); }
 .api-errors ion-note { font-size: .74rem; line-height: 1.45; }
 .login-shortcut { margin-top: 4px; color: var(--app-color-green-dark); font-size: .74rem; font-weight: 700; text-decoration: underline; }

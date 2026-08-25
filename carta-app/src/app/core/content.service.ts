@@ -3,11 +3,13 @@ import { CategoriaCarta, Pergunta, TipoPergunta } from '../models/pergunta.model
 import { Pacote, RegrasPacote, TemaDetalhe } from '../models/pacote.model';
 import { StorageService } from './storage.service';
 import { ApiService } from './api.service';
+import { AuthService } from './auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class ContentService {
     private readonly api = inject(ApiService);
     private readonly storage = inject(StorageService);
+    private readonly auth = inject(AuthService);
     private pacote: Pacote | null = null;
     private sincronizacao?: Promise<Pacote>;
 
@@ -90,9 +92,9 @@ export class ContentService {
         const guardado = await this.storage.obterPacote();
 
         try {
-            // O pedido é autenticado: o pacote transporta a resposta correta e
-            // a explicação de cada pergunta, e o seu conteúdo depende do plano.
-            const remoto = this.normalizarPacote(await this.api.get<Pacote>('content-package', true));
+            // O conteúdo Free é público. Com sessão, a API acrescenta o que o
+            // plano permite; sem sessão entrega apenas o pacote gratuito.
+            const remoto = this.normalizarPacote(await this.api.get<Pacote>('content-package', !!(await this.auth.token())));
             this.validarPacote(remoto);
 
             const mudou = forcar || !guardado || remoto.versao !== guardado.versao || remoto.plano !== guardado.plano;
@@ -105,7 +107,7 @@ export class ContentService {
         } catch (erro) {
             console.warn('CartaPro: API indisponível ou pacote inválido; a usar conteúdo offline.', erro);
             if (!guardado) {
-                throw new Error('É necessária ligação à API para o primeiro carregamento.');
+                throw new Error('É necessária ligação à API para carregar o conteúdo.');
             }
             this.pacote = guardado;
             return guardado;

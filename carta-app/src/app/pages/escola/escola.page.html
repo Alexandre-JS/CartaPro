@@ -1,0 +1,20 @@
+<ion-content [fullscreen]="true" class="school-page">
+  <main class="school-shell">
+    <app-app-header titulo="Minha Escola" subtitulo="O teu percurso" [mostrarPerfil]="false" />
+    @if (carregando) {
+      <section class="school-content"><app-skeleton variante="cartao" [quantidade]="1" etiqueta="A carregar a escola"></app-skeleton><app-skeleton variante="lista" [quantidade]="3"></app-skeleton></section>
+    } @else if (erro) {
+      <section class="school-state"><ion-icon name="school-outline" aria-hidden="true"></ion-icon><p>{{ erro }}</p><ion-button routerLink="/inicio">Voltar ao início</ion-button></section>
+    } @else if (ativa; as vinculo) {
+      <section class="school-content">
+        <article class="school-identity"><span class="school-icon"><ion-icon name="school-outline" aria-hidden="true"></ion-icon></span><div><span>Vínculo ativo</span><h1>{{ vinculo.school?.name || 'Escola de condução' }}</h1><p>{{ vinculo.classroom?.name || 'Turma a confirmar' }}{{ vinculo.classroom?.code ? ' · ' + (vinculo.classroom?.code || '') : '' }}</p></div></article>
+        <section class="assignments"><div class="section-heading"><div><span>Plano da escola</span><h2>Tarefas atribuídas</h2></div></div>
+          @for (tarefa of tarefas; track tarefa.id) { <article class="assignment-row"><ion-icon name="book-outline" aria-hidden="true"></ion-icon><div><strong>{{ tituloTarefa(tarefa) }}</strong><small>{{ tarefa.assignment?.description || 'Continua a tua preparação.' }}</small></div><span>{{ tarefa.status === 'completed' ? 'Concluída' : 'Por fazer' }}</span></article> } @empty { <div class="school-state compact"><ion-icon name="calendar-outline" aria-hidden="true"></ion-icon><p>A escola ainda não atribuiu tarefas.</p></div> }
+        </section>
+        <a class="back-link" routerLink="/inicio">Voltar ao início</a>
+      </section>
+    } @else {
+      <section class="school-state"><ion-icon name="school-outline" aria-hidden="true"></ion-icon><h1>Ainda não estás ligado a uma escola</h1><p>Pede à tua escola o convite ou código de ligação.</p><a routerLink="/inicio">Continuar a estudar</a></section>
+    }
+  </main>
+</ion-content>

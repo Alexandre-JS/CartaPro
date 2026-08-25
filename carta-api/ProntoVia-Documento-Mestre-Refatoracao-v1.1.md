@@ -726,6 +726,24 @@ platform
 
 Nem todo o conteúdo deverá exigir login.
 
+## Regra de entrada Free e recursos pagos
+
+O candidato pode instalar a aplicação e começar a utilizar o produto Free
+sem criar conta. O conteúdo Free deve funcionar localmente e pode ser
+explorado sem autenticação.
+
+Uma conta ProntoVia passa a ser obrigatória para:
+
+- guardar histórico e progresso na nuvem;
+- sincronizar entre dispositivos;
+- receber recomendações e prontidão persistentes;
+- aceitar vínculos e tarefas escolares;
+- iniciar pagamentos ou aceder ao ProntoVia+.
+
+O servidor continua a ser a fonte de verdade do entitlement. Um visitante sem
+sessão recebe apenas conteúdo Free; conteúdo Plus nunca deve ser entregue
+anonimamente.
+
 ## Público
 
 Pode incluir:

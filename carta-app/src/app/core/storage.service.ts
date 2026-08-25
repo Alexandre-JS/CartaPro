@@ -299,6 +299,14 @@ export class StorageService {
             return;
         }
 
+        // A instalação sem sessão é um espaço local válido: o visitante pode
+        // praticar Free antes de criar conta. Mantemos esses registos para que
+        // o primeiro login os envie para a conta, em vez de os apagar.
+        if (!value) {
+            await Preferences.set({ key: 'mobileCacheUserId', value: String(userId) });
+            return;
+        }
+
         // Conta diferente neste dispositivo: aqui limpar é correto.
         await this.db.transaction('rw', this.db.respostas, this.db.exames, this.db.revisoes, this.db.simulado, this.db.resultados, async () => {
             await Promise.all([

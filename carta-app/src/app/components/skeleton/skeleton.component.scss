@@ -1,13 +1,13 @@
 /* `--skeleton-shape` e `--skeleton-brilho` deixam o host retemar os blocos sem
    furar a encapsulação: no hero verde do Perfil o cinzento não se lia. */
-:host { display: block; --skeleton-shape: #e8ebe9; --skeleton-brilho: rgb(255 255 255 / 78%); }
+:host { display: block; --skeleton-shape: var(--pv-border); --skeleton-brilho: rgb(255 255 255 / 78%); }
 
 .skeleton { display: grid; gap: 10px; }
 .skeleton.grelha { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 12px; }
 
-.row, .card { display: grid; grid-template-columns: 46px minmax(0, 1fr); align-items: center; gap: 11px; padding: 13px; border-radius: 11px; background: #fff; box-shadow: 0 3px 11px rgb(32 33 36 / 5%); }
+.row, .card { display: grid; grid-template-columns: 46px minmax(0, 1fr); align-items: center; gap: 11px; padding: 13px; border-radius: 11px; background: var(--pv-white); box-shadow: 0 3px 11px rgb(22 22 22 / 5%); }
 .card { min-height: 74px; }
-.tile { display: grid; justify-items: center; gap: 8px; padding: 13px; border-radius: 11px; background: #fff; box-shadow: 0 3px 11px rgb(32 33 36 / 5%); }
+.tile { display: grid; justify-items: center; gap: 8px; padding: 13px; border-radius: 11px; background: var(--pv-white); box-shadow: 0 3px 11px rgb(22 22 22 / 5%); }
 .copy { display: grid; gap: 7px; }
 
 /* As formas herdam as medidas dos cartões reais para nada saltar ao chegar. */

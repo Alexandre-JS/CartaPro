@@ -3,22 +3,24 @@
     <header class="hero">
       <div class="hero-top">
         <div>
-          <p class="eyebrow">Olá, {{ primeiroNome }}! <span aria-hidden="true"></span></p>
-          <!-- Sem o `carregando`, o hero afirmava "Estás em dia" durante todo o
-               carregamento e só depois é que descobria as tarefas pendentes. -->
-          @if (carregando) {
-            <h1>A preparar o teu plano…</h1>
-          } @else if (passoPrincipal) {
-            <h1>Sabemos por onde deves<br>continuar hoje.</h1>
-          } @else {
-            <h1>Estás em dia.<br>Continua quando quiseres.</h1>
-          }
+          <p class="eyebrow">ProntoVia</p>
         </div>
+        <a class="hero-profile" routerLink="/perfil" aria-label="Abrir notificações e perfil">
+          <ion-icon name="notifications-outline" aria-hidden="true"></ion-icon>
+        </a>
       </div>
       <div class="hero-shape" aria-hidden="true"></div>
     </header>
 
     <section class="dashboard">
+      <section class="readiness-home">
+        <div class="readiness-ring" [style.--readiness]="prontidao + '%'" [class.locked]="!autenticado"><strong>{{ autenticado ? prontidao + '%' : '—' }}</strong></div>
+        <div><span>SUA PRONTIDÃO</span><h2>Prontidão</h2><p>{{ tituloProntidao }}</p></div>
+      </section>
+      <section class="continue-home">
+        <div class="section-heading"><div><span>CONTINUE DE ONDE PAROU</span></div></div>
+        <a class="continue-row" [routerLink]="autenticado && passoPrincipal ? passoPrincipal.rota : ['/estudos']" [queryParams]="autenticado && passoPrincipal ? (passoPrincipal.query || null) : null"><span><strong>{{ autenticado && passoPrincipal ? passoPrincipal.titulo : 'Escolhe um tema para começar' }}</strong><small>{{ autenticado && passoPrincipal ? passoPrincipal.motivo : 'Conteúdo Free disponível sem conta' }}</small></span><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>
+      </section>
       <!-- Um tutor dá uma instrução de cada vez. A recomendação de estudo, as
            revisões e o reforço de sinais competiam por atenção em cartões
            iguais e sobrepostos: quando havia revisões pendentes, a recomendação
@@ -59,6 +61,16 @@
           </div>
         </section>
       }
+
+      <section class="quick-home">
+        <div class="section-heading"><div><span>AÇÕES RÁPIDAS</span></div></div>
+        <div class="quick-list">
+          <a routerLink="/estudos"><ion-icon name="book-outline" aria-hidden="true"></ion-icon><span>Escolher tema para estudar</span><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>
+          <a routerLink="/simulado"><ion-icon name="checkmark-circle-outline" aria-hidden="true"></ion-icon><span>Iniciar simulado</span><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>
+          <a routerLink="/revisoes"><ion-icon name="refresh-outline" aria-hidden="true"></ion-icon><span>Revisar erros</span><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>
+          <a routerLink="/desempenho"><ion-icon name="document-text-outline" aria-hidden="true"></ion-icon><span>Meus relatórios</span><ion-icon name="lock-closed-outline" aria-hidden="true"></ion-icon></a>
+        </div>
+      </section>
 
       <!-- Cadeado real: o plano gratuito vê quanto conteúdo existe por trás,
            mas o servidor nunca lhe envia essas perguntas. -->

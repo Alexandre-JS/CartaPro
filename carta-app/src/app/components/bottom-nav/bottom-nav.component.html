@@ -2,16 +2,16 @@
   <a routerLink="/inicio" [class.active]="ativo === 'inicio'" [attr.aria-current]="ativo === 'inicio' ? 'page' : null">
     <ion-icon name="home-outline" aria-hidden="true"></ion-icon><span>Início</span>
   </a>
-  <a routerLink="/exames" [class.active]="ativo === 'exames'" [attr.aria-current]="ativo === 'exames' ? 'page' : null">
-    <ion-icon name="document-text-outline" aria-hidden="true"></ion-icon><span>Exames</span>
-  </a>
   <a routerLink="/estudos" [class.active]="ativo === 'estudos'" [attr.aria-current]="ativo === 'estudos' ? 'page' : null">
-    <ion-icon name="book-outline" aria-hidden="true"></ion-icon><span>Estudos</span>
+    <ion-icon name="book-outline" aria-hidden="true"></ion-icon><span>Aprender</span>
+  </a>
+  <a routerLink="/treino-sinais" [class.active]="ativo === 'praticar'" [attr.aria-current]="ativo === 'praticar' ? 'page' : null">
+    <ion-icon name="create-outline" aria-hidden="true"></ion-icon><span>Praticar</span>
+  </a>
+  <a routerLink="/exames" [class.active]="ativo === 'exames'" [attr.aria-current]="ativo === 'exames' ? 'page' : null">
+    <ion-icon name="clipboard-outline" aria-hidden="true"></ion-icon><span>Simular</span>
   </a>
   <a routerLink="/desempenho" [class.active]="ativo === 'desempenho'" [attr.aria-current]="ativo === 'desempenho' ? 'page' : null">
     <ion-icon name="stats-chart-outline" aria-hidden="true"></ion-icon><span>Desempenho</span>
-  </a>
-  <a routerLink="/perfil" [class.active]="ativo === 'perfil'" [attr.aria-current]="ativo === 'perfil' ? 'page' : null">
-    <ion-icon name="person-outline" aria-hidden="true"></ion-icon><span>Perfil</span>
   </a>
 </nav>

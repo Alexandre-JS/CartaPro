@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\AuthenticateApiToken;
 use App\Http\Middleware\AuthenticateMobileToken;
+use App\Http\Middleware\OptionalMobileToken;
 use App\Http\Middleware\EnsurePaymentsEnabled;
 use App\Http\Middleware\EnsurePermission;
 use App\Http\Middleware\EnsureRole;
@@ -25,6 +26,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
             'role' => EnsureRole::class,
             'api.auth' => AuthenticateApiToken::class,
             'mobile.auth' => AuthenticateMobileToken::class,
+            'mobile.optional' => OptionalMobileToken::class,
             'payments.enabled' => EnsurePaymentsEnabled::class,
             'permission' => EnsurePermission::class,
         ]);

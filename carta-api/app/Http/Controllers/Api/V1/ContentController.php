@@ -18,10 +18,8 @@ use Illuminate\Http\Request;
 /**
  * Entrega de conteúdo ao app.
  *
- * Todas as rotas deste controlador exigem sessão móvel (ver routes/api.php):
- * o pacote transporta a resposta correta e a explicação de cada pergunta, pelo
- * que nunca pode ser servido anonimamente. O que cada conta recebe é decidido
- * pelo EntitlementService, no servidor.
+ * Conteúdo Free pode ser lido sem conta. Quando existe sessão móvel, o
+ * EntitlementService decide no servidor se também pode receber o Plus.
  */
 class ContentController extends Controller
 {
@@ -48,7 +46,7 @@ class ContentController extends Controller
         ]);
 
         // `include_locked` deixou de ser aceite do cliente: quem decide é o plano.
-        $paid = $this->entitlements->isPaid($request->user());
+        $paid = $request->user() && $this->entitlements->isPaid($request->user());
 
         $questions = Question::query()->with(['topic:id,slug,name', 'sign:id,slug,file_path'])->where('is_active', true)->where('status', 'approved')
             ->whereHas('topic', fn ($query) => $query->where('is_active', true))
@@ -70,7 +68,7 @@ class ContentController extends Controller
      */
     public function package(Request $request): JsonResponse
     {
-        $paid = $this->entitlements->isPaid($request->user());
+        $paid = $request->user() && $this->entitlements->isPaid($request->user());
         $published = ContentPackage::where('status', 'published')->latest('published_at')->first();
 
         $payload = $published

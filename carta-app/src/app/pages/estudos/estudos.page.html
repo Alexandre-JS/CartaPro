@@ -1,5 +1,7 @@
 <ion-content [fullscreen]="true" class="studies-page">
   <main class="studies-shell">
+    <app-app-header titulo="Aprender" subtitulo="O teu percurso" />
+    <label class="search-field"><ion-icon name="search-outline" aria-hidden="true"></ion-icon><input [(ngModel)]="pesquisa" type="search" placeholder="Buscar temas" aria-label="Buscar temas"></label>
     <header class="studies-hero compact">
       <div class="hero-copy">
         <span>Material de estudo</span>
@@ -22,8 +24,26 @@
           <p>A CartaPro está a preparar os sinais, as fichas e o Código. Entretanto podes praticar perguntas.</p>
         </div>
       } @else {
-        <div class="sections-list">
-          @for (secao of secoesDisponiveis; track secao.id) {
+        @if (temas.length) {
+          <section class="topics-section topics-primary">
+            <div class="section-heading"><div><span>TEMAS</span></div></div>
+            <div class="topics-list">
+              @for (tema of temasVisiveis; track tema.slug) {
+                @let progressoTema = progressoDoTema(tema.slug);
+                <a class="topic-row" [routerLink]="['/estudo', tema.slug]">
+                  <ion-icon class="topic-state" [class.complete]="progressoTema.estado === 'dominado' || progressoTema.estado === 'solido'" [class.attention]="progressoTema.estado === 'fraco' || progressoTema.estado === 'em_avaliacao'" [name]="estadoIcone(progressoTema.estado)" aria-hidden="true"></ion-icon>
+                  <span class="topic-copy"><strong>{{ tema.nome }}</strong><span class="topic-progress"><i [style.width.%]="progressoTema.taxaRecente * 100"></i></span></span>
+                  <span class="topic-percent">{{ progressoTema.taxaRecente * 100 | number:'1.0-0' }}%</span>
+                  <ion-icon class="topic-next" name="chevron-forward-outline" aria-hidden="true"></ion-icon>
+                </a>
+              }
+            </div>
+          </section>
+        }
+        <section class="library-preview">
+          <div class="section-heading"><div><span>BIBLIOTECA DE ESTUDO</span></div><a routerLink="/biblioteca">Ver tudo</a></div>
+          <div class="sections-list">
+          @for (secao of secoesPreview; track secao.id) {
             <a class="section-card" [routerLink]="secao.rota">
               <span class="section-icon"><ion-icon [name]="secao.icone" aria-hidden="true"></ion-icon></span>
               <span class="section-copy">
@@ -41,7 +61,11 @@
               <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
             </a>
           }
-        </div>
+          </div>
+          @if (secoesDisponiveis.length > secoesPreview.length) {
+            <a class="library-more" routerLink="/biblioteca">Ler mais materiais <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>
+          }
+        </section>
       }
     </section>
 
