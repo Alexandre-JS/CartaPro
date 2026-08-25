@@ -58,6 +58,9 @@ jobs:
       - name: Instalar dependências
         run: composer install --prefer-dist --no-interaction --no-progress
 
+      - name: Limpar caches de aplicação
+        run: php artisan optimize:clear --ansi
+
       # Sem preparar ambiente: o .env.testing está no repositório e o Laravel
       # prefere-o quando APP_ENV=testing, que é o que o phpunit.xml define.
       - name: Testes
