@@ -13,4 +13,4 @@ use Illuminate\Support\Facades\Schedule;
 |   * * * * * cd /caminho/carta-api && php artisan schedule:run >> /dev/null 2>&1
 */
 
-Schedule::command('cartapro:expire-unlocks')->hourly()->withoutOverlapping();
+Schedule::command('prontovia:expire-unlocks')->hourly()->withoutOverlapping();

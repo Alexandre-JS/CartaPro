@@ -158,7 +158,7 @@ class ImportarBancoPerguntas extends Command
     /** @param  list<array<string, mixed>>  $perguntas */
     private function importar(array $perguntas, string $estado): void
     {
-        $autor = User::where('email', 'admin@cartapro.co.mz')->value('id') ?? User::orderBy('id')->value('id');
+        $autor = User::where('email', 'admin@prontovia.co.mz')->value('id') ?? User::orderBy('id')->value('id');
         $categorias = LicenseCategory::where('is_active', true)->orderBy('sort_order')->pluck('slug')->all();
 
         if ($categorias === []) {

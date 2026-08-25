@@ -1,10 +1,10 @@
 :host { display: block; }
 
 .review-page { --background: var(--app-color-page); }
-.review-shell { width: min(100%, 560px); min-height: 100%; margin: 0 auto; padding-bottom: calc(88px + env(safe-area-inset-bottom)); overflow: hidden; background: var(--app-color-light-gray); box-shadow: 0 0 42px rgb(32 33 36 / 10%); }
+.review-shell { width: min(100%, 560px); min-height: 100%; margin: 0 auto; padding-bottom: calc(88px + env(safe-area-inset-bottom)); overflow: hidden; background: var(--app-color-light-gray); box-shadow: 0 0 42px rgb(22 22 22 / 10%); }
 
-.review-header { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 138px; padding: max(28px, env(safe-area-inset-top)) 18px 24px; overflow: hidden; color: #fff; background-color: var(--app-color-brand-panel); background-image: url('/assets/backgrounds/ESCOLA-DE-CONDUCAO.jpg'); background-position: center 42%; background-size: cover; }
-.review-header::before { position: absolute; inset: 0; background: rgb(23 106 42 / 55%); content: ''; }
+.review-header { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 138px; padding: max(28px, env(safe-area-inset-top)) 18px 24px; overflow: hidden; color: var(--pv-white); background-color: var(--app-color-brand-panel); background-image: url('/assets/backgrounds/ESCOLA-DE-CONDUCAO.jpg'); background-position: center 42%; background-size: cover; }
+.review-header::before { position: absolute; inset: 0; background: rgb(26 31 92 / 55%); content: ''; }
 .review-header > * { position: relative; z-index: 1; }
 .review-header span { font-size: .58rem; text-transform: uppercase; letter-spacing: .07em; opacity: .85; }
 .review-header h1 { margin: 4px 0 0; font-size: 1.1rem; font-weight: 600; }
@@ -20,7 +20,7 @@
 .review-controls { display: flex; justify-content: flex-end; padding: 18px; }
 
 .primary-button, .outline-button { display: inline-flex; min-height: 47px; align-items: center; justify-content: center; gap: 8px; padding: 0 20px; border: 0; border-radius: 11px; font: inherit; font-size: .74rem; font-weight: 700; text-decoration: none; cursor: pointer; }
-.primary-button { color: #fff; background: var(--app-color-action); }
+.primary-button { color: var(--pv-white); background: var(--app-color-action); }
 .outline-button { margin-top: 10px; border: 1px solid var(--app-color-green); color: var(--app-color-green-dark); background: transparent; }
 
 .empty-state { display: grid; place-items: center; padding: 44px 28px; text-align: center; }

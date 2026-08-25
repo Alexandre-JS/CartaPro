@@ -184,4 +184,37 @@ class SchoolValueTest extends TestCase
         $this->actingAs($schoolUser)->get(route('admin.results.classroom', $otherClassroom))->assertForbidden();
         $this->actingAs($schoolUser)->get(route('admin.results.classroom', $this->classroom))->assertOk();
     }
+
+    public function test_school_dashboard_turns_recent_results_into_actionable_indicators(): void
+    {
+        $questions = $this->makeQuestions('velocidade', 2);
+        $exam = Exam::create([
+            'school_id' => $this->school->id, 'name' => 'Diagnóstico', 'license_category' => 'ligeiro',
+            'license_categories' => ['ligeiro'], 'type' => 'teorico', 'question_count' => 2,
+            'pass_score' => 2, 'duration_minutes' => 30, 'is_active' => true, 'is_public' => false,
+        ]);
+        $exam->questions()->sync(collect($questions)->mapWithKeys(fn ($question, $index) => [$question->id => ['sort_order' => $index + 1]])->all());
+        $exam->load('questions.topic');
+        $session = ExamSession::create(['exam_id' => $exam->id, 'classroom_id' => $this->classroom->id, 'code' => 'DASH01', 'status' => 'in_progress']);
+        $student = Student::create(['classroom_id' => $this->classroom->id, 'name' => 'Marta', 'is_active' => true]);
+        app(ExamScorer::class)->score($session, $student, ['velocidade-1' => 0, 'velocidade-2' => 1], 120);
+        $schoolUser = User::factory()->create(['role' => 'school', 'school_id' => $this->school->id]);
+
+        $this->actingAs($schoolUser)->get(route('admin.dashboard'))
+            ->assertOk()
+            ->assertSee('Desempenho da escola')
+            ->assertSee('Alunos ativos')
+            ->assertSee('Média recente')
+            ->assertSee('50%')
+            ->assertSee('Temas a reforçar')
+            ->assertSee('Velocidade')
+            ->assertSee('Sessões em curso');
+
+        $admin = User::factory()->create(['role' => 'admin']);
+        $this->actingAs($admin)->get(route('admin.dashboard'))
+            ->assertOk()
+            ->assertSee('Atividade das escolas')
+            ->assertSee('Escola Valor')
+            ->assertSee('1 provas');
+    }
 }

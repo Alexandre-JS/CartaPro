@@ -16,8 +16,9 @@ class ClassroomController extends Controller
     {
         $classrooms = Classroom::with(['school', 'students'])->withCount(['students', 'sessions'])
             ->when($request->user()->isSchool(), fn ($query) => $query->where('school_id', $request->user()->school_id))
+            ->when($request->user()->isInstructor(), fn ($query) => $query->whereHas('instructors', fn ($instructors) => $instructors->where('user_id', $request->user()->id)))
             ->when($request->filled('school_id'), fn ($query) => $query->where('school_id', $request->integer('school_id')))
-            ->latest()->paginate(12)->withQueryString();
+            ->latest()->paginate(10)->withQueryString();
 
         return view('admin.classrooms.index', ['classrooms' => $classrooms, 'schools' => School::where('is_active', true)->orderBy('name')->get()]);
     }
@@ -63,6 +64,6 @@ class ClassroomController extends Controller
 
     private function assertAccess(Request $request, Classroom $classroom): void
     {
-        abort_if($request->user()->isSchool() && $classroom->school_id !== $request->user()->school_id, 403);
+        abort_unless($request->user()->canAccessClassroom($classroom), 403);
     }
 }

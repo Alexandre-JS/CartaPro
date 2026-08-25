@@ -4,14 +4,16 @@ import { RouterLink } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
 import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
+import { AppHeaderComponent } from '../../components/app-header/app-header.component';
 import { addIcons } from 'ionicons';
-import { alertCircleOutline, bulbOutline, calendarOutline, closeOutline, documentTextOutline, eyeOutline, refreshOutline, statsChartOutline } from 'ionicons/icons';
+import { alertCircleOutline, bulbOutline, calendarOutline, chevronForwardOutline, closeOutline, documentTextOutline, eyeOutline, refreshOutline, statsChartOutline } from 'ionicons/icons';
 import { ContentService } from '../../core/content.service';
 import { RegrasService } from '../../core/regras.service';
 import { StorageService } from '../../core/storage.service';
 import { TemasService } from '../../core/temas.service';
 import { CategoriaCarta } from '../../models/pergunta.model';
 import { HistoricoExame, RespostaRegisto, RevisaoAgendada } from '../../models/progresso.model';
+import { GamificacaoService, ResumoGamificacao } from '../../core/gamificacao.service';
 
 interface RetencaoTema {
     tema: string;
@@ -25,7 +27,7 @@ interface RetencaoTema {
 @Component({
     standalone: true,
     selector: 'app-desempenho',
-    imports: [DatePipe, RouterLink, IonContent, IonIcon, BottomNavComponent, SkeletonComponent],
+    imports: [DatePipe, RouterLink, IonContent, IonIcon, BottomNavComponent, SkeletonComponent, AppHeaderComponent],
     templateUrl: './desempenho.page.html',
     styleUrls: ['./desempenho.page.scss'],
 })
@@ -44,14 +46,16 @@ export class DesempenhoPage implements OnInit {
     categoria: CategoriaCarta = 'ligeiro';
     carregando = true;
     alertaVisivel = true;
+    gamificacao: ResumoGamificacao = { pontos: 0, diasAtivos: 0, conquistas: [] };
 
     constructor(
         private readonly storage: StorageService,
         private readonly content: ContentService,
         private readonly temasService: TemasService,
         private readonly regras: RegrasService,
+        private readonly gamificacaoService: GamificacaoService,
     ) {
-        addIcons({ alertCircleOutline, bulbOutline, calendarOutline, closeOutline, documentTextOutline, eyeOutline, refreshOutline, statsChartOutline });
+        addIcons({ alertCircleOutline, bulbOutline, calendarOutline, chevronForwardOutline, closeOutline, documentTextOutline, eyeOutline, refreshOutline, statsChartOutline });
     }
 
     ionViewWillEnter(): void {
@@ -61,13 +65,15 @@ export class DesempenhoPage implements OnInit {
     async ngOnInit(): Promise<void> {
         await Promise.all([this.temasService.carregar(), this.regras.carregar()]);
 
-        const [historico, respostas, revisoes, nomesTemas, categoriaGuardada] = await Promise.all([
+        const [historico, respostas, revisoes, nomesTemas, categoriaGuardada, gamificacao] = await Promise.all([
             this.storage.listarExames(),
             this.storage.listarRespostas(),
             this.storage.listarRevisoes(),
             this.content.listarTemas(),
             this.storage.obterCategoria(),
+            this.gamificacaoService.resumo(),
         ]);
+        this.gamificacao = gamificacao;
         this.categoria = (categoriaGuardada || 'ligeiro') as CategoriaCarta;
         const perguntasDoBanco = await this.content.listarPerguntas({ categoria: this.categoria });
         const idsDoBanco = new Set(perguntasDoBanco.map((pergunta) => pergunta.id));

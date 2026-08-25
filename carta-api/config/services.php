@@ -40,7 +40,7 @@ return [
     'sms' => [
         'endpoint' => env('SMS_ENDPOINT'),
         'token' => env('SMS_TOKEN'),
-        'sender' => env('SMS_SENDER', 'CartaPro'),
+        'sender' => env('SMS_SENDER', 'ProntoVia'),
     ],
 
 ];

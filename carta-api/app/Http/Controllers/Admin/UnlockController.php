@@ -26,8 +26,11 @@ class UnlockController extends Controller
                         // ao cliente encontrar o registo escreva-o como escrever.
                         ->orWhere('phone_normalized', 'like', '%'.Phone::normalize($termo).'%');
                 }))
-                ->latest('unlocked_at')->paginate(20)->withQueryString(),
+                ->latest('unlocked_at')->paginate(10)->withQueryString(),
             'semConta' => Unlock::whereNull('mobile_user_id')->where('is_active', true)->count(),
+            'total' => Unlock::count(),
+            'ativos' => Unlock::where('is_active', true)->count(),
+            'associados' => Unlock::whereNotNull('mobile_user_id')->count(),
         ]);
     }
 
@@ -66,7 +69,7 @@ class UnlockController extends Controller
 
         return back()->with('status', $this->associarConta($unlock)
             ? 'Desbloqueio associado à conta '.$unlock->fresh()->mobileUser->email.'.'
-            : 'Não existe nenhuma conta CartaPro com este número. O aluno tem de se registar primeiro.');
+            : 'Não existe nenhuma conta ProntoVia com este número. O aluno tem de se registar primeiro.');
     }
 
     public function destroy(Unlock $unlock): RedirectResponse

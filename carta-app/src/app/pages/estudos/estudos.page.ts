@@ -1,14 +1,21 @@
 import { Component, OnInit } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
+import { AppHeaderComponent } from '../../components/app-header/app-header.component';
 import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
 import { addIcons } from 'ionicons';
 import {
-    bookOutline, chevronForwardOutline, documentTextOutline, libraryOutline, textOutline, warningOutline,
+    bookOutline, checkmarkCircleOutline, chevronForwardOutline, documentTextOutline, ellipseOutline, libraryOutline, searchOutline, textOutline, timeOutline, warningOutline,
 } from 'ionicons/icons';
 import { MaterialEstudoService } from '../../core/material-estudo.service';
 import { ProgressoEstudo } from '../../models/material-estudo.model';
+import { ContentService } from '../../core/content.service';
+import { TemaDetalhe } from '../../models/pacote.model';
+import { ProgressoService } from '../../core/progresso.service';
+import { ProgressoTema } from '../../models/progresso.model';
 
 /** Uma das quatro frentes do material de estudo. */
 interface SecaoEstudo {
@@ -34,25 +41,37 @@ interface SecaoEstudo {
 @Component({
     standalone: true,
     selector: 'app-estudos',
-    imports: [RouterLink, IonContent, IonIcon, BottomNavComponent, SkeletonComponent],
+    imports: [DecimalPipe, FormsModule, RouterLink, IonContent, IonIcon, BottomNavComponent, SkeletonComponent, AppHeaderComponent],
     templateUrl: './estudos.page.html',
     styleUrls: ['./estudos.page.scss'],
 })
 export class EstudosPage implements OnInit {
     secoes: SecaoEstudo[] = [];
+    temas: TemaDetalhe[] = [];
+    progressoTemas: ProgressoTema[] = [];
     carregando = true;
+    pesquisa = '';
 
-    constructor(private readonly material: MaterialEstudoService) {
+    constructor(private readonly material: MaterialEstudoService, private readonly content: ContentService, private readonly progresso: ProgressoService) {
         addIcons({
-            bookOutline, chevronForwardOutline, documentTextOutline, libraryOutline, textOutline, warningOutline,
+            bookOutline, checkmarkCircleOutline, chevronForwardOutline, documentTextOutline, ellipseOutline, libraryOutline, searchOutline, textOutline, timeOutline, warningOutline,
         });
     }
 
+    get temasVisiveis(): TemaDetalhe[] {
+        const termo = this.pesquisa.trim().toLocaleLowerCase();
+        return termo ? this.temas.filter((tema) => `${tema.nome} ${tema.descricao || ''}`.toLocaleLowerCase().includes(termo)) : this.temas;
+    }
+
     async ngOnInit(): Promise<void> {
-        const [estudo, progressoLeitura] = await Promise.all([
+        const [estudo, progressoLeitura, temas] = await Promise.all([
             this.material.carregar(),
             this.material.progresso(),
+            this.content.listarTemasDetalhe(),
         ]);
+
+        this.temas = temas;
+        this.progressoTemas = await this.progresso.estatisticasPorTema(temas.map((tema) => tema.slug));
 
         this.secoes = [
             {
@@ -106,5 +125,22 @@ export class EstudosPage implements OnInit {
 
     get semMaterial(): boolean {
         return !this.carregando && this.secoesDisponiveis.length === 0;
+    }
+
+    get secoesPreview(): SecaoEstudo[] {
+        return this.secoesDisponiveis.slice(0, 2);
+    }
+
+    progressoDoTema(slug: string): ProgressoTema {
+        return this.progressoTemas.find((item) => item.tema === slug) ?? {
+            tema: slug, respondidas: 0, acertos: 0, taxaAcerto: 0, taxaRecente: 0,
+            estado: 'nao_praticado', graduado: false, revisoesPendentes: 0, tempoMedioMs: 0,
+        };
+    }
+
+    estadoIcone(estado: ProgressoTema['estado']): string {
+        if (estado === 'dominado' || estado === 'solido') return 'checkmark-circle-outline';
+        if (estado === 'fraco' || estado === 'em_avaliacao') return 'time-outline';
+        return 'ellipse-outline';
     }
 }

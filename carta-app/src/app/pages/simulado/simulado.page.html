@@ -1,11 +1,11 @@
 <ion-content [fullscreen]="true" class="test-page">
-  <main class="test-shell">
+    <main class="test-shell" [class.exam-mode]="numeroExame > 0">
     <header class="test-header">
       <button type="button" class="icon-button" (click)="sair()" aria-label="Sair do exame">
         <ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>
       </button>
       <div class="exam-title">
-        <strong>Questão {{ perguntas.length ? indice + 1 : 0 }} de {{ totalQuestoes }}</strong>
+        <strong>{{ numeroExame ? 'Exame' : 'Simulado' }} · Questão {{ perguntas.length ? indice + 1 : 0 }} de {{ totalQuestoes }}</strong>
       </div>
       <div class="timer" [class.warning]="tempoUrgente" [class.critical]="tempoCritico" role="timer" aria-live="off" [attr.aria-label]="'Tempo restante: ' + tempoFormatado">
         <ion-icon name="time-outline" aria-hidden="true"></ion-icon>
@@ -21,12 +21,23 @@
       <p class="resume-notice" role="status">Retomámos a prova onde a deixaste — o tempo continua a contar.</p>
     }
 
-    @if (perguntaAtual; as pergunta) {
+    @if (!carregando && !iniciada && perguntas.length) {
+      <section class="exam-intro">
+        <span class="intro-icon"><ion-icon name="document-text-outline" aria-hidden="true"></ion-icon></span>
+        <span class="intro-eyebrow">{{ numeroExame ? 'Exame oficial' : 'Simulado completo' }}</span>
+        <h1>{{ numeroExame ? 'Reproduz as condições do exame' : 'Testa a tua preparação' }}</h1>
+        <p>Responde a todas as perguntas dentro do tempo. {{ numeroExame ? 'A correção aparece apenas no resultado final.' : 'A correção e o resultado aparecem no fim.' }}</p>
+        <dl class="exam-facts"><div><dt>Questões</dt><dd>{{ totalQuestoes }}</dd></div><div><dt>Tempo</dt><dd>{{ tempoTotalFormatado }}</dd></div></dl>
+        <button type="button" class="start-button" (click)="iniciarSimulado()">Iniciar simulado <ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon></button>
+        <a routerLink="/estudos">Voltar</a>
+      </section>
+    } @else if (perguntaAtual; as pergunta) {
       <section class="question-area">
         <app-pergunta-card
           [pergunta]="pergunta"
           [respondida]="respondida"
           [escolhida]="escolhida"
+          [mostrarFeedback]="numeroExame === 0"
           (escolha)="responder($event)">
         </app-pergunta-card>
       </section>

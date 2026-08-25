@@ -36,7 +36,7 @@ class PaySuiteGateway implements PaymentGateway
             'amount' => (float) $payment->amount,
             'method' => $payment->method,
             'reference' => $payment->reference,
-            'description' => 'CartaPro '.$payment->plan,
+            'description' => 'ProntoVia '.$payment->plan,
             'callback_url' => route('webhooks.paysuite'),
         ]);
 

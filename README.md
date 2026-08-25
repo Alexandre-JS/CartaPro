@@ -1,11 +1,11 @@
-# CartaPro
+# ProntoVia
 
-Plataforma de preparação e gestão de avaliações de condução.
+Plataforma de aprendizagem, prática e acompanhamento para candidatos à carta de condução.
 
 ## Estrutura
 
-- `carta-api`: API e painel administrativo em Laravel.
-- `carta-app`: aplicativo mobile em Ionic/Angular e Capacitor.
+- `carta-api`: website, API, ProntoVia Admin e ProntoVia Escolas em Laravel.
+- `carta-app`: aplicação do candidato em Ionic/Angular e Capacitor; o rebranding mobile será tratado numa etapa posterior.
 
 ## Desenvolvimento
 

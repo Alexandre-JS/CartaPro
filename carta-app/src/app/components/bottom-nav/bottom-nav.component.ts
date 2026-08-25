@@ -2,9 +2,9 @@ import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { bookOutline, documentTextOutline, homeOutline, personOutline, statsChartOutline } from 'ionicons/icons';
+import { bookOutline, clipboardOutline, createOutline, homeOutline, statsChartOutline } from 'ionicons/icons';
 
-export type SeccaoNav = 'inicio' | 'exames' | 'estudos' | 'desempenho' | 'perfil';
+export type SeccaoNav = 'inicio' | 'exames' | 'estudos' | 'desempenho' | 'perfil' | 'praticar';
 
 /**
  * Barra de navegação principal.
@@ -25,6 +25,6 @@ export class BottomNavComponent {
     @Input({ required: true }) ativo!: SeccaoNav;
 
     constructor() {
-        addIcons({ bookOutline, documentTextOutline, homeOutline, personOutline, statsChartOutline });
+        addIcons({ bookOutline, clipboardOutline, createOutline, homeOutline, statsChartOutline });
     }
 }

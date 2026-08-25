@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\File;
  * ATENÇÃO — CONTEÚDO A REVER: os significados dos sinais aqui usados são os
  * convencionais (a sinalização segue a Convenção de Viena e é consistente
  * internacionalmente), mas os textos das fichas e as remissões para artigos
- * têm de ser confirmados pela equipa CartaPro contra o Código da Estrada de
+ * têm de ser confirmados pela equipa ProntoVia contra o Código da Estrada de
  * Moçambique antes de irem para produção. Este seeder serve para os ecrãs
  * terem estrutura real com que trabalhar, não como fonte autoritativa.
  *

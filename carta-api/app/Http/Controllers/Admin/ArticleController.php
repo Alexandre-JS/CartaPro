@@ -18,7 +18,7 @@ class ArticleController extends Controller
             'articles' => Article::query()
             ->when($request->filled('q'), fn ($query) => $query->where(fn ($nested) => $nested->where('title', 'like', '%'.$request->string('q')->value().'%')->orWhere('text', 'like', '%'.$request->string('q')->value().'%')->orWhere('number', $request->input('q'))))
             ->when($request->filled('chapter'), fn ($query) => $query->where('chapter_number', $request->integer('chapter')))
-            ->orderBy('chapter_number')->orderBy('sort_order')->orderBy('number')->paginate(20)->withQueryString(),
+            ->orderBy('chapter_number')->orderBy('sort_order')->orderBy('number')->paginate(10)->withQueryString(),
             'capitulos' => Article::whereNotNull('chapter_number')
                 ->selectRaw('chapter_number, chapter_title, count(*) as total')
                 ->groupBy('chapter_number', 'chapter_title')->orderBy('chapter_number')->get(),

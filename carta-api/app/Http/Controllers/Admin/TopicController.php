@@ -13,7 +13,7 @@ class TopicController extends Controller
 {
     public function index(): View
     {
-        return view('admin.topics.index', ['topics' => Topic::withCount('questions')->orderBy('sort_order')->paginate(15)]);
+        return view('admin.topics.index', ['topics' => Topic::withCount('questions')->orderBy('sort_order')->paginate(10)]);
     }
 
     public function create(): View

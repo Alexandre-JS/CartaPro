@@ -18,7 +18,8 @@ class UserController extends Controller
             'users' => User::with('school')
                 ->when($request->filled('q'), fn ($query) => $query->where(fn ($nested) => $nested->where('name', 'like', '%'.$request->string('q')->value().'%')->orWhere('email', 'like', '%'.$request->string('q')->value().'%')))
                 ->when($request->filled('role'), fn ($query) => $query->where('role', $request->string('role')->value()))
-                ->latest()->paginate(15)->withQueryString(),
+                ->latest()->paginate(10)->withQueryString(),
+            'schools' => School::where('is_active', true)->orderBy('name')->get(['id', 'name']),
         ]);
     }
 
@@ -59,15 +60,15 @@ class UserController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:150'],
             'email' => ['required', 'email', 'max:150', Rule::unique('users')->ignore($user)],
-            'role' => ['required', Rule::in(['admin', 'school'])],
-            'school_id' => ['nullable', 'exists:schools,id', Rule::requiredIf($request->input('role') === 'school')],
+            'role' => ['required', Rule::in(['admin', 'school', 'platform_admin', 'school_owner', 'school_admin', 'content_author', 'content_reviewer'])],
+            'school_id' => ['nullable', 'exists:schools,id', Rule::requiredIf(in_array($request->input('role'), ['school', 'school_owner', 'school_admin'], true))],
             'password' => [$user?->exists ? 'nullable' : 'required', 'string', 'min:8'],
             'is_active' => ['nullable', 'boolean'],
         ]);
         if (blank($data['password'] ?? null)) {
             unset($data['password']);
         }
-        if ($data['role'] === 'admin') {
+        if (! in_array($data['role'], ['school', 'school_owner', 'school_admin'], true)) {
             $data['school_id'] = null;
         }
         $data['is_active'] = $request->boolean('is_active');

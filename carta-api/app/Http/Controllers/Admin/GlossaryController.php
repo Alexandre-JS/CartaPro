@@ -20,7 +20,7 @@ class GlossaryController extends Controller
                 ->when($request->filled('q'), fn ($query) => $query->where(fn ($nested) => $nested
                     ->where('term', 'like', '%'.$request->string('q')->value().'%')
                     ->orWhere('definition', 'like', '%'.$request->string('q')->value().'%')))
-                ->orderBy('sort_order')->orderBy('term')->paginate(30)->withQueryString(),
+                ->orderBy('sort_order')->orderBy('term')->paginate(10)->withQueryString(),
             'total' => GlossaryTerm::count(),
         ]);
     }

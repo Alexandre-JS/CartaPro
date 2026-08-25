@@ -17,7 +17,10 @@ use Illuminate\Console\Command;
  */
 class BackfillTopicBreakdown extends Command
 {
-    protected $signature = 'cartapro:backfill-breakdown {--dry-run : Mostra o que faria sem gravar}';
+    protected $signature = 'prontovia:backfill-breakdown {--dry-run : Mostra o que faria sem gravar}';
+
+    /** Compatibilidade com comandos documentados antes da mudança de marca. */
+    protected $aliases = ['cartapro:backfill-breakdown'];
 
     protected $description = 'Recalcula o diagnóstico por tema das tentativas antigas';
 

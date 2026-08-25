@@ -1,6 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
 import { addIcons } from 'ionicons';
@@ -36,9 +36,11 @@ export class ResultadoPage implements OnInit {
     valores = 0;
     /** Acertos muito rápidos: provável adivinhação, não domínio. */
     acertosSuspeitos = 0;
+    publico = false;
 
     constructor(
         private readonly router: Router,
+        private readonly route: ActivatedRoute,
         private readonly content: ContentService,
         private readonly progresso: ProgressoService,
         private readonly storage: StorageService,
@@ -49,6 +51,7 @@ export class ResultadoPage implements OnInit {
     }
 
     async ngOnInit(): Promise<void> {
+        this.publico = this.route.snapshot.queryParamMap.get('publico') === '1';
         await Promise.all([this.regras.carregar(), this.temasService.carregar()]);
 
         /*
@@ -89,6 +92,27 @@ export class ResultadoPage implements OnInit {
         return this.resumo.total ? Math.round((this.resumo.acertos / this.resumo.total) * 100) : 0;
     }
 
+    get estadoProntidao(): 'pronto' | 'quase' | 'preparacao' {
+        if (!this.aprovado) {
+            return 'preparacao';
+        }
+        return this.fracos.length ? 'quase' : 'pronto';
+    }
+
+    get tituloProntidao(): string {
+        return this.estadoProntidao === 'pronto' ? 'Pronto para avançar' : this.estadoProntidao === 'quase' ? 'Quase pronto' : 'Ainda em preparação';
+    }
+
+    get mensagemProntidao(): string {
+        if (this.estadoProntidao === 'pronto') {
+            return 'O resultado está consistente. Mantém revisões curtas para não perder ritmo.';
+        }
+        if (this.fracos.length) {
+            return `Reforça ${this.nomeTema(this.fracos[0].tema)} antes de repetires o exame.`;
+        }
+        return 'Pratica os temas abaixo do mínimo e repete o simulado quando te sentires preparado.';
+    }
+
     get aprovado(): boolean {
         return this.regras.aprovado(this.resumo.acertos, this.resumo.total);
     }
@@ -115,14 +139,14 @@ export class ResultadoPage implements OnInit {
     }
 
     repetirAdaptativo(): Promise<boolean> {
-        return this.router.navigate(['/simulado'], { queryParams: { modo: 'adaptativo' } });
+        return this.router.navigate(['/simulado'], { queryParams: { modo: 'adaptativo', ...(this.publico ? { publico: 1 } : {}) } });
     }
 
     novoExame(): Promise<boolean> {
-        return this.router.navigate(['/exames']);
+        return this.publico ? this.router.navigate(['/simulado'], { queryParams: { publico: 1 } }) : this.router.navigate(['/exames']);
     }
 
     voltarInicio(): Promise<boolean> {
-        return this.router.navigateByUrl('/inicio');
+        return this.router.navigateByUrl(this.publico ? '/estudos' : '/inicio');
     }
 }

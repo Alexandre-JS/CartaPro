@@ -10,10 +10,13 @@ class ExampleTest extends TestCase
     /**
      * A basic test example.
      */
-    public function test_the_application_returns_a_successful_response(): void
+    public function test_the_application_returns_the_public_website(): void
     {
         $response = $this->get('/');
 
-        $response->assertRedirect('/admin');
+        $response->assertOk()
+            ->assertViewIs('website.home')
+            ->assertSee('Prepare-se para conduzir com confiança.')
+            ->assertSee('ProntoVia');
     }
 }

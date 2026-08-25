@@ -1,0 +1,13 @@
+:host { display: block; }
+.library-page { --background: var(--pv-bg); }
+.library-shell { min-height: 100%; padding-bottom: calc(78px + env(safe-area-inset-bottom)); background: var(--pv-bg); }
+.library-content { padding: 20px 16px 28px; }
+.library-intro { margin: 0 0 16px; color: var(--pv-text-secondary); font-size: var(--pv-type-body); line-height: 1.45; }
+.library-list { display: grid; gap: 8px; }
+.library-card { display: grid; grid-template-columns: 36px minmax(0, 1fr) 16px; align-items: center; gap: 12px; padding: 13px 12px; border: 1px solid var(--pv-border); border-radius: 8px; color: var(--pv-text); background: var(--pv-white); text-decoration: none; }
+.library-icon { display: grid; width: 32px; height: 32px; place-items: center; border-radius: 50%; color: var(--pv-indigo); background: var(--pv-bg); }
+.library-card > span:nth-child(2) { display: grid; gap: 3px; min-width: 0; }
+.library-card strong { font-size: var(--pv-type-body); font-weight: 600; }
+.library-card small, .library-card em { color: var(--pv-text-secondary); font-size: var(--pv-type-caption); font-style: normal; line-height: 1.35; }
+.library-card em { color: var(--pv-indigo); }
+.library-card > ion-icon { color: var(--pv-text-secondary); }

@@ -33,7 +33,7 @@ class PublicationController extends Controller
         return view('admin.publications.index', [
             'approvedCount' => Question::where('status', 'approved')->where('is_active', true)->count(),
             'byTopic' => Topic::where('is_active', true)->withCount(['questions' => fn ($query) => $query->where('status', 'approved')->where('is_active', true)])->orderBy('sort_order')->get(),
-            'packages' => ContentPackage::with('publisher')->latest('published_at')->paginate(12),
+            'packages' => ContentPackage::with('publisher')->latest('published_at')->paginate(10),
             'publishedExamsCount' => Exam::where(['is_public' => true, 'is_active' => true, 'publication_status' => 'published'])->count(),
         ]);
     }
@@ -67,7 +67,7 @@ class PublicationController extends Controller
         // Pacotes anteriores à mudança de disco: serve o payload guardado.
         return response()->streamDownload(function () use ($package): void {
             echo json_encode($package->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        }, 'cartapro-'.$package->version.'.json', ['Content-Type' => 'application/json']);
+        }, 'prontovia-'.$package->version.'.json', ['Content-Type' => 'application/json']);
     }
 
 }

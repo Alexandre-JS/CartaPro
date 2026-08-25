@@ -12,7 +12,10 @@ use Illuminate\Console\Command;
  */
 class ExpireUnlocks extends Command
 {
-    protected $signature = 'cartapro:expire-unlocks';
+    protected $signature = 'prontovia:expire-unlocks';
+
+    /** Compatibilidade com automações locais anteriores à mudança de marca. */
+    protected $aliases = ['cartapro:expire-unlocks'];
 
     protected $description = 'Desativa desbloqueios expirados e limpa desafios OTP caducados';
 

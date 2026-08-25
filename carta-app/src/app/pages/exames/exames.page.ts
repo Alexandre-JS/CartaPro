@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
+import { AppHeaderComponent } from '../../components/app-header/app-header.component';
 import { IconeProvaComponent } from '../../components/icone-prova/icone-prova.component';
 import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
 import { addIcons } from 'ionicons';
@@ -27,7 +28,7 @@ interface ExameDisponivel {
 @Component({
     standalone: true,
     selector: 'app-exames',
-    imports: [DatePipe, RouterLink, IonContent, IonIcon, BottomNavComponent, SkeletonComponent, IconeProvaComponent],
+    imports: [DatePipe, RouterLink, IonContent, IonIcon, BottomNavComponent, SkeletonComponent, IconeProvaComponent, AppHeaderComponent],
     templateUrl: './exames.page.html',
     styleUrls: ['./exames.page.scss'],
 })

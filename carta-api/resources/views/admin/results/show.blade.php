@@ -3,7 +3,7 @@
 @section('page-title','Resultado de '.$attempt->student->name)
 @section('page-subtitle','Relatório completo e não editável da submissão.')
 @section('content')
-<div class="toolbar"><a class="btn light" href="{{ route('admin.results.index') }}">← Voltar aos resultados</a><div class="actions"><a class="btn light" href="{{ route('admin.students.show',$attempt->student) }}">Histórico do estudante</a><span class="status inactive">Somente leitura</span></div></div>
+<div class="toolbar"><x-admin.button variant="secondary" :href="route('admin.results.index')">← Voltar aos resultados</x-admin.button><div class="actions"><x-admin.button variant="secondary" :href="route('admin.students.show',$attempt->student)">Histórico do estudante</x-admin.button><x-admin.state>Somente leitura</x-admin.state></div></div>
 <section class="metric-grid">
     <article class="card metric-card"><span class="metric-icon green">✓</span><div><span>Respostas certas</span><strong>{{ $attempt->score }}/{{ $attempt->total }}</strong></div></article>
     <article class="card metric-card"><span class="metric-icon blue">%</span><div><span>Percentagem</span><strong>{{ $percentage }}%</strong></div></article>
@@ -21,7 +21,7 @@
 @foreach($answerReview as $item)
     @php($question = $item['question'])
     <article class="card answer-card {{ $item['is_correct'] ? 'answer-correct' : 'answer-wrong' }}">
-        <div class="answer-heading"><span class="option-letter">{{ $loop->iteration }}</span><div><small>{{ $question->external_id }} · {{ $question->topic->name }}</small><h3>{{ $question->statement }}</h3></div><span class="status {{ $item['is_correct'] ? 'approved' : 'rejected' }}">{{ $item['is_correct'] ? 'Correta' : 'Incorreta' }}</span></div>
+        <div class="answer-heading"><span class="option-letter">{{ $loop->iteration }}</span><div><small>{{ $question->external_id }} · {{ $question->topic->name }}</small><h3>{{ $question->statement }}</h3></div><x-admin.state :type="$item['is_correct'] ? 'approved' : 'rejected'">{{ $item['is_correct'] ? 'Correta' : 'Incorreta' }}</x-admin.state></div>
         @if($question->image)<div class="detail-image"><img src="{{ $question->image }}" alt="Imagem da pergunta"></div>@endif
         <div class="answer-comparison"><div><small>Resposta do estudante</small><strong>{{ $item['selected_index'] !== null ? chr(65 + $item['selected_index']).'. ' : '' }}{{ $item['selected_answer'] }}</strong></div><div><small>Resposta correta</small><strong>{{ chr(65 + $question->correct_index) }}. {{ $item['correct_answer'] }}</strong></div></div>
         <div class="answer-explanation"><small>Explicação</small><p>{{ $question->explanation }}</p></div>

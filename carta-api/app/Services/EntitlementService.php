@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\MobileUser;
+use App\Models\Plan;
+use App\Models\SchoolMembership;
 use App\Models\Unlock;
 use App\Support\Phone;
 use Illuminate\Database\Eloquent\Builder;
@@ -47,16 +49,39 @@ class EntitlementService
 
     public function isPaid(MobileUser $user): bool
     {
-        return (bool) $this->unlockFor($user);
+        return $this->planCode($user) !== Plan::FREE;
+    }
+
+    public function planCode(MobileUser $user): string
+    {
+        $atSchool = SchoolMembership::query()
+            ->where('mobile_user_id', $user->id)
+            ->where('status', 'active')
+            ->whereHas('school', fn (Builder $query) => $query->where('is_active', true))
+            ->exists();
+
+        if ($atSchool) {
+            return Plan::SCHOOL;
+        }
+
+        return $this->unlockFor($user) ? Plan::PLUS : Plan::FREE;
     }
 
     /** Bloco 'access' devolvido ao app — a fonte de verdade do plano. */
     public function describe(MobileUser $user): array
     {
         $unlock = $this->unlockFor($user);
+        $code = $this->planCode($user);
 
         return [
-            'plano' => $unlock ? 'pago' : 'gratis',
+            'produto' => $code,
+            'nomePlano' => match ($code) {
+                Plan::PLUS => 'ProntoVia+',
+                Plan::SCHOOL => 'ProntoVia Escolas',
+                default => 'ProntoVia Free',
+            },
+            // Contrato legado, preservado até à futura fase mobile.
+            'plano' => $code === Plan::FREE ? 'gratis' : 'pago',
             'telefone' => $user->phone,
             'expiraEm' => $unlock?->expires_at?->toIso8601String(),
             'verificadoEm' => now()->toIso8601String(),

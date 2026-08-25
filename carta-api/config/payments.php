@@ -107,7 +107,7 @@ return [
     |
     | `garantia` sai vazia de propósito. Prometer devolução do dinheiro é um
     | compromisso comercial que só o dono do negócio pode assumir — inventá-lo
-    | seria vincular a CartaPro a algo que ninguém decidiu.
+    | seria vincular o ProntoVia a algo que ninguém decidiu.
     |
     */
 
@@ -130,8 +130,30 @@ return [
     */
 
     'plans' => [
+        'free' => [
+            'nome' => 'ProntoVia Free',
+            'descricao' => 'Conteúdo essencial, treino e progresso básico.',
+            'preco' => 0,
+            'dias' => 0,
+            'periodo' => 'Sem prazo',
+        ],
+        'plus' => [
+            'nome' => env('PAYMENTS_PLAN_NAME', 'ProntoVia+'),
+            'descricao' => 'Treino personalizado, simulados e recursos premium.',
+            'preco' => (float) env('PAYMENTS_PRICE', 129),
+            'dias' => (int) env('PAYMENTS_DAYS', 90),
+            'periodo' => env('PAYMENTS_PERIOD_LABEL', '3 meses'),
+        ],
+        'school' => [
+            'nome' => 'ProntoVia Escolas',
+            'descricao' => 'Turmas, instrutores, tarefas, testes, resultados e analytics.',
+            'preco' => 0,
+            'dias' => 0,
+            'periodo' => 'Por vínculo escolar',
+        ],
+        // Alias de entrada temporário; não é apresentado no novo catálogo.
         'completo' => [
-            'nome' => env('PAYMENTS_PLAN_NAME', 'Plano completo'),
+            'nome' => env('PAYMENTS_PLAN_NAME', 'ProntoVia+'),
             'descricao' => 'Todo o banco de perguntas, exames completos e material sem cadeado.',
             'preco' => (float) env('PAYMENTS_PRICE', 129),
             'dias' => (int) env('PAYMENTS_DAYS', 90),
@@ -229,7 +251,7 @@ return [
         /*
          * O nosso vocabulário para o deles. A DebitoPay também expõe 'payfast'
          * (cartões e EFT em ZAR, África do Sul); não está ligado porque a
-         * CartaPro vende em MZN e o PayFast só aceita carteiras em ZAR — abri-lo
+         * ProntoVia vende em MZN e o PayFast só aceita carteiras em ZAR — abri-lo
          * exigia uma carteira e um preço numa segunda moeda, que é decisão de
          * negócio, não de código. O driver cobra-o sem alterações no dia em que
          * existir esse método com a sua carteira.

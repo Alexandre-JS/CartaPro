@@ -28,7 +28,7 @@ use Illuminate\Database\Seeder;
 class TesteMonetizacaoSeeder extends Seeder
 {
     /** Conta de teste em plano gratuito. */
-    public const EMAIL = 'teste@cartapro.co.mz';
+    public const EMAIL = 'teste@prontovia.co.mz';
 
     public const TELEFONE = '+258 84 900 0001';
 

@@ -4,7 +4,9 @@ namespace App\Services\Payments;
 
 use App\Models\MobileUser;
 use App\Models\Payment;
+use App\Models\Plan;
 use App\Models\Unlock;
+use App\Services\PlanCatalog;
 use App\Support\Carteira;
 use App\Support\Phone;
 use Illuminate\Support\Facades\DB;
@@ -29,17 +31,11 @@ use Illuminate\Validation\ValidationException;
  */
 class PaymentService
 {
-    public function __construct(private readonly GatewayManager $gateways) {}
+    public function __construct(private readonly GatewayManager $gateways, private readonly PlanCatalog $plans) {}
 
     public function plano(string $chave): array
     {
-        $plano = config("payments.plans.{$chave}");
-
-        if (! $plano) {
-            throw ValidationException::withMessages(['plan' => 'Plano desconhecido.']);
-        }
-
-        return $plano + ['chave' => $chave];
+        return $this->plans->purchasable($chave);
     }
 
     /**
@@ -52,6 +48,7 @@ class PaymentService
     public function iniciar(MobileUser $user, string $chavePlano, string $metodo, ?string $carteira = null): Payment
     {
         $plano = $this->plano($chavePlano);
+        $chavePlano = $plano['chave'];
 
         if (! in_array($metodo, $this->gateways->disponiveis(), true)) {
             throw ValidationException::withMessages([
@@ -267,6 +264,7 @@ class PaymentService
 
         if ($existente) {
             $existente->update([
+                'plan' => Plan::PLUS,
                 'expires_at' => $expira,
                 'is_active' => true,
                 'mobile_user_id' => $user->id,
@@ -280,7 +278,7 @@ class PaymentService
 
         return Unlock::create([
             'phone' => $user->phone,
-            'plan' => $payment->plan,
+            'plan' => Plan::canonical($payment->plan),
             'payment_method' => $payment->method,
             'payment_reference' => $payment->reference,
             'amount' => $payment->amount,

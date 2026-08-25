@@ -27,6 +27,10 @@ export class AuthService {
         try { await this.api.post('mobile/logout', {}, true); } catch { /* remove a sessão local mesmo sem rede */ }
         await Preferences.remove({ key: 'mobileAuthToken' });
         await Preferences.remove({ key: 'perfilUtilizador' });
+        // Exames completos são Premium: não podem reaparecer por cache quando
+        // o dispositivo volta ao modo visitante.
+        const { keys } = await Preferences.keys();
+        await Promise.all(keys.filter((key) => key === 'mobileExamsCache' || key.startsWith('mobileExamCache:')).map((key) => Preferences.remove({ key })));
     }
 
     async token(): Promise<string | null> { return (await Preferences.get({ key: 'mobileAuthToken' })).value; }
@@ -37,5 +41,7 @@ export class AuthService {
         await this.storage.prepararDadosDaConta(response.user.id);
         await Preferences.set({ key: 'categoriaCarta', value: response.user.categoriaCarta || 'ligeiro' });
         await this.storage.baixarSnapshot();
+        // Inclui respostas feitas como visitante no primeiro sync autenticado.
+        await this.storage.sincronizarAgora();
     }
 }

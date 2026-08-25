@@ -30,7 +30,7 @@ class ResultController extends Controller
 
         return view('admin.results.index', [
             'attempts' => $this->query($request)->with(['student', 'session.exam.school', 'session.classroom'])
-                ->latest('submitted_at')->paginate(20)->withQueryString(),
+                ->latest('submitted_at')->paginate(10)->withQueryString(),
             'average' => (int) round((float) ($totals->taxa_media ?? 0) * 100),
             'validGradesCount' => (int) ($totals->notas_validas ?? 0),
             'attemptsCount' => (int) ($totals->tentativas ?? 0),
@@ -41,7 +41,7 @@ class ResultController extends Controller
     /** Painel por turma: médias, temas mais falhados, evolução e prontidão. */
     public function classroom(Request $request, Classroom $classroom): View
     {
-        abort_if($request->user()->isSchool() && $classroom->school_id !== $request->user()->school_id, 403);
+        abort_unless($request->user()->canAccessClassroom($classroom), 403);
 
         $classroom->load('school');
 
@@ -84,13 +84,14 @@ class ResultController extends Controller
                 });
 
             fclose($output);
-        }, 'resultados-cartapro.csv', ['Content-Type' => 'text/csv']);
+        }, 'resultados-prontovia.csv', ['Content-Type' => 'text/csv']);
     }
 
     private function query(Request $request): Builder
     {
         return ExamAttempt::query()
             ->when($request->user()->isSchool(), fn (Builder $query) => $query->whereHas('session.exam', fn ($exam) => $exam->where('school_id', $request->user()->school_id)))
+            ->when($request->user()->isInstructor(), fn (Builder $query) => $query->whereHas('session.classroom.instructors', fn (Builder $instructors) => $instructors->where('user_id', $request->user()->id)))
             ->when($request->filled('classroom_id'), fn (Builder $query) => $query->whereHas('session', fn ($session) => $session->where('classroom_id', $request->integer('classroom_id'))));
     }
 
@@ -98,6 +99,7 @@ class ResultController extends Controller
     {
         return Classroom::query()
             ->when($request->user()->isSchool(), fn ($query) => $query->where('school_id', $request->user()->school_id))
+            ->when($request->user()->isInstructor(), fn ($query) => $query->whereHas('instructors', fn ($instructors) => $instructors->where('user_id', $request->user()->id)))
             ->where('is_active', true)->orderBy('name')->get(['id', 'name']);
     }
 }

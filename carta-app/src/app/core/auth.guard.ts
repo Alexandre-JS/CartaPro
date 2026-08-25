@@ -17,7 +17,7 @@ export const authGuard: CanActivateFn = async () => {
         return true;
     }
 
-    await router.navigateByUrl('/');
+    await router.navigateByUrl('/entrar');
     return false;
 };
 

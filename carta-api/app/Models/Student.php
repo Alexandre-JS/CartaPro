@@ -24,4 +24,9 @@ class Student extends Model
     {
         return $this->hasMany(ExamAttempt::class);
     }
+
+    public function memberships(): HasMany
+    {
+        return $this->hasMany(SchoolMembership::class);
+    }
 }

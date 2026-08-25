@@ -7,6 +7,7 @@ use App\Models\Exam;
 use App\Models\MobileApiToken;
 use App\Models\MobileUser;
 use App\Services\EntitlementService;
+use App\Services\Learning\LearningEngine;
 use App\Support\Grading;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -18,7 +19,10 @@ use Illuminate\Validation\Rule;
 
 class MobileController extends Controller
 {
-    public function __construct(private readonly EntitlementService $entitlements) {}
+    public function __construct(
+        private readonly EntitlementService $entitlements,
+        private readonly LearningEngine $learning,
+    ) {}
 
     public function register(Request $request): JsonResponse
     {
@@ -190,7 +194,13 @@ class MobileController extends Controller
                     ['updated_at' => $now, 'created_at' => $now],
                 );
             }
+
+            $this->learning->recordSyncEvents($user, $data);
         });
+
+        if (collect(['answers', 'exams', 'revisions', 'readContents'])->contains(fn (string $key) => ! empty($data[$key]))) {
+            $this->learning->refresh($user);
+        }
 
         return response()->json($this->buildSnapshot($user, $since));
     }

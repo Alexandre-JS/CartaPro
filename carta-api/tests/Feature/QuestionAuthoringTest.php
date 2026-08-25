@@ -24,7 +24,7 @@ class QuestionAuthoringTest extends TestCase
     {
         parent::setUp();
 
-        $this->admin = User::create(['name' => 'Admin', 'email' => 'admin@cartapro.test', 'password' => 'segredo123', 'role' => 'admin', 'is_active' => true]);
+        $this->admin = User::create(['name' => 'Admin', 'email' => 'admin@prontovia.test', 'password' => 'segredo123', 'role' => 'admin', 'is_active' => true]);
         $this->topic = Topic::create(['name' => 'Velocidade', 'slug' => 'velocidade', 'is_active' => true]);
         LicenseCategory::create(['name' => 'Ligeiro', 'slug' => 'ligeiro', 'sort_order' => 1, 'is_active' => true]);
     }
@@ -95,6 +95,11 @@ class QuestionAuthoringTest extends TestCase
             'is_active' => true,
         ]));
 
+        $this->actingAs($this->admin)->get(route('admin.questions.index'))
+            ->assertOk()
+            ->assertViewHas('questions', fn ($questions) => $questions->count() === 10
+                && $questions->perPage() === 10);
+
         $this->actingAs($this->admin)->get(route('admin.questions.index', [
             'topic' => 'Prioridade',
             'per_page' => 30,
@@ -102,10 +107,32 @@ class QuestionAuthoringTest extends TestCase
         ]))
             ->assertOk()
             ->assertSee('Filtros')
+            ->assertSee('aria-label="Paginação"', false)
             ->assertDontSee('Tema sem perguntas 40')
             ->assertViewHas('questions', fn ($questions) => $questions->total() === 35
                 && $questions->count() === 30
                 && $questions->perPage() === 30);
+    }
+
+    public function test_o_banco_usa_os_componentes_acessiveis_do_painel(): void
+    {
+        $this->actingAs($this->admin)->get(route('admin.questions.index'))
+            ->assertOk()
+            ->assertSee('aria-labelledby="question-bank-title"', false)
+            ->assertSee('Nenhuma pergunta encontrada')
+            ->assertSee('class="empty-state"', false)
+            ->assertSee('aria-label="Pesquisar perguntas"', false);
+
+        $this->actingAs($this->admin)->post(route('admin.questions.store'), $this->payload());
+        $question = Question::firstOrFail();
+
+        $this->actingAs($this->admin)->get(route('admin.questions.index'))
+            ->assertOk()
+            ->assertSee('class="status approved"', false)
+            ->assertSee('data-dialog-open="delete-question-'.$question->id.'"', false)
+            ->assertSee('id="delete-question-'.$question->id.'"', false)
+            ->assertSee('aria-labelledby="delete-question-'.$question->id.'-title"', false)
+            ->assertDontSee("confirm('Remover esta pergunta?')", false);
     }
 
     public function test_o_identificador_e_gerado_a_partir_do_tema(): void

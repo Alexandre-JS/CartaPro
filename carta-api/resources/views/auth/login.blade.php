@@ -1,1 +1,51 @@
-<!doctype html><html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Entrar · CartaPro</title><link rel="icon" type="image/png" href="{{ asset('images/logo/icon CartaPro.png') }}"><style>*{box-sizing:border-box}body{display:grid;min-height:100vh;margin:0;place-items:center;padding:20px;background:linear-gradient(145deg,#124f21,#218b38);font:14px system-ui}.box{width:min(100%,390px);padding:27px 30px 30px;border-radius:16px;background:#fff;box-shadow:0 20px 60px #102b1766}.login-logo{display:block;width:100%;height:92px;margin:0 auto 5px;object-fit:contain}h1{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}p{margin:0 0 20px;color:#69716b;text-align:center}.field{display:grid;gap:6px;margin-top:14px}label{font-size:12px;font-weight:700}input{width:100%;padding:12px;border:1px solid #ccd5ce;border-radius:8px;font:inherit}.remember{display:flex;align-items:center;gap:7px;margin:14px 0}.remember input{width:auto}button{width:100%;padding:12px;border:0;border-radius:8px;color:#fff;background:#176a2a;font-weight:700;cursor:pointer}.error{margin-top:7px;color:#b4232a;font-size:12px}</style></head><body><form class="box" method="POST" action="{{ route('login.store') }}">@csrf<img class="login-logo" src="{{ asset('images/logo/Logo cartaPro.png') }}" alt="CartaPro"><h1>CartaPro</h1><p>Painel administrativo</p><div class="field"><label for="email">E-mail</label><input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus>@error('email')<span class="error">{{ $message }}</span>@enderror</div><div class="field"><label for="password">Palavra-passe</label><input id="password" type="password" name="password" required></div><label class="remember"><input type="checkbox" name="remember" value="1"> Manter sessão iniciada</label><button type="submit">Entrar</button></form></body></html>
+<!doctype html>
+<html lang="pt-MZ">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex,nofollow">
+    <meta name="theme-color" content="#1A1F5C">
+    <title>Entrar no ProntoVia</title>
+    <link rel="icon" type="image/webp" href="{{ asset('images/prontovia/iconProntovia.webp') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/prontovia/iconProntovia.png') }}">
+    @vite(['resources/css/website.css'])
+</head>
+<body class="pv-auth-page" style="--pv-auth-background: url('{{ asset(config('prontovia.images.home_hero') ?: 'images/prontovia/pessoa-que.avif') }}')">
+    <a class="pv-skip-link" href="#login-form">Saltar para o formulário</a>
+    <main class="pv-auth-shell">
+        <section class="pv-auth-story" aria-labelledby="auth-story-title">
+            <a href="{{ route('website.home') }}" aria-label="ProntoVia — voltar ao início"><img src="{{ asset('images/prontovia/Prontovia-white.png') }}" width="1640" height="664" alt="ProntoVia"></a>
+            <div>
+                <span class="pv-auth-eyebrow"><i class="bi bi-shield-check" aria-hidden="true"></i> Área segura</span>
+                <h1 id="auth-story-title">Acompanhe cada percurso com mais clareza.</h1>
+                <p>Entre para gerir conteúdos, turmas, testes e resultados no ambiente ProntoVia.</p>
+            </div>
+            <small>Aprenda. Pratique. Esteja pronto.</small>
+        </section>
+        <section class="pv-auth-form-panel" id="login-form" aria-labelledby="login-title">
+            <div class="pv-auth-form-inner">
+                <a class="pv-auth-mobile-logo" href="{{ route('website.home') }}"><img src="{{ asset('images/prontovia/prontovia.png') }}" width="710" height="141" alt="ProntoVia"></a>
+                <span class="pv-kicker">Bem-vindo de volta</span>
+                <h2 id="login-title">Entrar na sua conta</h2>
+                <p class="pv-auth-intro">Utilize os dados associados ao seu acesso administrativo ou escolar.</p>
+                <form method="POST" action="{{ route('login.store') }}">
+                    @csrf
+                    <div class="pv-auth-field">
+                        <label for="email">Endereço de email</label>
+                        <div class="pv-auth-control"><i class="bi bi-envelope" aria-hidden="true"></i><input id="email" type="email" name="email" value="{{ old('email') }}" autocomplete="username" inputmode="email" required autofocus @error('email') aria-invalid="true" aria-describedby="email-error" @enderror></div>
+                        @error('email')<span class="pv-auth-error" id="email-error" role="alert"><i class="bi bi-exclamation-circle" aria-hidden="true"></i>{{ $message }}</span>@enderror
+                    </div>
+                    <div class="pv-auth-field">
+                        <label for="password">Palavra-passe</label>
+                        <div class="pv-auth-control"><i class="bi bi-lock" aria-hidden="true"></i><input id="password" type="password" name="password" autocomplete="current-password" required></div>
+                    </div>
+                    <label class="pv-auth-remember"><input type="checkbox" name="remember" value="1"><span>Manter sessão iniciada neste dispositivo</span></label>
+                    <button class="pv-btn pv-btn-primary pv-auth-submit" type="submit">Entrar <i class="bi bi-arrow-right" aria-hidden="true"></i></button>
+                </form>
+                <div class="pv-auth-help"><i class="bi bi-info-circle" aria-hidden="true"></i><p><strong>É candidato?</strong> A preparação individual acontece na aplicação ProntoVia.</p></div>
+                <a class="pv-auth-back" href="{{ route('website.home') }}"><i class="bi bi-arrow-left" aria-hidden="true"></i> Voltar ao website</a>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

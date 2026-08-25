@@ -17,7 +17,7 @@ class ManagementApiTest extends TestCase
 
     public function test_active_user_can_login_use_token_and_logout(): void
     {
-        $user = User::factory()->create(['email' => 'admin@cartapro.co.mz']);
+        $user = User::factory()->create(['email' => 'admin@prontovia.co.mz']);
 
         $login = $this->postJson('/api/v1/auth/login', ['email' => $user->email, 'password' => 'password'])
             ->assertOk()->assertJsonPath('user.role', 'admin');

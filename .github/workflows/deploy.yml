@@ -7,9 +7,9 @@
 # o canal entre os dois servidores: depois da configuração inicial, cada merge
 # em main continua a ser publicado automaticamente, sem intervenção manual.
 #
-# O GITHUB_TOKEN autoriza o push e, por ser temporário, também autentica a
-# finalização. O acesso ao servidor usa uma chave exclusiva guardada nos
-# Secrets do GitHub; passwords, FTP e webhooks não são usados.
+# O GITHUB_TOKEN autoriza apenas o push do artefacto. A finalização é feita por
+# SSH, com uma chave exclusiva guardada nos Secrets do GitHub; passwords, FTP
+# e endpoints públicos de manutenção não são usados.
 #
 # O deploy depende dos testes. As rotas de cobrança ficam desligadas por
 # PAYMENTS_ENABLED=false até a integração estar pronta para produção.
@@ -92,8 +92,6 @@ jobs:
         run: composer install --no-dev --optimize-autoloader --no-interaction --no-progress
 
       - name: Montar o artefacto
-        env:
-          DEPLOY_FINALIZE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # A árvore espelha o public_html do servidor:
         #
         #   /            → conteúdo de carta-api/public (o que a web serve)
@@ -160,12 +158,6 @@ jobs:
           # exatamente este build, sem executar PHP ou consultar a base.
           printf '%s\n' "$GITHUB_SHA" > artefacto/deploy-version.txt
 
-          # Só o hash entra no artefacto. O token continua guardado nos Secrets
-          # do GitHub e autentica a migração/cache após a cópia dos ficheiros.
-          test -n "$DEPLOY_FINALIZE_TOKEN"
-          printf '%s' "$DEPLOY_FINALIZE_TOKEN" \
-            | sha256sum | cut -d' ' -f1 > artefacto/carta-api/.deploy-token.sha256
-
       - name: Validar o artefacto
         # Falha antes de publicar se alguma pasta do monorepo ou ficheiro
         # sensível entrar por engano. O servidor recebe só o public da API e a
@@ -175,7 +167,6 @@ jobs:
           test -f artefacto/carta-api/artisan
           test -f artefacto/carta-api/vendor/autoload.php
           test -s artefacto/deploy-version.txt
-          test -s artefacto/carta-api/.deploy-token.sha256
           test ! -e artefacto/carta-app
           test ! -e artefacto/carta-api/tests
           test ! -e artefacto/carta-api/node_modules

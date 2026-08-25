@@ -26,4 +26,19 @@ class School extends Model
     {
         return $this->hasMany(Classroom::class);
     }
+
+    public function memberships(): HasMany
+    {
+        return $this->hasMany(SchoolMembership::class);
+    }
+
+    public function instructors(): HasMany
+    {
+        return $this->hasMany(Instructor::class);
+    }
+
+    public function assignments(): HasMany
+    {
+        return $this->hasMany(SchoolAssignment::class);
+    }
 }

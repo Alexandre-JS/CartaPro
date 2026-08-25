@@ -62,17 +62,15 @@ class ContentApiTest extends TestCase
             ->assertJsonPath('temasDetalhe.0.nome', 'Prioridade');
     }
 
-    public function test_content_endpoints_reject_anonymous_access(): void
+    public function test_free_content_endpoints_are_available_anonymously_but_filter_locked_content(): void
     {
         $this->seedContent();
 
-        // Antes qualquer pessoa descarregava o banco inteiro com a resposta
-        // correta e a explicação de cada pergunta.
-        $this->getJson('/api/v1/content-package')->assertUnauthorized();
-        $this->getJson('/api/v1/questions')->assertUnauthorized();
-        $this->getJson('/api/v1/questions?include_locked=1')->assertUnauthorized();
-        $this->getJson('/api/v1/packages')->assertUnauthorized();
-        $this->getJson('/api/v1/articles')->assertUnauthorized();
+        $this->getJson('/api/v1/content-package')->assertOk()->assertJsonPath('plano', 'gratis');
+        $this->getJson('/api/v1/questions')->assertOk()->assertJsonMissing(['id' => 'pri-002-paga']);
+        $this->getJson('/api/v1/questions?include_locked=1')->assertOk()->assertJsonMissing(['id' => 'pri-002-paga']);
+        $this->getJson('/api/v1/packages')->assertOk();
+        $this->getJson('/api/v1/articles')->assertOk();
     }
 
     public function test_free_plan_never_receives_locked_content(): void
@@ -115,5 +113,13 @@ class ContentApiTest extends TestCase
         $response = $this->withToken($token)->getJson('/api/v1/questions?include_locked=1')->assertOk();
 
         $this->assertNotContains('pri-002-paga', array_column($response->json('data'), 'id'));
+    }
+
+    public function test_personal_and_paid_endpoints_still_require_an_account(): void
+    {
+        $this->getJson('/api/v1/mobile/snapshot')->assertUnauthorized();
+        $this->getJson('/api/v1/learning/profile')->assertUnauthorized();
+        $this->getJson('/api/v1/school-memberships')->assertUnauthorized();
+        $this->getJson('/api/v1/mobile/payments/plans')->assertUnauthorized();
     }
 }

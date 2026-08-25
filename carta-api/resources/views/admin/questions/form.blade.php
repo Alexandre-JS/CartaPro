@@ -9,17 +9,17 @@
 <section class="form-section" id="identificacao">
 <header class="form-section-head"><h2>Identificação</h2></header>
 <div class="form-grid">
-<div class="field"><label>Tema</label><select name="topic_id" required><option value="">Selecione</option>@foreach($topics as $topic)<option value="{{ $topic->id }}" @selected(old('topic_id',$question->topic_id)==$topic->id)>{{ $topic->name }}</option>@endforeach</select></div>
+<x-admin.field as="select" name="topic_id" label="Tema" required><option value="">Selecione</option>@foreach($topics as $topic)<option value="{{ $topic->id }}" @selected(old('topic_id',$question->topic_id)==$topic->id)>{{ $topic->name }}</option>@endforeach</x-admin.field>
 <div class="field"><label>Identificador</label><input value="{{ $question->external_id ?? 'Gerado automaticamente' }}" disabled><small>@if($question->exists)Fixo — as respostas das provas já submetidas são guardadas por este identificador.@else Derivado do tema (ex.: velocidade-001).@endif</small></div>
-<div class="field"><label>Tipo</label><select name="type"><option value="teorico" @selected(old('type',$question->type)==='teorico')>Teórica</option><option value="pratico" @selected(old('type',$question->type)==='pratico')>Prática</option></select></div>
-<div class="field"><label>Ordem <small>Opcional.</small></label><input type="number" min="0" name="sort_order" value="{{ old('sort_order',$proximaOrdem) }}" placeholder="A seguir à última do tema"><small>Deixe vazio para colocar no fim; escreva um número para mudar a posição.</small></div>
+<x-admin.field as="select" name="type" label="Tipo"><option value="teorico" @selected(old('type',$question->type)==='teorico')>Teórica</option><option value="pratico" @selected(old('type',$question->type)==='pratico')>Prática</option></x-admin.field>
+<x-admin.field name="sort_order" label="Ordem" type="number" min="0" :value="$proximaOrdem" placeholder="A seguir à última do tema" hint="Opcional. Deixe vazio para colocar no fim." />
 <div class="field full"><label>Categorias de carta</label><div class="checks">@foreach($categories as $category)<label><input type="checkbox" name="categories[]" value="{{ $category->slug }}" @checked(in_array($category->slug,old('categories',$question->categories ?? [$categories->first()?->slug])))> {{ $category->name }}</label>@endforeach</div></div>
 </div></section>
 
 <section class="form-section" id="conteudo">
 <header class="form-section-head"><h2>Pergunta e respostas</h2></header>
 <div class="form-grid">
-<div class="field full"><label>Enunciado</label><textarea name="statement" required>{{ old('statement',$question->statement) }}</textarea></div>
+<x-admin.field as="textarea" name="statement" label="Enunciado" :value="$question->statement" required full />
 <div class="field full"><label>Opções <small>Marque a resposta correta.</small></label><div id="options">@foreach(old('option_items',$question->options ?? ['', '']) as $index=>$option)<div class="question-option"><span class="option-letter">{{ chr(65+$index) }}</span><input style="flex:1" name="option_items[]" value="{{ $option }}" required><label><input type="radio" name="correct_index" value="{{ $index }}" @checked((int)old('correct_index',$question->correct_index ?? 0)===$index)> Correta</label><button class="btn danger small remove-option" type="button">×</button></div>@endforeach</div><button class="btn light small" id="add-option" type="button">＋ Adicionar opção</button></div>
 </div></section>
 
@@ -27,8 +27,8 @@
 <header class="form-section-head"><h2>Material de apoio <small>Opcional</small></h2></header>
 <div class="support-grid">
 <div class="support-copy">
-<div class="field"><label>Artigo de referência</label><select name="article_id"><option value="">Sem artigo</option>@foreach($articles as $article)<option value="{{ $article->id }}" @selected(old('article_id',$question->article_id)===$article->id)>Artigo {{ $article->number }} — {{ $article->title }}</option>@endforeach</select></div>
-<div class="field"><label>Explicação</label><textarea name="explanation" placeholder="Explicação apresentada depois da resposta.">{{ old('explanation',$question->explanation) }}</textarea></div>
+<x-admin.field as="select" name="article_id" label="Artigo de referência"><option value="">Sem artigo</option>@foreach($articles as $article)<option value="{{ $article->id }}" @selected(old('article_id',$question->article_id)===$article->id)>Artigo {{ $article->number }} — {{ $article->title }}</option>@endforeach</x-admin.field>
+<x-admin.field as="textarea" name="explanation" label="Explicação" :value="$question->explanation" placeholder="Explicação apresentada depois da resposta." />
 </div>
 <div class="support-image">
 
@@ -98,7 +98,7 @@
 <div class="publication-options"><label><input type="checkbox" name="is_active" value="1" @checked(old('is_active',$question->exists ? $question->is_active : true))><span><strong>Pergunta ativa</strong></span></label><label><input type="checkbox" name="is_locked" value="1" @checked(old('is_locked',$question->is_locked))><span><strong>Conteúdo Premium</strong></span></label></div>
 @if($question->status==='rejected' && $question->rejection_reason)<div class="errors"><strong>Motivo da rejeição:</strong> {{ $question->rejection_reason }}</div>@endif
 </section>
-<div class="form-actions"><a class="btn light" href="{{ route('admin.questions.index') }}">Cancelar</a>@if(auth()->user()->isAdmin())<button class="btn light" name="action" value="draft">Guardar rascunho</button><button class="btn" name="action" value="approve">Guardar aprovada</button>@else<button class="btn" name="action" value="review">Enviar para aprovação</button>@endif</div>
+<div class="form-actions"><x-admin.button variant="secondary" :href="route('admin.questions.index')">Cancelar</x-admin.button>@if(auth()->user()->isAdmin())<x-admin.button variant="secondary" type="submit" name="action" value="draft" loading-label="A guardar…">Guardar rascunho</x-admin.button><x-admin.button type="submit" name="action" value="approve" loading-label="A guardar…">Guardar aprovada</x-admin.button>@else<x-admin.button type="submit" name="action" value="review" loading-label="A enviar…">Enviar para aprovação</x-admin.button>@endif</div>
 </div></div></form>
 <script>
 const options=document.getElementById('options');
@@ -114,7 +114,7 @@ const picker=document.getElementById('sign-picker'),choices=[...document.querySe
 let uploadedPreview='';
 function imageDiagnostic(level,message,details={}){
     const logger=console[level]||console.log;
-    logger.call(console,`[CartaPro:imagem] ${message}`,{pagina:location.href,...details});
+    logger.call(console,`[ProntoVia:imagem] ${message}`,{pagina:location.href,...details});
 }
 function monitorImage(image,context){
     const loaded=()=>{if(image===preview){preview.hidden=false;previewError.hidden=true;}imageDiagnostic('info','Imagem carregada',{context,src:image.currentSrc||image.src,largura:image.naturalWidth,altura:image.naturalHeight});};

@@ -1,5 +1,6 @@
 <ion-content [fullscreen]="true" class="performance-page">
   <main class="performance-shell">
+    <app-app-header titulo="Desempenho" subtitulo="O teu progresso" />
     <header class="performance-hero">
       <div><span>O teu progresso</span><h1>Desempenho</h1><p>Onde estás, em números.</p></div>
       <span class="hero-icon"><ion-icon name="stats-chart-outline" aria-hidden="true"></ion-icon></span>
@@ -42,17 +43,23 @@
         <article><span class="metric-icon purple"><ion-icon name="document-text-outline" aria-hidden="true"></ion-icon></span><div><small>Exames feitos</small><strong>{{ historico.length }}</strong><em>resultados guardados</em></div></article>
       </section>
 
+      <section class="achievement-strip" aria-label="Conquistas locais">
+        <div><span>Gamificação</span><strong>{{ gamificacao.pontos }} pontos</strong><small>{{ gamificacao.diasAtivos }} {{ gamificacao.diasAtivos === 1 ? 'dia' : 'dias' }} de prática</small></div>
+        <span class="achievement-count">{{ gamificacao.conquistas.length }} conquistas</span>
+      </section>
+
       <section class="themes-section">
         <div class="section-heading"><div><span>Conhecimento</span><h2>Desempenho por tema</h2></div></div>
         <div class="theme-list">
           <!-- Só temas com respostas: um tema nunca praticado aparecia a 0% e
                lia-se como ponto fraco. Os por praticar vão listados à parte. -->
           @for (tema of temasComDados; track tema.tema) {
-            <article class="theme-row">
+            <a class="theme-row" [routerLink]="['/estudo', tema.tema]" [queryParams]="{ categoria: categoria }" [attr.aria-label]="'Praticar o tema ' + nomeTema(tema.tema)">
               <div><strong>{{ nomeTema(tema.tema) }}</strong><small>{{ tema.retidas }}/{{ tema.praticadas }} retidas · {{ tema.consolidadas }} consolidadas</small></div>
               <span class="theme-progress"><i [style.width.%]="tema.retencao"></i></span>
               <b>{{ tema.retencao }}%</b>
-            </article>
+              <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
+            </a>
           } @empty {
             <p class="hint">Responde a algumas perguntas para veres o teu perfil por tema.</p>
           }
@@ -62,7 +69,8 @@
             <ion-icon name="alert-circle-outline" aria-hidden="true"></ion-icon>
             <div>
               <strong>Ainda por praticar</strong>
-              <p>{{ nomesPorPraticar }}</p>
+            <p>{{ nomesPorPraticar }}</p>
+            <a routerLink="/estudos">Escolher tema</a>
             </div>
             <button type="button" (click)="alertaVisivel = false" aria-label="Fechar aviso">
               <ion-icon name="close-outline" aria-hidden="true"></ion-icon>

@@ -1,0 +1,18 @@
+<header class="pv-app-header">
+  <div class="pv-app-header-leading">
+    @if (voltarPara) {
+      <a class="pv-header-back" [routerLink]="voltarPara" aria-label="Voltar">
+        <ion-icon name="chevron-back-outline" aria-hidden="true"></ion-icon>
+      </a>
+    }
+    <div class="pv-header-copy">
+      @if (subtitulo) { <span>{{ subtitulo }}</span> }
+      <h1>{{ titulo }}</h1>
+    </div>
+  </div>
+  @if (mostrarPerfil) {
+    <a class="pv-header-profile" routerLink="/perfil" aria-label="Abrir perfil">
+      <ion-icon name="person-circle-outline" aria-hidden="true"></ion-icon>
+    </a>
+  }
+</header>

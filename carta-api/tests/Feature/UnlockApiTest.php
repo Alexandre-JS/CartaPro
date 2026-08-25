@@ -100,7 +100,7 @@ class UnlockApiTest extends TestCase
         $this->withToken($token)->getJson('/api/v1/mobile/unlock')->assertOk()->assertJsonPath('plano', 'gratis');
 
         // A tarefa agendada fecha o registo (antes `expires_at` era decorativo).
-        $this->artisan('cartapro:expire-unlocks')->assertSuccessful();
+        $this->artisan('prontovia:expire-unlocks')->assertSuccessful();
         $this->assertDatabaseHas('unlocks', ['phone' => '842222222', 'is_active' => false]);
     }
 
