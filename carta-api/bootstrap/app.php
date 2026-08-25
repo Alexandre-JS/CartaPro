@@ -3,7 +3,9 @@
 use App\Http\Middleware\AuthenticateApiToken;
 use App\Http\Middleware\AuthenticateMobileToken;
 use App\Http\Middleware\EnsurePaymentsEnabled;
+use App\Http\Middleware\EnsurePermission;
 use App\Http\Middleware\EnsureRole;
+use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -17,11 +19,14 @@ $app = Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->append(SecurityHeaders::class);
+
         $middleware->alias([
             'role' => EnsureRole::class,
             'api.auth' => AuthenticateApiToken::class,
             'mobile.auth' => AuthenticateMobileToken::class,
             'payments.enabled' => EnsurePaymentsEnabled::class,
+            'permission' => EnsurePermission::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

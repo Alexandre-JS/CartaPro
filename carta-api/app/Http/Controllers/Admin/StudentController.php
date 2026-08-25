@@ -50,6 +50,6 @@ class StudentController extends Controller
 
     private function assertAccess(Request $request, Classroom $classroom): void
     {
-        abort_if($request->user()->isSchool() && $classroom->school_id !== $request->user()->school_id, 403);
+        abort_unless($request->user()->canAccessClassroom($classroom), 403);
     }
 }

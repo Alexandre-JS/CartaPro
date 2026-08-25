@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use App\Services\EntitlementService;
+use App\Services\PlanCatalog;
 use App\Services\Payments\GatewayManager;
 use App\Services\Payments\PaymentService;
 use App\Support\Carteira;
@@ -25,6 +26,7 @@ class PaymentController extends Controller
         private readonly PaymentService $payments,
         private readonly GatewayManager $gateways,
         private readonly EntitlementService $entitlements,
+        private readonly PlanCatalog $plans,
     ) {}
 
     /**
@@ -57,14 +59,16 @@ class PaymentController extends Controller
             'promessa' => config('payments.promessa'),
             // Vazia enquanto o negócio não decidir que compromisso assume.
             'garantia' => config('payments.garantia') ?: null,
-            'planos' => collect(config('payments.plans'))
-                ->map(fn (array $plano, string $chave) => [
-                    'chave' => $chave,
-                    'nome' => $plano['nome'],
-                    'descricao' => $plano['descricao'] ?? null,
-                    'preco' => (float) $plano['preco'],
-                    'dias' => (int) $plano['dias'],
-                    'periodo' => $plano['periodo'] ?? ((int) $plano['dias'].' dias'),
+            'planos' => $this->plans->all()
+                ->map(fn ($plano) => [
+                    'chave' => $plano->code,
+                    'nome' => $plano->name,
+                    'descricao' => $plano->description,
+                    'preco' => (float) $plano->price,
+                    'dias' => $plano->duration_days,
+                    'periodo' => $plano->duration_days ? $plano->duration_days.' dias' : null,
+                    'recursos' => $plano->features,
+                    'compravel' => $plano->is_purchasable,
                 ])
                 ->values(),
             'acesso' => $this->entitlements->describe($user),
@@ -112,6 +116,7 @@ class PaymentController extends Controller
             'referencia' => $payment->reference,
             'telefone' => Phone::format($payment->phone_normalized),
             'valor' => (float) $payment->amount,
+            'produto' => \App\Models\Plan::canonical($payment->plan),
             'moeda' => $payment->currency,
             'mensagem' => $payment->provider_message,
             'transacao' => $payment->provider_transaction_id,

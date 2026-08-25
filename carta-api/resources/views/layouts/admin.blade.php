@@ -1,7 +1,7 @@
 @php
     $adminPageTitle = trim($__env->yieldContent('page-title', 'Dashboard'));
     $adminRouteName = request()->route()?->getName() ?? '';
-    $adminIsPlatform = auth()->user()->isAdmin();
+    $adminIsPlatform = ! auth()->user()->isSchool();
     $adminContextLabel = $adminIsPlatform ? 'Administração ProntoVia' : 'ProntoVia Escolas';
     $adminSectionKey = (string) str($adminRouteName)->after('admin.')->before('.');
     $adminSectionLabels = [
@@ -59,18 +59,19 @@
         <button class="sidebar-close" type="button" data-sidebar-close aria-label="Fechar menu">×</button>
         <a class="brand" href="{{ route('admin.dashboard') }}"><img class="admin-brand-logo" src="{{ asset('images/prontovia/Prontovia-white.png') }}" width="1640" height="664" alt="ProntoVia"><small>Painel de gestão</small></a>
         <span class="admin-context"><i aria-hidden="true"></i>{{ $adminContextLabel }}</span>
+        <span class="sr-only">{{ $adminIsPlatform ? 'Governação do conteúdo, utilizadores e operação global.' : 'Turmas, alunos, provas e evolução da sua escola.' }}</span>
         <span class="nav-label">{{ $adminIsPlatform ? 'Visão geral' : 'Área da escola' }}</span>
         <nav class="nav">
             <a class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}"><svg viewBox="0 0 24 24"><path d="M3 11 12 3l9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Dashboard</a>
-            @if($adminIsPlatform)<a class="{{ request()->routeIs('admin.questions.*') ? 'active' : '' }}" href="{{ route('admin.questions.index') }}"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6zM15 3v5h5M9 12h7M9 16h7"/></svg>Perguntas</a>@endif
-            @if(auth()->user()->isAdmin())<a class="{{ request()->routeIs('admin.approvals.*') ? 'active' : '' }}" href="{{ route('admin.approvals.index') }}"><svg viewBox="0 0 24 24"><path d="M12 22s8-3 8-10V5l-8-3-8 3v7c0 7 8 10 8 10zM8.5 12l2.2 2.2 4.8-5"/></svg>Aprovação @if(($sidebarReviewCount ?? 0)>0)<span class="badge">{{ $sidebarReviewCount }}</span>@endif</a>@endif
+            @if($adminIsPlatform && auth()->user()->hasPermission('question.create'))<a class="{{ request()->routeIs('admin.questions.*') ? 'active' : '' }}" href="{{ route('admin.questions.index') }}"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6zM15 3v5h5M9 12h7M9 16h7"/></svg>Perguntas</a>@endif
+            @if(auth()->user()->hasPermission('question.review'))<a class="{{ request()->routeIs('admin.approvals.*') ? 'active' : '' }}" href="{{ route('admin.approvals.index') }}"><svg viewBox="0 0 24 24"><path d="M12 22s8-3 8-10V5l-8-3-8 3v7c0 7 8 10 8 10zM8.5 12l2.2 2.2 4.8-5"/></svg>Aprovação @if(($sidebarReviewCount ?? 0)>0)<span class="badge">{{ $sidebarReviewCount }}</span>@endif</a>@endif
         </nav>
         @unless($adminIsPlatform)
             <span class="nav-label">Ensino e acompanhamento</span>
-            <nav class="nav"><a class="{{ request()->routeIs('admin.classrooms.*') ? 'active' : '' }}" href="{{ route('admin.classrooms.index') }}"><svg viewBox="0 0 24 24"><path d="M3 7h18M5 7v14h14V7M9 11h6M9 15h6"/></svg>Turmas</a><a class="{{ request()->routeIs('admin.exams.*') ? 'active' : '' }}" href="{{ route('admin.exams.index') }}"><svg viewBox="0 0 24 24"><path d="M5 3h14v18H5zM8 8h8M8 12h8M8 16h5"/></svg>Provas</a><a class="{{ request()->routeIs('admin.sessions.*') ? 'active' : '' }}" href="{{ route('admin.sessions.index') }}"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg>Sessões</a><a class="{{ request()->routeIs('admin.results.*') ? 'active' : '' }}" href="{{ route('admin.results.index') }}"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Resultados</a></nav>
+            <nav class="nav">@if(auth()->user()->hasPermission('classroom.manage'))<a class="{{ request()->routeIs('admin.classrooms.*') ? 'active' : '' }}" href="{{ route('admin.classrooms.index') }}"><svg viewBox="0 0 24 24"><path d="M3 7h18M5 7v14h14V7M9 11h6M9 15h6"/></svg>Turmas</a>@endif @if(auth()->user()->hasPermission('exam.create'))<a class="{{ request()->routeIs('admin.exams.*') ? 'active' : '' }}" href="{{ route('admin.exams.index') }}"><svg viewBox="0 0 24 24"><path d="M5 3h14v18H5zM8 8h8M8 12h8M8 16h5"/></svg>Provas</a>@endif @if(auth()->user()->hasPermission('exam.publish'))<a class="{{ request()->routeIs('admin.sessions.*') ? 'active' : '' }}" href="{{ route('admin.sessions.index') }}"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg>Sessões</a>@endif @if(auth()->user()->hasPermission('analytics.view'))<a class="{{ request()->routeIs('admin.results.*') ? 'active' : '' }}" href="{{ route('admin.results.index') }}"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Resultados</a>@endif</nav>
         @endunless
         <span class="nav-label">{{ $adminIsPlatform ? 'Conteúdo da plataforma' : 'Recursos pedagógicos' }}</span>
-        <nav class="nav">@unless($adminIsPlatform)<a class="{{ request()->routeIs('admin.questions.*') ? 'active' : '' }}" href="{{ route('admin.questions.index') }}"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6zM15 3v5h5M9 12h7M9 16h7"/></svg>Perguntas</a>@endunless<a class="{{ request()->routeIs('admin.signs.*') ? 'active' : '' }}" href="{{ route('admin.signs.index') }}"><svg viewBox="0 0 24 24"><path d="M12 3 2 21h20zM12 9v5M12 18h.01"/></svg>Sinais</a>@if(auth()->user()->isAdmin())<a class="{{ request()->routeIs('admin.sign-categories.*') ? 'active' : '' }}" href="{{ route('admin.sign-categories.index') }}"><svg viewBox="0 0 24 24"><path d="M3 5h7v6H3zM14 5h7v6h-7zM3 15h7v4H3zM14 15h7v4h-7z"/></svg>Categorias de sinais</a>@endif<a class="{{ request()->routeIs('admin.articles.*') ? 'active' : '' }}" href="{{ route('admin.articles.index') }}"><svg viewBox="0 0 24 24"><path d="M5 3h14v18H5zM8 7h8M8 11h8M8 15h6"/></svg>Artigos</a><a class="{{ request()->routeIs('admin.lessons.*') ? 'active' : '' }}" href="{{ route('admin.lessons.index') }}"><svg viewBox="0 0 24 24"><path d="M4 19.5V6a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM8 8h8M8 12h6"/></svg>Fichas de estudo</a><a class="{{ request()->routeIs('admin.glossary.*') ? 'active' : '' }}" href="{{ route('admin.glossary.index') }}"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h4M16 13h.01"/></svg>Glossário</a><a class="{{ request()->routeIs('admin.topics.*') ? 'active' : '' }}" href="{{ route('admin.topics.index') }}"><svg viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg>Temas</a>@if(auth()->user()->isAdmin())<a class="{{ request()->routeIs('admin.categories.*') ? 'active' : '' }}" href="{{ route('admin.categories.index') }}"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Categorias</a>@endif</nav>
+        <nav class="nav">@if(!$adminIsPlatform && auth()->user()->hasPermission('question.create'))<a class="{{ request()->routeIs('admin.questions.*') ? 'active' : '' }}" href="{{ route('admin.questions.index') }}"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6zM15 3v5h5M9 12h7M9 16h7"/></svg>Perguntas</a>@endif<a class="{{ request()->routeIs('admin.signs.*') ? 'active' : '' }}" href="{{ route('admin.signs.index') }}"><svg viewBox="0 0 24 24"><path d="M12 3 2 21h20zM12 9v5M12 18h.01"/></svg>Sinais</a>@if(auth()->user()->isAdmin())<a class="{{ request()->routeIs('admin.sign-categories.*') ? 'active' : '' }}" href="{{ route('admin.sign-categories.index') }}"><svg viewBox="0 0 24 24"><path d="M3 5h7v6H3zM14 5h7v6h-7zM3 15h7v4H3zM14 15h7v4h-7z"/></svg>Categorias de sinais</a>@endif<a class="{{ request()->routeIs('admin.articles.*') ? 'active' : '' }}" href="{{ route('admin.articles.index') }}"><svg viewBox="0 0 24 24"><path d="M5 3h14v18H5zM8 7h8M8 11h8M8 15h6"/></svg>Artigos</a><a class="{{ request()->routeIs('admin.lessons.*') ? 'active' : '' }}" href="{{ route('admin.lessons.index') }}"><svg viewBox="0 0 24 24"><path d="M4 19.5V6a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM8 8h8M8 12h6"/></svg>Fichas de estudo</a><a class="{{ request()->routeIs('admin.glossary.*') ? 'active' : '' }}" href="{{ route('admin.glossary.index') }}"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h4M16 13h.01"/></svg>Glossário</a><a class="{{ request()->routeIs('admin.topics.*') ? 'active' : '' }}" href="{{ route('admin.topics.index') }}"><svg viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg>Temas</a>@if(auth()->user()->isAdmin())<a class="{{ request()->routeIs('admin.categories.*') ? 'active' : '' }}" href="{{ route('admin.categories.index') }}"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Categorias</a>@endif</nav>
         @if(auth()->user()->isAdmin())
             <nav class="nav"><a class="{{ request()->routeIs('admin.publications.*') ? 'active' : '' }}" href="{{ route('admin.publications.index') }}"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 8l5-5 5 5M5 14v6h14v-6"/></svg>Publicação</a></nav>
             <span class="nav-label">Operação da plataforma</span>
@@ -89,16 +90,12 @@
         <header class="topbar">
             <div class="page-heading"><button class="menu-button" type="button" data-sidebar-open aria-expanded="false" aria-controls="sidebar" aria-label="Abrir menu">☰</button><div><span class="topbar-context">{{ $adminContextLabel }}</span><h1>{{ $adminPageTitle }}</h1><p>@yield('page-subtitle', 'Gestão ProntoVia')</p></div></div>
             @if($adminSearch)<form class="search" action="{{ $adminSearch[0] }}" role="search" aria-label="{{ $adminSearch[1] }}"><label class="sr-only" for="admin-context-search">{{ $adminSearch[1] }}</label><input id="admin-context-search" name="q" value="{{ request('q') }}" placeholder="{{ $adminSearch[2] }}"><button aria-label="Pesquisar">⌕</button></form>@else<div class="topbar-search-placeholder"><span>{{ $adminSectionLabel }}</span></div>@endif
-            <div class="admin-user"><span class="avatar">{{ str(auth()->user()->name)->substr(0, 1)->upper() }}</span><div><strong>{{ auth()->user()->name }}</strong><small>{{ auth()->user()->isAdmin() ? 'Administrador' : auth()->user()->school?->name }}</small></div></div>
+            <div class="admin-user"><span class="avatar">{{ str(auth()->user()->name)->substr(0, 1)->upper() }}</span><div><strong>{{ auth()->user()->name }}</strong><small>{{ auth()->user()->roleLabel() }}{{ auth()->user()->school ? ' · '.auth()->user()->school->name : '' }}</small></div></div>
         </header>
         @unless(request()->routeIs('admin.dashboard'))
             <nav class="breadcrumbs" aria-label="Caminho da página"><a href="{{ route('admin.dashboard') }}">Início</a><span aria-hidden="true">/</span>@if($adminSectionLabel !== $adminPageTitle)<span>{{ $adminSectionLabel }}</span><span aria-hidden="true">/</span>@endif<strong aria-current="page">{{ $adminPageTitle }}</strong></nav>
         @endunless
         <main class="content" id="admin-content">
-            <div class="context-banner" role="note">
-                <span class="context-banner-icon" aria-hidden="true">{{ $adminIsPlatform ? 'P' : 'E' }}</span>
-                <span><strong>{{ $adminContextLabel }}</strong><small>{{ $adminIsPlatform ? 'Governação do conteúdo, utilizadores e operação global.' : 'Turmas, alunos, provas e evolução da sua escola.' }}</small></span>
-            </div>
             @if(session('status'))<div class="alert" role="status"><strong>Operação concluída.</strong><span>{{ session('status') }}</span></div>@endif
             @if($errors->any())<div class="errors" role="alert" tabindex="-1" data-error-summary><strong>Existem dados que precisam da sua atenção:</strong><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
             @yield('content')
@@ -113,6 +110,44 @@ var adminLoadingTimer;
 var adminSidebar = document.getElementById('sidebar');
 var adminSidebarOpen = document.querySelector('[data-sidebar-open]');
 var adminSidebarBackdrop = document.querySelector('.sidebar-backdrop');
+
+function enhanceAdminNavigation() {
+    if (!adminSidebar) return;
+    adminSidebar.querySelectorAll('.nav-label').forEach(function (label, index) {
+        var panel = label.nextElementSibling;
+        if (!panel?.matches('nav.nav')) return;
+
+        var group = document.createElement('section');
+        group.className = 'nav-group';
+        var button = document.createElement('button');
+        var panelId = 'admin-nav-group-' + index;
+        var storageKey = 'prontovia-nav-' + label.textContent.trim().toLowerCase().replace(/\s+/g, '-');
+        var containsCurrent = Boolean(panel.querySelector('.active'));
+        var stored = window.localStorage.getItem(storageKey);
+        var open = containsCurrent || stored === 'open';
+
+        button.type = 'button';
+        button.className = 'nav-label nav-group-toggle';
+        button.innerHTML = '<span>' + label.textContent.trim() + '</span><span class="nav-chevron" aria-hidden="true">⌄</span>';
+        button.setAttribute('aria-controls', panelId);
+        button.setAttribute('aria-expanded', String(open));
+        panel.id = panelId;
+        panel.hidden = !open;
+
+        label.parentNode.insertBefore(group, label);
+        group.append(button, panel);
+        label.remove();
+        button.addEventListener('click', function () {
+            var expanded = button.getAttribute('aria-expanded') === 'true';
+            button.setAttribute('aria-expanded', String(!expanded));
+            panel.hidden = expanded;
+            window.localStorage.setItem(storageKey, expanded ? 'closed' : 'open');
+        });
+    });
+    adminSidebar.classList.add('nav-enhanced');
+}
+
+enhanceAdminNavigation();
 
 function setAdminSidebar(open) {
     if (!adminSidebar || !adminSidebarOpen) return;

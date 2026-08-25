@@ -51,8 +51,10 @@ class PaymentApiTest extends TestCase
         $this->withToken($token)->getJson('/api/v1/mobile/payments/plans')
             ->assertOk()
             ->assertJsonPath('moeda', 'MZN')
-            ->assertJsonPath('planos.0.chave', 'completo')
-            ->assertJsonPath('planos.0.preco', 500)
+            ->assertJsonPath('planos.0.chave', 'free')
+            ->assertJsonPath('planos.1.chave', 'plus')
+            ->assertJsonPath('planos.2.chave', 'school')
+            ->assertJsonPath('planos.1.compravel', true)
             // O ecrã de desbloqueio pedia para pagar sem dizer quanto nem para
             // que número: ambos passam a vir do servidor.
             ->assertJsonPath('telefone', '+258 84 123 4567')
@@ -60,7 +62,7 @@ class PaymentApiTest extends TestCase
             // A promessa vem do servidor para o negócio a afinar sem deploy.
             ->assertJsonPath('promessa', 'Chega ao INATRO sem dúvidas.')
             ->assertJsonPath('garantia', 'Não gostaste? Devolvemos em 7 dias, sem perguntas.')
-            ->assertJsonPath('planos.0.periodo', '3 meses');
+            ->assertJsonPath('acesso.produto', 'free');
     }
 
     public function test_guarantee_can_be_switched_off_without_a_deploy(): void
@@ -133,6 +135,8 @@ class PaymentApiTest extends TestCase
             ->postJson('/api/v1/mobile/payments', ['plan' => 'completo', 'method' => 'mpesa'])
             ->assertStatus(201)
             ->assertJsonPath('estado', Payment::PAGO)
+            ->assertJsonPath('produto', 'plus')
+            ->assertJsonPath('acesso.produto', 'plus')
             ->assertJsonPath('acesso.plano', 'pago');
 
         // O C2B prova a posse do número com o PIN; o SMS deixa de ser preciso.

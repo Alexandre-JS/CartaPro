@@ -9,6 +9,7 @@ use App\Models\ContentPackage;
 use App\Models\Exam;
 use App\Models\ExamSession;
 use App\Models\LicenseCategory;
+use App\Models\Plan;
 use App\Models\Question;
 use App\Models\School;
 use App\Models\Sign;
@@ -159,6 +160,31 @@ class ManagementController extends Controller
         return response()->json(School::withCount(['users'])->latest()->paginate(20));
     }
 
+    public function plans(): JsonResponse
+    {
+        return response()->json(Plan::orderBy('sort_order')->get());
+    }
+
+    public function updatePlan(Request $request, Plan $plan): JsonResponse
+    {
+        $data = $request->validate([
+            'name' => ['sometimes', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'price' => ['sometimes', 'numeric', 'min:0'],
+            'currency' => ['sometimes', 'string', 'size:3'],
+            'duration_days' => ['nullable', 'integer', 'min:1'],
+            'features' => ['sometimes', 'array'],
+            'features.*' => ['string', 'max:80'],
+            'is_purchasable' => ['sometimes', 'boolean'],
+            'is_active' => ['sometimes', 'boolean'],
+            'sort_order' => ['sometimes', 'integer', 'min:0'],
+        ]);
+
+        $plan->update($data);
+
+        return response()->json($plan->fresh());
+    }
+
     public function storeSchool(Request $request): JsonResponse
     {
         return response()->json(School::create($this->schoolData($request)), 201);
@@ -195,7 +221,9 @@ class ManagementController extends Controller
 
     public function storeUnlock(Request $request): JsonResponse
     {
-        $data = $request->validate(['phone' => ['required', 'string', 'max:30', 'unique:unlocks'], 'plan' => ['required', 'string', 'max:50'], 'payment_method' => ['nullable', 'string'], 'payment_reference' => ['nullable', 'string', 'unique:unlocks'], 'expires_at' => ['nullable', 'date']]);
+        $data = $request->validate(['phone' => ['required', 'string', 'max:30', 'unique:unlocks'], 'plan' => ['required', Rule::in([Plan::PLUS, Plan::LEGACY_COMPLETE])], 'payment_method' => ['nullable', 'string'], 'payment_reference' => ['nullable', 'string', 'unique:unlocks'], 'expires_at' => ['nullable', 'date']]);
+
+        $data['plan'] = Plan::canonical($data['plan']);
 
         return response()->json(Unlock::create($data + ['unlocked_at' => now(), 'is_active' => true, 'created_by' => $request->user()->id]), 201);
     }
@@ -204,7 +232,9 @@ class ManagementController extends Controller
     {
         $this->assertSchoolAccess($request, $school);
 
-        return response()->json($school->classrooms()->withCount('students')->get());
+        return response()->json($school->classrooms()->withCount('students')
+            ->when($request->user()->isInstructor(), fn (Builder $query) => $query->whereHas('instructors', fn (Builder $instructors) => $instructors->where('user_id', $request->user()->id)))
+            ->get());
     }
 
     public function storeClassroom(Request $request, School $school): JsonResponse
@@ -258,6 +288,7 @@ class ManagementController extends Controller
     {
         $this->assertExamAccess($request, $exam);
         $classroom = Classroom::whereKey($request->validate(['classroom_id' => ['required', 'exists:classrooms,id']])['classroom_id'])->where('school_id', $exam->school_id)->firstOrFail();
+        abort_unless($request->user()->canAccessClassroom($classroom), 403);
         do {
             $code = Str::upper(Str::random(6));
         } while (ExamSession::where('code', $code)->exists());
@@ -269,7 +300,9 @@ class ManagementController extends Controller
     {
         $this->assertExamAccess($request, $exam);
 
-        return response()->json($exam->sessions()->with(['classroom', 'attempts.student'])->get());
+        return response()->json($exam->sessions()->with(['classroom', 'attempts.student'])
+            ->when($request->user()->isInstructor(), fn (Builder $query) => $query->whereHas('classroom.instructors', fn (Builder $instructors) => $instructors->where('user_id', $request->user()->id)))
+            ->get());
     }
 
     /**
@@ -321,8 +354,8 @@ class ManagementController extends Controller
 
     private function userData(Request $request, ?User $user = null): array
     {
-        $data = $request->validate(['name' => ['required', 'string'], 'email' => ['required', 'email', Rule::unique('users')->ignore($user)], 'role' => ['required', 'in:admin,school'], 'school_id' => ['nullable', 'exists:schools,id'], 'password' => [$user ? 'nullable' : 'required', 'string', 'min:8'], 'is_active' => ['boolean']]);
-        if ($data['role'] === 'school') {
+        $data = $request->validate(['name' => ['required', 'string'], 'email' => ['required', 'email', Rule::unique('users')->ignore($user)], 'role' => ['required', Rule::in(['admin', 'school', 'platform_admin', 'school_owner', 'school_admin', 'content_author', 'content_reviewer'])], 'school_id' => ['nullable', 'exists:schools,id'], 'password' => [$user ? 'nullable' : 'required', 'string', 'min:8'], 'is_active' => ['boolean']]);
+        if (in_array($data['role'], ['school', 'school_owner', 'school_admin'], true)) {
             abort_unless($data['school_id'] ?? null, 422, 'A escola é obrigatória.');
         } else {
             $data['school_id'] = null;
@@ -345,7 +378,7 @@ class ManagementController extends Controller
 
     private function assertClassroomAccess(Request $request, Classroom $classroom): void
     {
-        abort_if($request->user()->isSchool() && $request->user()->school_id !== $classroom->school_id, 403);
+        abort_unless($request->user()->canAccessClassroom($classroom), 403);
     }
 
     private function assertExamAccess(Request $request, Exam $exam): void

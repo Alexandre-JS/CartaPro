@@ -130,8 +130,30 @@ return [
     */
 
     'plans' => [
+        'free' => [
+            'nome' => 'ProntoVia Free',
+            'descricao' => 'Conteúdo essencial, treino e progresso básico.',
+            'preco' => 0,
+            'dias' => 0,
+            'periodo' => 'Sem prazo',
+        ],
+        'plus' => [
+            'nome' => env('PAYMENTS_PLAN_NAME', 'ProntoVia+'),
+            'descricao' => 'Treino personalizado, simulados e recursos premium.',
+            'preco' => (float) env('PAYMENTS_PRICE', 129),
+            'dias' => (int) env('PAYMENTS_DAYS', 90),
+            'periodo' => env('PAYMENTS_PERIOD_LABEL', '3 meses'),
+        ],
+        'school' => [
+            'nome' => 'ProntoVia Escolas',
+            'descricao' => 'Turmas, instrutores, tarefas, testes, resultados e analytics.',
+            'preco' => 0,
+            'dias' => 0,
+            'periodo' => 'Por vínculo escolar',
+        ],
+        // Alias de entrada temporário; não é apresentado no novo catálogo.
         'completo' => [
-            'nome' => env('PAYMENTS_PLAN_NAME', 'Plano completo'),
+            'nome' => env('PAYMENTS_PLAN_NAME', 'ProntoVia+'),
             'descricao' => 'Todo o banco de perguntas, exames completos e material sem cadeado.',
             'preco' => (float) env('PAYMENTS_PRICE', 129),
             'dias' => (int) env('PAYMENTS_DAYS', 90),

@@ -21,9 +21,10 @@ class ExamSessionController extends Controller
         return view('admin.sessions.index', [
             'sessions' => ExamSession::with(['exam.school', 'classroom'])->withCount('attempts')
                 ->when($request->user()->isSchool(), fn ($query) => $query->whereHas('exam', fn ($exam) => $exam->where('school_id', $schoolId)))
+                ->when($request->user()->isInstructor(), fn ($query) => $query->whereHas('classroom.instructors', fn ($instructors) => $instructors->where('user_id', $request->user()->id)))
                 ->latest()->paginate(15),
             'exams' => Exam::with('school')->where('is_active', true)->where('is_public', false)->whereNotNull('school_id')->when($request->user()->isSchool(), fn ($query) => $query->where('school_id', $schoolId))->orderBy('name')->get(),
-            'classrooms' => Classroom::with('school')->where('is_active', true)->when($request->user()->isSchool(), fn ($query) => $query->where('school_id', $schoolId))->orderBy('name')->get(),
+            'classrooms' => Classroom::with('school')->where('is_active', true)->when($request->user()->isSchool(), fn ($query) => $query->where('school_id', $schoolId))->when($request->user()->isInstructor(), fn ($query) => $query->whereHas('instructors', fn ($instructors) => $instructors->where('user_id', $request->user()->id)))->orderBy('name')->get(),
         ]);
     }
 
@@ -36,6 +37,7 @@ class ExamSessionController extends Controller
             throw ValidationException::withMessages(['classroom_id' => 'Selecione uma turma da mesma escola da prova.']);
         }
         abort_if($request->user()->isSchool() && $exam->school_id !== $request->user()->school_id, 403);
+        abort_unless($request->user()->canAccessClassroom($classroom), 403);
         do {
             $code = Str::upper(Str::random(6));
         } while (ExamSession::where('code', $code)->exists());
@@ -67,6 +69,6 @@ class ExamSessionController extends Controller
 
     private function assertAccess(Request $request, ExamSession $session): void
     {
-        abort_if($request->user()->isSchool() && $session->exam->school_id !== $request->user()->school_id, 403);
+        abort_unless($request->user()->canAccessClassroom($session->classroom), 403);
     }
 }

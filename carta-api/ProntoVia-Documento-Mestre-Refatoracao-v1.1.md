@@ -1025,7 +1025,7 @@ Criar:
 
 ## Fase 3 — Identidade e vínculo escolar
 
-Criar:
+- [x] criar:
 
 ```text
 school_memberships
@@ -1033,21 +1033,35 @@ school_memberships
 
 Implementar:
 
-- convite;
-- associação;
-- desvinculação;
-- mudança de escola;
-- preservação do histórico.
+- [x] convite iniciado por uma escola para uma conta ProntoVia existente;
+- [x] associação aceite exclusivamente pelo candidato;
+- [x] desvinculação pelo candidato e gestão de suspensão/conclusão pela escola;
+- [x] mudança de escola com encerramento do vínculo anterior;
+- [x] preservação do histórico pessoal, que continua ligado apenas a `mobile_users`;
+- [x] validação de pertença entre escola, turma e registo de aluno;
+- [x] isolamento de acesso entre escolas;
+- [x] endpoints em `/api/v1/school-memberships` e endpoints de gestão escolar;
+- [x] validar os testes do backend no fecho da fase (180 testes/806 asserções).
+
+**Estado da Fase 3 no backend:** concluída em 25 de agosto de 2026.
 
 ## Fase 4 — Instrutores e permissões
 
-- entidade de instrutor;
-- vínculo instrutor–turma;
-- RBAC granular.
+- [x] criar entidade própria de instrutor ligada a uma conta do painel e a uma escola;
+- [x] implementar vínculo muitos-para-muitos entre instrutores e turmas;
+- [x] criar permissões administráveis e atribuição por papel ou diretamente ao utilizador;
+- [x] suportar `platform_admin`, `school_owner`, `school_admin`, `instructor`, `content_author` e `content_reviewer`;
+- [x] preservar `admin` e `school` como aliases legados durante a migração;
+- [x] proteger operações de perguntas, provas, turmas, alunos, analítica e instrutores por permissão;
+- [x] limitar instrutores às turmas que lhes foram atribuídas;
+- [x] devolver papel, rótulo e permissões efetivas na autenticação da API;
+- [x] validar os testes do backend no fecho da fase (186 testes/836 asserções).
+
+**Estado da Fase 4 no backend:** concluída em 25 de agosto de 2026.
 
 ## Fase 5 — Learning Core
 
-Criar/refatorar:
+- [x] criar/refatorar:
 
 ```text
 LearningProfile
@@ -1057,7 +1071,21 @@ StudyRecommendation
 ReadinessScore
 ```
 
+- [x] derivar o domínio Learning da telemetria móvel existente, sem duplicar o histórico pessoal;
+- [x] registar eventos deduplicados para respostas, simulados e conteúdos lidos;
+- [x] calcular domínio por tema a partir de precisão, volume e atividade recente;
+- [x] calcular prontidão com decomposição por tema e desempenho recente em simulados;
+- [x] gerar recomendações para temas fracos, revisões vencidas e início de aprendizagem;
+- [x] expor perfil, eventos, prontidão e recomendações em endpoints autenticados;
+- [x] manter todos os dados Learning privados e pertencentes à conta do candidato;
+- [x] validar os testes do backend no fecho da fase (189 testes/862 asserções).
+
+**Estado da Fase 5 no backend:** concluída em 25 de agosto de 2026.
+
 ## Fase 6 — Nova experiência do candidato
+
+**Estado:** adiada por decisão de escopo. Esta fase pertence à aplicação móvel
+e será retomada depois da refatoração prioritária do backend.
 
 Navegação:
 
@@ -1079,12 +1107,18 @@ Minha Escola
 
 Evoluir:
 
-- tarefas;
-- instrutores;
-- testes;
-- turmas;
-- analytics;
-- acompanhamento.
+- [x] tarefas para turmas ou candidatos com treino, leitura, simulado, teste e revisão;
+- [x] distribuição apenas a candidatos com vínculo escolar ativo;
+- [x] acompanhamento de estado atribuído, em curso e concluído;
+- [x] preservação do histórico concluído depois da saída da escola, sem manter acesso a tarefas abertas;
+- [x] instrutores e atribuição a turmas, implementados na Fase 4;
+- [x] testes, sessões e resultados escolares preservados e protegidos por permissão;
+- [x] turmas, alunos e vínculos escolares integrados;
+- [x] analytics por turma e progresso de tarefas;
+- [x] isolamento de instrutores às turmas atribuídas;
+- [x] validar os testes do backend no fecho da fase (193 testes/882 asserções).
+
+**Estado da Fase 7 no backend:** concluída em 25 de agosto de 2026.
 
 ## Fase 8 — Monetização
 
@@ -1095,6 +1129,65 @@ Free
 Plus
 School
 ```
+
+- [x] catálogo de planos migrado para dados administráveis (`plans`), sem exigir deploy para alterar preço, duração, recursos ou disponibilidade;
+- [x] `Free` definido como produto base do candidato;
+- [x] `Plus` definido como único produto individual comprável, com pagamento e desbloqueio normalizados para `plus`;
+- [x] `School` concedido pelo backend apenas a candidatos com vínculo escolar ativo e escola ativa;
+- [x] prioridade de entitlement centralizada em `School > Plus > Free`;
+- [x] alias legado `completo` aceito na entrada e normalizado para `plus` durante a transição;
+- [x] contrato legado `plano: gratis|pago` preservado até à futura fase mobile, acompanhado pelos novos campos `produto` e `nomePlano`;
+- [x] endpoints administrativos para consultar e atualizar o catálogo de planos;
+- [x] `Free` e `School` impedidos de entrar no fluxo de cobrança individual;
+- [x] testes direcionados da fase (43 testes/165 asserções) e suíte completa do backend (197 testes/910 asserções).
+
+**Estado da Fase 8 no backend:** concluída em 25 de agosto de 2026. A migration `000029` foi validada em SQLite descartável e ainda não foi aplicada à base local, por decisão de segurança.
+
+## Fase 9 — Rebranding técnico do backend
+
+- [x] identidade do pacote Composer alterada de `laravel/laravel` para `prontovia/backend`;
+- [x] descrição e palavras-chave técnicas alinhadas à plataforma ProntoVia;
+- [x] ambiente de referência já usa `APP_NAME="ProntoVia API"` e base `prontovia`;
+- [x] referências do backend ao projeto móvel legado retiradas da documentação operacional;
+- [x] logotipos CartaPro antigos, sem utilização, removidos dos assets distribuídos;
+- [x] comandos operacionais usam o namespace `prontovia:*`;
+- [x] aliases `cartapro:*` mantidos temporariamente para não quebrar cron jobs já configurados;
+- [x] identificadores e mudanças do aplicativo móvel continuam adiados com a Fase 6;
+- [x] validar o manifesto Composer e os testes do backend no fecho da fase (200 testes/924 asserções).
+
+**Estado da Fase 9 no backend:** concluída em 25 de agosto de 2026. Não exigiu migration de base de dados.
+
+## Fase 10 — Segurança e preparação operacional
+
+- [x] auditar dependências bloqueadas com o Composer;
+- [x] eliminar 6 alertas de segurança de `league/commonmark`, incluindo vulnerabilidades de negação de serviço e filtragem de links;
+- [x] atualizar apenas `league/commonmark` (2.8.3 → 2.10.0) e a dependência necessária `nette/schema` (1.3.5 → 1.3.6);
+- [x] adicionar cabeçalhos globais contra MIME sniffing, framing indevido e exposição desnecessária de capacidades do navegador;
+- [x] ativar HSTS apenas em pedidos HTTPS, evitando forçar comportamento incorreto no desenvolvimento HTTP;
+- [x] explicitar cookies de sessão cifrados, Secure, HttpOnly e SameSite=Lax no ambiente de referência;
+- [x] adiar CSP rígida até existir inventário dos recursos externos usados pelo website;
+- [x] validar auditoria sem alertas, testes específicos (6 testes/31 asserções) e suíte completa (203 testes/941 asserções) no fecho da fase.
+
+**Estado da Fase 10 no backend:** concluída em 25 de agosto de 2026. Não exigiu migration de base de dados.
+
+## Fase 11 — Design system e UI operacional
+
+Escopo: painel web administrativo e escolar. A experiência mobile permanece adiada com a Fase 6.
+
+- [x] pesquisar padrões oficiais para shell de aplicações modulares, navegação lateral, tabelas densas e acessibilidade;
+- [x] manter a paleta ProntoVia com índigo e ciano para marca, laranja para destaque e cores semânticas separadas;
+- [x] organizar os módulos em grupos recolhíveis de dois níveis, preservando o grupo da página atual aberto;
+- [x] guardar localmente a preferência de grupos abertos sem transformar o frontend em fonte de autorização;
+- [x] reduzir cards e sombras, usando superfícies contínuas, divisores e espaço para definir hierarquia;
+- [x] criar componentes Blade reutilizáveis para cabeçalhos de página, toolbars de dados, tabelas, estados, formulários, paginação, diálogos e estados vazios;
+- [x] alinhar os módulos de maior densidade inicial (`Perguntas` e `Escolas`) ao novo padrão;
+- [x] padronizar tabelas para largura útil, cabeçalhos semânticos, hover/focus de linha, paginação e ações consistentes;
+- [x] garantir foco visível, navegação por teclado, skip link e adaptação do shell para ecrãs menores;
+- [x] validar testes direcionados (28 testes/137 asserções) e suíte completa (206 testes/962 asserções) no fecho da etapa.
+
+Referências adotadas: Carbon UI Shell e Data Table, GOV.UK Design System e WCAG 2.2. O padrão limita a navegação a dois níveis e usa tabs dentro da página quando um terceiro nível seria necessário.
+
+**Estado da Fase 11 no painel web:** concluída em 25 de agosto de 2026. O shell e os estilos transversais cobrem todos os módulos; `Perguntas` e `Escolas` são as referências para a migração progressiva das views específicas.
 
 ---
 

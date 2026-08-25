@@ -13,6 +13,7 @@ use App\Models\Question;
 use App\Models\School;
 use App\Models\Student;
 use App\Models\Topic;
+use App\Models\User;
 use App\Support\Grading;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -26,7 +27,7 @@ class DashboardController extends Controller
         $questionQuery = Question::query()->when($request->user()->isSchool(), fn ($query) => $query->where('school_id', $request->user()->school_id));
 
         $analytics = $request->user()->isSchool()
-            ? $this->schoolAnalytics($request->user()->school_id)
+            ? $this->schoolAnalytics($request->user())
             : $this->platformAnalytics();
 
         return view('admin.dashboard', [
@@ -39,7 +40,9 @@ class DashboardController extends Controller
             'rejectedCount' => (clone $questionQuery)->where('status', 'rejected')->count(),
             'draftCount' => (clone $questionQuery)->where('status', 'draft')->count(),
             'recentQuestions' => (clone $questionQuery)->with('topic')->latest('updated_at')->limit(5)->get(),
-            'classroomsCount' => Classroom::when($request->user()->isSchool(), fn ($query) => $query->where('school_id', $request->user()->school_id))->count(),
+            'classroomsCount' => Classroom::when($request->user()->isSchool(), fn ($query) => $query->where('school_id', $request->user()->school_id))
+                ->when($request->user()->isInstructor(), fn ($query) => $query->whereHas('instructors', fn ($instructors) => $instructors->where('user_id', $request->user()->id)))
+                ->count(),
             'examsCount' => Exam::when($request->user()->isSchool(), fn ($query) => $query->where('school_id', $request->user()->school_id))->count(),
             'lastPackage' => ContentPackage::where('status', 'published')->latest('published_at')->first(),
             'schoolsCount' => School::where('is_active', true)->count(),
@@ -51,11 +54,17 @@ class DashboardController extends Controller
     }
 
     /** @return array<string, mixed> */
-    private function schoolAnalytics(int $schoolId): array
+    private function schoolAnalytics(User $user): array
     {
-        $attemptQuery = ExamAttempt::query()->whereHas('session.classroom', fn (Builder $query) => $query->where('school_id', $schoolId));
+        $classroomIds = $user->isInstructor() ? $user->instructor?->classrooms()->pluck('classrooms.id') : null;
+        $attemptQuery = ExamAttempt::query()->whereHas('session.classroom', fn (Builder $query) => $query
+            ->where('school_id', $user->school_id)
+            ->when($classroomIds !== null, fn (Builder $assigned) => $assigned->whereIn('classrooms.id', $classroomIds)));
         $attempts = (clone $attemptQuery)->where('submitted_at', '>=', now()->subDays(30))->get(['student_id', 'score', 'total', 'weak_topics', 'submitted_at']);
-        $studentsCount = Student::whereHas('classroom', fn (Builder $query) => $query->where('school_id', $schoolId))->where('is_active', true)->count();
+        $studentsCount = Student::whereHas('classroom', fn (Builder $query) => $query
+            ->where('school_id', $user->school_id)
+            ->when($classroomIds !== null, fn (Builder $assigned) => $assigned->whereIn('classrooms.id', $classroomIds)))
+            ->where('is_active', true)->count();
         $validGradeSql = Grading::validGradeSql();
         $readyStudentsCount = (clone $attemptQuery)->select('student_id')
             ->selectRaw('SUM(CASE WHEN '.$validGradeSql.' THEN 1 ELSE 0 END) as valid_grades')
@@ -78,7 +87,10 @@ class DashboardController extends Controller
             'attemptsLast30Count' => $attempts->count(),
             'averageLast30' => $average,
             'readyStudentsCount' => $readyStudentsCount,
-            'activeSessionsCount' => ExamSession::whereHas('classroom', fn (Builder $query) => $query->where('school_id', $schoolId))->where('status', 'in_progress')->count(),
+            'activeSessionsCount' => ExamSession::whereHas('classroom', fn (Builder $query) => $query
+                ->where('school_id', $user->school_id)
+                ->when($classroomIds !== null, fn (Builder $assigned) => $assigned->whereIn('classrooms.id', $classroomIds)))
+                ->where('status', 'in_progress')->count(),
             'studentParticipation' => $studentsCount ? (int) round(($activeStudents / $studentsCount) * 100) : 0,
             'dailySchoolActivity' => $daily,
             'schoolWeakTopics' => $weakTopics,

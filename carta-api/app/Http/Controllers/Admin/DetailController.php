@@ -105,12 +105,12 @@ class DetailController extends Controller
     {
         $user->load('school');
 
-        return $this->detail($user->name, 'Conta de acesso ao painel.', route('admin.users.index'), ['Email' => $user->email, 'Papel' => $user->isAdmin() ? 'Administrador' : 'Escola', 'Escola' => $user->school?->name ?? '—', 'Estado' => $user->is_active ? 'Ativo' : 'Inativo', 'Criado em' => $user->created_at->format('d/m/Y H:i')], route('admin.users.edit', $user));
+        return $this->detail($user->name, 'Conta de acesso ao painel.', route('admin.users.index'), ['Email' => $user->email, 'Papel' => $user->roleLabel(), 'Escola' => $user->school?->name ?? '—', 'Estado' => $user->is_active ? 'Ativo' : 'Inativo', 'Criado em' => $user->created_at->format('d/m/Y H:i')], route('admin.users.edit', $user));
     }
 
     public function classroom(Request $request, Classroom $classroom): View
     {
-        abort_if($request->user()->isSchool() && $classroom->school_id !== $request->user()->school_id, 403);
+        abort_unless($request->user()->canAccessClassroom($classroom), 403);
         $classroom->load(['school', 'students'])->loadCount('sessions');
 
         return $this->detail($classroom->name, 'Turma e alunos associados.', route('admin.classrooms.index'), ['Escola' => $classroom->school->name, 'Código' => $classroom->code, 'Ano' => $classroom->year ?: '—', 'Alunos' => $classroom->students->pluck('name')->join(', ') ?: 'Sem alunos', 'Sessões' => $classroom->sessions_count, 'Estado' => $classroom->is_active ? 'Ativa' : 'Inativa']);
@@ -128,6 +128,7 @@ class DetailController extends Controller
     {
         $session->load(['exam.school', 'classroom', 'attempts.student']);
         $this->assertExamAccess($request, $session->exam);
+        abort_unless($request->user()->canAccessClassroom($session->classroom), 403);
 
         return $this->detail('Sessão '.$session->code, 'Aplicação de prova.', route('admin.sessions.index'), ['Prova' => $session->exam->name, 'Escola' => $session->exam->school?->name ?? '—', 'Turma' => $session->classroom->name, 'Estado' => $this->status($session->status), 'Submissões' => $session->attempts->count(), 'Alunos submetidos' => $session->attempts->pluck('student.name')->join(', ') ?: 'Nenhum', 'Início' => $session->starts_at?->format('d/m/Y H:i') ?? '—', 'Fim' => $session->ends_at?->format('d/m/Y H:i') ?? '—']);
     }
@@ -136,6 +137,7 @@ class DetailController extends Controller
     {
         $attempt->load(['student', 'session.exam.school', 'session.exam.questions.topic', 'session.classroom']);
         $this->assertExamAccess($request, $attempt->session->exam);
+        abort_unless($request->user()->canAccessClassroom($attempt->session->classroom), 403);
         $answers = $attempt->answers ?? [];
         $answerReview = $attempt->session->exam->questions->map(function (Question $question) use ($answers): array {
             $hasAnswer = array_key_exists($question->external_id, $answers);

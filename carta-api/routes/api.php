@@ -4,10 +4,14 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\ContentController;
 use App\Http\Controllers\Api\V1\DebitoPayWebhookController;
 use App\Http\Controllers\Api\V1\ExamSessionController;
+use App\Http\Controllers\Api\V1\InstructorController;
+use App\Http\Controllers\Api\V1\LearningController;
 use App\Http\Controllers\Api\V1\ManagementController;
 use App\Http\Controllers\Api\V1\MobileController;
 use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\PaySuiteWebhookController;
+use App\Http\Controllers\Api\V1\SchoolMembershipController;
+use App\Http\Controllers\Api\V1\SchoolAssignmentController;
 use App\Http\Controllers\Api\V1\UnlockController;
 use Illuminate\Support\Facades\Route;
 
@@ -88,6 +92,15 @@ Route::prefix('v1')->group(function () {
         Route::get('/articles', [ContentController::class, 'articles']);
         Route::get('/categories', [ContentController::class, 'categories']);
         Route::get('/packages', [ContentController::class, 'packages']);
+        Route::get('/school-memberships', [SchoolMembershipController::class, 'index']);
+        Route::patch('/school-memberships/{membership}/accept', [SchoolMembershipController::class, 'accept'])->whereNumber('membership');
+        Route::patch('/school-memberships/{membership}/leave', [SchoolMembershipController::class, 'leave'])->whereNumber('membership');
+        Route::get('/learning/profile', [LearningController::class, 'profile']);
+        Route::get('/learning/events', [LearningController::class, 'events']);
+        Route::get('/readiness', [LearningController::class, 'readiness']);
+        Route::get('/recommendations', [LearningController::class, 'recommendations']);
+        Route::get('/school-assignments', [SchoolAssignmentController::class, 'candidateIndex']);
+        Route::patch('/school-assignment-progress/{progress}', [SchoolAssignmentController::class, 'updateProgress'])->whereNumber('progress');
     });
 
     /*
@@ -99,25 +112,39 @@ Route::prefix('v1')->group(function () {
         Route::get('/auth/me', [AuthController::class, 'me']);
         Route::post('/auth/logout', [AuthController::class, 'logout']);
 
-        Route::get('/perguntas', [ManagementController::class, 'questions']);
-        Route::post('/perguntas', [ManagementController::class, 'storeQuestion']);
-        Route::put('/perguntas/{question}', [ManagementController::class, 'updateQuestion']);
-        Route::post('/perguntas/{question}/aprovar', [ManagementController::class, 'approveQuestion'])->middleware('role:admin');
-        Route::post('/perguntas/{question}/rejeitar', [ManagementController::class, 'rejectQuestion'])->middleware('role:admin');
+        Route::get('/perguntas', [ManagementController::class, 'questions'])->middleware('permission:question.create');
+        Route::post('/perguntas', [ManagementController::class, 'storeQuestion'])->middleware('permission:question.create,question.submit');
+        Route::put('/perguntas/{question}', [ManagementController::class, 'updateQuestion'])->middleware('permission:question.create');
+        Route::post('/perguntas/{question}/aprovar', [ManagementController::class, 'approveQuestion'])->middleware('permission:question.review');
+        Route::post('/perguntas/{question}/rejeitar', [ManagementController::class, 'rejectQuestion'])->middleware('permission:question.review');
 
         Route::get('/sinais', [ManagementController::class, 'signs']);
         Route::get('/artigos', [ManagementController::class, 'articles']);
         Route::get('/temas', [ManagementController::class, 'topics']);
         Route::get('/categorias-carta', [ManagementController::class, 'categories']);
-        Route::get('/provas', [ManagementController::class, 'exams']);
-        Route::post('/provas', [ManagementController::class, 'storeExam']);
-        Route::post('/provas/{exam}/aplicar', [ManagementController::class, 'applyExam']);
-        Route::get('/provas/{exam}/resultados', [ManagementController::class, 'examResults']);
-        Route::get('/escolas/{school}/turmas', [ManagementController::class, 'classrooms']);
-        Route::post('/escolas/{school}/turmas', [ManagementController::class, 'storeClassroom']);
-        Route::get('/turmas/{classroom}/alunos', [ManagementController::class, 'students']);
-        Route::post('/turmas/{classroom}/alunos', [ManagementController::class, 'storeStudent']);
-        Route::get('/turmas/{classroom}/analitica', [ManagementController::class, 'classroomAnalytics']);
+        Route::get('/provas', [ManagementController::class, 'exams'])->middleware('permission:exam.create');
+        Route::post('/provas', [ManagementController::class, 'storeExam'])->middleware('permission:exam.create');
+        Route::post('/provas/{exam}/aplicar', [ManagementController::class, 'applyExam'])->middleware('permission:exam.publish');
+        Route::get('/provas/{exam}/resultados', [ManagementController::class, 'examResults'])->middleware('permission:analytics.view');
+        Route::get('/escolas/{school}/turmas', [ManagementController::class, 'classrooms'])->middleware('permission:student.view');
+        Route::post('/escolas/{school}/turmas', [ManagementController::class, 'storeClassroom'])->middleware('permission:classroom.manage');
+        Route::get('/turmas/{classroom}/alunos', [ManagementController::class, 'students'])->middleware('permission:student.view');
+        Route::post('/turmas/{classroom}/alunos', [ManagementController::class, 'storeStudent'])->middleware('permission:classroom.manage');
+        Route::get('/turmas/{classroom}/analitica', [ManagementController::class, 'classroomAnalytics'])->middleware('permission:analytics.view');
+        Route::get('/escolas/{school}/vinculos', [SchoolMembershipController::class, 'schoolIndex'])->whereNumber('school')->middleware('permission:classroom.manage');
+        Route::post('/escolas/{school}/vinculos', [SchoolMembershipController::class, 'invite'])->whereNumber('school')->middleware('permission:classroom.manage');
+        Route::patch('/school-memberships/{membership}/status', [SchoolMembershipController::class, 'updateStatus'])->whereNumber('membership')->middleware('permission:classroom.manage');
+        Route::get('/escolas/{school}/instrutores', [InstructorController::class, 'index'])->whereNumber('school')->middleware('permission:instructor.manage');
+        Route::post('/escolas/{school}/instrutores', [InstructorController::class, 'store'])->whereNumber('school')->middleware('permission:instructor.manage');
+        Route::put('/instrutores/{instructor}', [InstructorController::class, 'update'])->whereNumber('instructor')->middleware('permission:instructor.manage');
+        Route::post('/instrutores/{instructor}/turmas/{classroom}', [InstructorController::class, 'attachClassroom'])->whereNumber('instructor')->whereNumber('classroom')->middleware('permission:instructor.manage');
+        Route::delete('/instrutores/{instructor}/turmas/{classroom}', [InstructorController::class, 'detachClassroom'])->whereNumber('instructor')->whereNumber('classroom')->middleware('permission:instructor.manage');
+        Route::get('/escolas/{school}/tarefas', [SchoolAssignmentController::class, 'index'])->whereNumber('school')->middleware('permission:assignment.manage');
+        Route::post('/escolas/{school}/tarefas', [SchoolAssignmentController::class, 'store'])->whereNumber('school')->middleware('permission:assignment.manage');
+        Route::put('/tarefas/{assignment}', [SchoolAssignmentController::class, 'update'])->whereNumber('assignment')->middleware('permission:assignment.manage');
+        Route::patch('/tarefas/{assignment}/publicar', [SchoolAssignmentController::class, 'publish'])->whereNumber('assignment')->middleware('permission:assignment.manage');
+        Route::patch('/tarefas/{assignment}/encerrar', [SchoolAssignmentController::class, 'close'])->whereNumber('assignment')->middleware('permission:assignment.manage');
+        Route::get('/tarefas/{assignment}/progresso', [SchoolAssignmentController::class, 'progress'])->whereNumber('assignment')->middleware(['permission:assignment.manage', 'permission:analytics.view']);
 
         Route::middleware('role:admin')->group(function () {
             Route::post('/sinais', [ManagementController::class, 'storeSign']);
@@ -130,6 +157,8 @@ Route::prefix('v1')->group(function () {
             Route::post('/publicar', [ManagementController::class, 'publish']);
             Route::get('/pacotes-gestao', [ManagementController::class, 'managedPackages']);
             Route::get('/escolas', [ManagementController::class, 'schools']);
+            Route::get('/planos', [ManagementController::class, 'plans']);
+            Route::put('/planos/{plan}', [ManagementController::class, 'updatePlan'])->whereNumber('plan');
             Route::post('/escolas', [ManagementController::class, 'storeSchool']);
             Route::put('/escolas/{school}', [ManagementController::class, 'updateSchool']);
             Route::get('/utilizadores', [ManagementController::class, 'users']);

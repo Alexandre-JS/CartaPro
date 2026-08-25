@@ -1,8 +1,8 @@
 # ProntoVia Backend
 
 Backend Laravel que serve o website institucional, a API v1, o ProntoVia Admin
-e o ProntoVia Escolas. A aplicação do candidato permanece no projeto irmão
-`carta-app` e não faz parte da Fase 1 de refatoração do backend.
+e o ProntoVia Escolas. O backend é a fonte de verdade para autenticação,
+conteúdo, aprendizagem, vínculos escolares, permissões e planos.
 
 > Aprenda. Pratique. Esteja pronto.
 

@@ -6,6 +6,7 @@ use App\Support\Phone;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 #[Fillable(['name', 'email', 'phone', 'password', 'license_category', 'is_active'])]
@@ -58,5 +59,45 @@ class MobileUser extends Authenticatable
     public function readContents(): HasMany
     {
         return $this->hasMany(MobileReadContent::class);
+    }
+
+    public function schoolMemberships(): HasMany
+    {
+        return $this->hasMany(SchoolMembership::class);
+    }
+
+    public function learningProfile(): HasOne
+    {
+        return $this->hasOne(LearningProfile::class);
+    }
+
+    public function learningEvents(): HasMany
+    {
+        return $this->hasMany(LearningEvent::class);
+    }
+
+    public function topicMasteries(): HasMany
+    {
+        return $this->hasMany(TopicMastery::class);
+    }
+
+    public function studyRecommendations(): HasMany
+    {
+        return $this->hasMany(StudyRecommendation::class);
+    }
+
+    public function readinessScore(): HasOne
+    {
+        return $this->hasOne(ReadinessScore::class);
+    }
+
+    public function schoolAssignments(): HasMany
+    {
+        return $this->hasMany(SchoolAssignment::class);
+    }
+
+    public function schoolAssignmentProgress(): HasMany
+    {
+        return $this->hasMany(SchoolAssignmentProgress::class);
     }
 }

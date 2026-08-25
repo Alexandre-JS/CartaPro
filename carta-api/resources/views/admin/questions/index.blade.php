@@ -5,10 +5,12 @@
 @section('content')
 @php($hasAdvancedFilters = request()->filled('topic') || request()->filled('type') || request()->filled('category') || request()->filled('status') || request('sort', 'latest') !== 'latest' || request('per_page', 15) != 15)
 @php($activeFilterCount = collect([request('topic'), request('type'), request('category'), request('status')])->filter(fn($value) => filled($value))->count())
-<div class="toolbar"><div><h2 id="question-bank-title">Banco de perguntas</h2><p>{{ $questions->total() }} registos encontrados</p></div><x-admin.button :href="route('admin.questions.create')">＋ Nova pergunta</x-admin.button></div>
-<form class="card question-bank-filters" method="GET">
+<x-admin.page-header id="question-bank-title" title="Banco de perguntas" description="Pesquise, filtre e mantenha o conteúdo de avaliação." :count="$questions->total()">
+    <x-admin.button :href="route('admin.questions.create')">＋ Nova pergunta</x-admin.button>
+</x-admin.page-header>
+<form class="data-toolbar question-bank-filters" method="GET" aria-label="Pesquisar e filtrar perguntas">
     <div class="question-bank-search"><input name="q" value="{{ request('q') }}" aria-label="Pesquisar perguntas" placeholder="Pesquisar por enunciado ou identificador"><x-admin.button type="submit">Pesquisar</x-admin.button><x-admin.button variant="secondary" id="toggle-bank-filters" type="button" aria-expanded="{{ $hasAdvancedFilters ? 'true' : 'false' }}">Filtros @if($activeFilterCount)<span class="filter-count">{{ $activeFilterCount }}</span>@endif</x-admin.button>@if(request()->query())<x-admin.button variant="secondary" :href="route('admin.questions.index')">Limpar</x-admin.button>@endif</div>
-    <div class="question-bank-advanced" id="question-bank-advanced" @hidden(!$hasAdvancedFilters)>
+    <div class="question-bank-advanced" id="question-bank-advanced" @if(!$hasAdvancedFilters) hidden @endif>
         <x-admin.field name="topic" label="Tema" :value="request('topic')" placeholder="Pesquisar pelo nome" />
         <x-admin.field as="select" name="type" label="Tipo"><option value="">Todos</option><option value="teorico" @selected(request('type')==='teorico')>Teórico</option><option value="pratico" @selected(request('type')==='pratico')>Prático</option></x-admin.field>
         <x-admin.field as="select" name="category" label="Categoria"><option value="">Todas</option>@foreach($categories as $category)<option value="{{ $category->slug }}" @selected(request('category')===$category->slug)>{{ $category->name }}</option>@endforeach</x-admin.field>
@@ -18,7 +20,7 @@
         <x-admin.button variant="secondary" type="submit" class="question-filter-apply">Aplicar filtros</x-admin.button>
     </div>
 </form>
-<x-admin.table class="question-bank-table" labelledby="question-bank-title">
+<x-admin.table class="question-bank-table" labelledby="question-bank-title" caption="Banco de perguntas">
 <x-slot:head><tr><th scope="col">Pergunta</th><th scope="col">Classificação</th><th scope="col">Origem</th><th scope="col">Estado</th><th scope="col">Atualização</th><th scope="col">Ações</th></tr></x-slot:head>
 @forelse($questions as $question)
 <tr>
