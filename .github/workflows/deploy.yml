@@ -40,6 +40,13 @@ jobs:
     # pode ser transformada no artefacto de produção.
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    env:
+      APP_ENV: testing
+      DB_CONNECTION: sqlite
+      DB_DATABASE: ':memory:'
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
     defaults:
       run:
         working-directory: carta-api
