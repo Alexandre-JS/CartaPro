@@ -95,6 +95,11 @@ class QuestionAuthoringTest extends TestCase
             'is_active' => true,
         ]));
 
+        $this->actingAs($this->admin)->get(route('admin.questions.index'))
+            ->assertOk()
+            ->assertViewHas('questions', fn ($questions) => $questions->count() === 10
+                && $questions->perPage() === 10);
+
         $this->actingAs($this->admin)->get(route('admin.questions.index', [
             'topic' => 'Prioridade',
             'per_page' => 30,

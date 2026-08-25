@@ -7,7 +7,11 @@
 {{-- Uma prova de escola já aplicada não pode ser promovida no lugar: anular o
      `school_id` retirava à escola o acesso aos resultados dos seus alunos. --}}
 @php($aplicada = $exam->exists && ! $exam->is_public && $exam->sessions()->exists())
-<form class="card form-card exam-form" method="POST" action="{{ $exam->exists ? route('admin.exams.update', $exam) : route('admin.exams.store') }}">@csrf @if($exam->exists)@method('PUT')@endif
+<x-admin.page-header id="exam-edit-title" :title="$exam->exists ? 'Editar prova' : 'Criar prova'" :description="$exam->exists ? 'Altere a configuração e as perguntas enquanto a prova não tiver sido respondida.' : 'Defina o acesso, a duração e as perguntas da nova prova.'">
+    <x-admin.button variant="secondary" :href="route('admin.exams.index')"><i class="bi bi-arrow-left" aria-hidden="true"></i>Voltar às provas</x-admin.button>
+</x-admin.page-header>
+<form class="exam-edit-form" aria-labelledby="exam-edit-title" method="POST" action="{{ $exam->exists ? route('admin.exams.update', $exam) : route('admin.exams.store') }}">@csrf @if($exam->exists)@method('PUT')@endif
+<section class="exam-form-section"><header><h3>Informação da prova</h3><p>Defina o contexto e as regras principais.</p></header>
 <div class="form-grid">
     <x-admin.field class="exam-name" name="name" label="Nome da prova" :value="$exam->name" required />
     @if(auth()->user()->isAdmin())<div class="field"><label>Visibilidade</label><select name="visibility" id="visibility" @disabled($aplicada)><option value="public" @selected(old('visibility', $exam->is_public ? 'public' : null) === 'public')>Pública — aplicativo</option><option value="private" @selected(old('visibility', $exam->is_public ? 'public' : 'private') === 'private')>Privada — escola</option></select>@if($aplicada)<input type="hidden" name="visibility" value="private"><small>Já aplicada em turmas: para a levar ao telemóvel use «Publicar cópia no app» na listagem, que mantém esta prova e os resultados da escola.</small>@else<small>Pública torna a prova visível no aplicativo, desligando-a da escola. Depois de gravar, falta carregar em «Publicar no app».</small>@endif</div><div class="field" id="school-field"><label>Escola da prova privada</label><select name="school_id"><option value="">Selecione a escola</option>@foreach($schools as $school)<option value="{{ $school->id }}" @selected(old('school_id', $exam->school_id) == $school->id)>{{ $school->name }}</option>@endforeach</select></div><div class="field full" id="plan-field"><div class="checks"><label><input type="checkbox" name="is_locked" value="1" @checked(old('is_locked', $exam->is_locked))> Só para o plano completo <small>— o aluno gratuito vê a prova, mas não a abre.</small></label></div></div>@else<input type="hidden" name="visibility" value="private">@endif
@@ -15,11 +19,12 @@
     <x-admin.field name="duration_minutes" label="Duração (minutos)" type="number" min="1" max="300" :value="$exam->duration_minutes ?? \App\Support\Grading::durationMinutes()" required />
     <div class="field"><label>Regra de aprovação</label><input value="{{ $passPercentage }}% — {{ \App\Support\Grading::passScore($defaultQuestionCount) }} acertos em {{ $defaultQuestionCount }} ({{ \App\Support\Grading::passValues() }} valores)" disabled><small>Definida em config/grading.php e calculada proporcionalmente à quantidade escolhida.</small></div>
 
+<div class="field full exam-form-divider"><h3>Seleção de perguntas</h3><p>Escolha como a prova será composta e reveja as perguntas selecionadas.</p></div>
 @if($selada)
     {{-- Prova já respondida: as perguntas ficam seladas. --}}
     <div class="field full"><p class="alert warning">Esta prova já tem {{ $attemptCount }} {{ $attemptCount === 1 ? 'tentativa submetida' : 'tentativas submetidas' }}, por isso as perguntas não podem ser trocadas. As respostas dos alunos ficaram guardadas contra estas perguntas; substituí-las passaria a corrigir provas antigas com perguntas que ninguém viu. O nome, a duração e o acesso continuam editáveis.</p></div>
     <div class="field full"><label>Perguntas da prova <small>{{ $exam->questions->count() }} perguntas, seladas.</small></label>
-        <ol class="sealed-questions">@foreach($exam->questions as $question)<li>{{ $question->external_id }} — {{ $question->statement }}</li>@endforeach</ol>
+        <ol class="sealed-questions">@foreach($exam->questions as $question)<li>{{ $question->statement }}</li>@endforeach</ol>
     </div>
 @else
     <div class="field full"><label>Modo de seleção</label>
@@ -63,13 +68,14 @@
         @forelse($questions as $question)
         <label class="question-choice" data-type="{{ $question->type }}" data-usage="{{ $question->exams_count }}" data-search="{{ str($question->external_id.' '.$question->statement.' '.$question->topic->name.' '.implode(' ', $question->categories))->lower() }}">
             <input type="checkbox" name="question_ids[]" value="{{ $question->id }}" @checked(in_array($question->id, $selecionadas))>
-            <span class="question-description"><strong>{{ $question->external_id }} — {{ $question->statement }}</strong><small>{{ $question->topic->name }} · {{ implode(', ', $question->categories) }} · {{ ucfirst($question->type) }}</small>@if($question->exams_count)<small class="question-exams">Usada em {{ $question->exams_count }} {{ $question->exams_count === 1 ? 'prova' : 'provas' }}: {{ $question->exams->pluck('name')->join(', ') }}</small>@else<small class="question-unused">Nunca usada numa prova</small>@endif</span>
+            <span class="question-description"><strong>{{ $question->statement }}</strong><small>{{ $question->topic->name }} · {{ ucfirst($question->type) }}</small>@if($question->exams_count)<small class="question-exams">Usada em {{ $question->exams_count }} {{ $question->exams_count === 1 ? 'prova' : 'provas' }}</small>@else<small class="question-unused">Nunca usada numa prova</small>@endif</span>
             <span class="usage-badge {{ $question->exams_count ? 'used' : 'unused' }}">{{ $question->exams_count }}×</span>
         </label>
         @empty<div class="empty">Não existem perguntas aprovadas disponíveis.</div>@endforelse
     </div><small id="selected-count">0 perguntas selecionadas</small></div>
 @endif
 </div>
+ </section>
 <dialog class="topic-picker-modal" id="topic-picker-modal" data-source="{{ route('admin.exams.topic-options') }}" aria-labelledby="topic-picker-title">
     <div class="topic-picker-head"><div><h2 id="topic-picker-title">Selecionar temas</h2><p id="topic-picker-count">0 selecionados</p></div><button type="button" id="close-topic-picker" aria-label="Fechar">×</button></div>
     <div class="topic-picker-search"><input type="search" id="topic-search" placeholder="Pesquisar tema" autocomplete="off"></div>
@@ -77,7 +83,7 @@
     <div class="topic-picker-footer"><span id="topic-result-status"></span><button class="btn light small" id="load-more-topics" type="button" hidden>Carregar mais</button><button class="btn small" id="apply-topics" type="button">Concluir</button></div>
 </dialog>
 @if(session('warning'))<p class="alert warning">{{ session('warning') }}</p>@endif
-<div class="form-actions"><x-admin.button variant="secondary" :href="route('admin.exams.index')">Cancelar</x-admin.button><x-admin.button type="submit" loading-label="A guardar…">{{ $exam->exists ? 'Guardar alterações' : 'Criar prova' }}</x-admin.button></div>
+<div class="form-actions exam-form-actions"><x-admin.button variant="secondary" :href="route('admin.exams.index')">Cancelar</x-admin.button><x-admin.button type="submit" loading-label="A guardar…"><i class="bi bi-check-lg" aria-hidden="true"></i>{{ $exam->exists ? 'Guardar alterações' : 'Criar prova' }}</x-admin.button></div>
 </form>
 <script>
 (function(){

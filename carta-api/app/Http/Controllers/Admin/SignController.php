@@ -24,7 +24,7 @@ class SignController extends Controller
             'signs' => Sign::query()->with(['topic', 'category', 'subcategory'])
                 ->when($request->filled('q'), fn ($query) => $query->where(fn ($nested) => $nested->where('name', 'like', '%'.$request->string('q')->value().'%')->orWhere('meaning', 'like', '%'.$request->string('q')->value().'%')))
                 ->when($request->filled('category'), fn ($query) => $query->where('sign_category_id', $request->integer('category')))
-                ->orderBy('sort_order')->orderBy('name')->paginate(18)->withQueryString(),
+                ->orderBy('sort_order')->orderBy('name')->paginate(10)->withQueryString(),
         ]);
     }
 

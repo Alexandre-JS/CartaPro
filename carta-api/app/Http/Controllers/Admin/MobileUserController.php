@@ -22,7 +22,7 @@ class MobileUserController extends Controller
             ->when($request->filled('status'), fn ($query) => $query->where('is_active', $request->string('status')->value() === 'active'))
             ->withCount(['answers', 'examHistory as exams_count', 'readContents as read_contents_count'])
             ->withMax('tokens as last_seen_at', 'last_used_at')
-            ->latest()->paginate(20)->withQueryString();
+            ->latest()->paginate(10)->withQueryString();
 
         $unlocks = Unlock::all()->keyBy(fn (Unlock $unlock) => $this->phoneKey($unlock->phone));
 

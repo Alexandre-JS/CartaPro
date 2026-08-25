@@ -4,7 +4,7 @@
 @section('page-subtitle','Gerencie as instituições parceiras e o seu acesso.')
 @section('content')
 <x-admin.page-header title="Escolas parceiras" description="Instituições, contactos e acesso à plataforma." :count="$schools->total()" count-label="escolas">
-    <x-admin.button :href="route('admin.schools.create')">＋ Nova escola</x-admin.button>
+    <x-admin.button data-dialog-open="create-school"><i class="bi bi-plus-lg" aria-hidden="true"></i>Nova escola</x-admin.button>
 </x-admin.page-header>
 
 <x-admin.data-toolbar label="Pesquisar escolas">
@@ -34,6 +34,7 @@
             <td>{{ $school->users_count }}</td>
             <td><x-admin.state :type="$school->is_active ? 'active' : 'neutral'">{{ $school->is_active ? 'Ativa' : 'Inativa' }}</x-admin.state></td>
             <td class="actions">
+                <x-admin.button variant="secondary" size="small" :href="route('admin.school-operations.index',['school_id'=>$school->id])">Operar</x-admin.button>
                 <x-admin.button variant="secondary" size="small" :href="route('admin.schools.edit',$school)">Editar</x-admin.button>
                 <x-admin.button variant="danger" size="small" data-dialog-open="delete-school-{{ $school->id }}">Remover</x-admin.button>
             </td>
@@ -58,4 +59,17 @@
         </x-slot:footer>
     </x-admin.dialog>
 @endforeach
+
+<x-admin.dialog id="create-school" title="Nova escola" description="Registe a instituição e, se indicar um e-mail, será criada também a conta de acesso principal.">
+    <form id="create-school-form" method="POST" action="{{ route('admin.schools.store') }}" class="modal-form-grid">@csrf
+        <x-admin.field name="name" label="Nome" required />
+        <x-admin.field name="code" label="Código" placeholder="ESC-001" required />
+        <x-admin.field name="email" label="E-mail" type="email" />
+        <x-admin.field name="phone" label="Telefone" />
+        <x-admin.field name="contact_person" label="Pessoa de contacto" />
+        <x-admin.field name="address" label="Endereço" />
+        <label class="pv-checkbox modal-form-full"><input type="checkbox" name="is_active" value="1" checked> Escola ativa</label>
+    </form>
+    <x-slot:footer><x-admin.button variant="secondary" data-dialog-close>Cancelar</x-admin.button><x-admin.button type="submit" form="create-school-form">Guardar escola</x-admin.button></x-slot:footer>
+</x-admin.dialog>
 @endsection

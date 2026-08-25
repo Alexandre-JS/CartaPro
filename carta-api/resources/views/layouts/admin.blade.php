@@ -37,6 +37,7 @@
     <title>@yield('title', 'Painel') · ProntoVia</title>
     <link rel="icon" type="image/webp" href="{{ asset('images/prontovia/iconProntovia.webp') }}">
     <link rel="icon" type="image/png" href="{{ asset('images/prontovia/iconProntovia.png') }}">
+    @vite('resources/css/admin-icons.css')
     {{--
         A data de modificação no endereço obriga o browser — e o CDN à frente
         dele — a buscar a folha de estilos outra vez quando ela muda. Sem isto
@@ -55,6 +56,8 @@
     <small>Aguarde sem fechar esta página.</small>
 </div>
 <div class="app-shell">
+    {{-- Menu anterior preservado temporariamente no histórico da alteração; não é renderizado. --}}
+    {{--
     <aside class="sidebar" id="sidebar">
         <button class="sidebar-close" type="button" data-sidebar-close aria-label="Fechar menu">×</button>
         <a class="brand" href="{{ route('admin.dashboard') }}"><img class="admin-brand-logo" src="{{ asset('images/prontovia/Prontovia-white.png') }}" width="1640" height="664" alt="ProntoVia"><small>Painel de gestão</small></a>
@@ -85,19 +88,16 @@
         @if($adminIsPlatform)<span class="nav-label">Operação das escolas</span><nav class="nav"><a class="{{ request()->routeIs('admin.classrooms.*') ? 'active' : '' }}" href="{{ route('admin.classrooms.index') }}"><svg viewBox="0 0 24 24"><path d="M3 7h18M5 7v14h14V7M9 11h6M9 15h6"/></svg>Turmas</a><a class="{{ request()->routeIs('admin.exams.*') ? 'active' : '' }}" href="{{ route('admin.exams.index') }}"><svg viewBox="0 0 24 24"><path d="M5 3h14v18H5zM8 8h8M8 12h8M8 16h5"/></svg>Provas</a><a class="{{ request()->routeIs('admin.sessions.*') ? 'active' : '' }}" href="{{ route('admin.sessions.index') }}"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg>Sessões</a><a class="{{ request()->routeIs('admin.results.*') ? 'active' : '' }}" href="{{ route('admin.results.index') }}"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Resultados</a></nav>@endif
         <div class="sidebar-footer"><form method="POST" action="{{ route('admin.logout') }}">@csrf<button class="logout" type="submit">Terminar sessão</button></form></div>
     </aside>
+    --}}
+    <x-admin.sidebar :platform="$adminIsPlatform" :context-label="$adminContextLabel" :review-count="$sidebarReviewCount ?? 0" />
     <button class="sidebar-backdrop" type="button" data-sidebar-close hidden aria-label="Fechar menu"></button>
     <section class="workspace">
-        <header class="topbar">
-            <div class="page-heading"><button class="menu-button" type="button" data-sidebar-open aria-expanded="false" aria-controls="sidebar" aria-label="Abrir menu">☰</button><div><span class="topbar-context">{{ $adminContextLabel }}</span><h1>{{ $adminPageTitle }}</h1><p>@yield('page-subtitle', 'Gestão ProntoVia')</p></div></div>
-            @if($adminSearch)<form class="search" action="{{ $adminSearch[0] }}" role="search" aria-label="{{ $adminSearch[1] }}"><label class="sr-only" for="admin-context-search">{{ $adminSearch[1] }}</label><input id="admin-context-search" name="q" value="{{ request('q') }}" placeholder="{{ $adminSearch[2] }}"><button aria-label="Pesquisar">⌕</button></form>@else<div class="topbar-search-placeholder"><span>{{ $adminSectionLabel }}</span></div>@endif
-            <div class="admin-user"><span class="avatar">{{ str(auth()->user()->name)->substr(0, 1)->upper() }}</span><div><strong>{{ auth()->user()->name }}</strong><small>{{ auth()->user()->roleLabel() }}{{ auth()->user()->school ? ' · '.auth()->user()->school->name : '' }}</small></div></div>
-        </header>
+        <x-admin.topbar :search="$adminSearch" :context-label="$adminContextLabel" :page-title="$adminPageTitle" :page-subtitle="trim($__env->yieldContent('page-subtitle', 'Gestão ProntoVia'))" :review-count="$sidebarReviewCount ?? 0" />
         @unless(request()->routeIs('admin.dashboard'))
             <nav class="breadcrumbs" aria-label="Caminho da página"><a href="{{ route('admin.dashboard') }}">Início</a><span aria-hidden="true">/</span>@if($adminSectionLabel !== $adminPageTitle)<span>{{ $adminSectionLabel }}</span><span aria-hidden="true">/</span>@endif<strong aria-current="page">{{ $adminPageTitle }}</strong></nav>
         @endunless
         <main class="content" id="admin-content">
-            @if(session('status'))<div class="alert" role="status"><strong>Operação concluída.</strong><span>{{ session('status') }}</span></div>@endif
-            @if($errors->any())<div class="errors" role="alert" tabindex="-1" data-error-summary><strong>Existem dados que precisam da sua atenção:</strong><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
+            <x-admin.flash-messages />
             @yield('content')
         </main>
     </section>
@@ -110,6 +110,20 @@ var adminLoadingTimer;
 var adminSidebar = document.getElementById('sidebar');
 var adminSidebarOpen = document.querySelector('[data-sidebar-open]');
 var adminSidebarBackdrop = document.querySelector('.sidebar-backdrop');
+var adminSidebarCollapse = document.querySelector('[data-sidebar-collapse]');
+
+function setAdminSidebarCollapsed(collapsed) {
+    if (!adminSidebarCollapse || window.matchMedia('(max-width: 900px)').matches) collapsed = false;
+    document.body.classList.toggle('sidebar-is-collapsed', collapsed);
+    adminSidebarCollapse?.setAttribute('aria-expanded', String(!collapsed));
+    adminSidebarCollapse?.setAttribute('aria-label', collapsed ? 'Expandir menu' : 'Recolher menu');
+    window.localStorage.setItem('prontovia-sidebar-collapsed', collapsed ? 'yes' : 'no');
+}
+
+setAdminSidebarCollapsed(window.localStorage.getItem('prontovia-sidebar-collapsed') === 'yes');
+adminSidebarCollapse?.addEventListener('click', function () {
+    setAdminSidebarCollapsed(!document.body.classList.contains('sidebar-is-collapsed'));
+});
 
 function enhanceAdminNavigation() {
     if (!adminSidebar) return;
@@ -178,7 +192,12 @@ adminSidebar?.querySelectorAll('.nav a').forEach(function (link) {
     if (link.classList.contains('active')) link.setAttribute('aria-current', 'page');
     link.addEventListener('click', function () { if (window.matchMedia('(max-width: 760px)').matches) setAdminSidebar(false); });
 });
+adminSidebar?.querySelectorAll('.pv-sidebar-nav a').forEach(function (link) {
+    link.addEventListener('click', function () { if (window.matchMedia('(max-width: 900px)').matches) setAdminSidebar(false); });
+});
 document.querySelector('[data-error-summary]')?.focus();
+document.querySelectorAll('[data-message-dismiss]').forEach(function (button) { button.addEventListener('click', function () { button.closest('.admin-toast,.admin-message')?.remove(); }); });
+document.querySelectorAll('[data-message-toast]').forEach(function (toast) { window.setTimeout(function () { toast.remove(); }, 5000); });
 
 document.querySelectorAll('[data-dialog-open]').forEach(function (trigger) {
     trigger.addEventListener('click', function () {

@@ -30,7 +30,7 @@ class ResultController extends Controller
 
         return view('admin.results.index', [
             'attempts' => $this->query($request)->with(['student', 'session.exam.school', 'session.classroom'])
-                ->latest('submitted_at')->paginate(20)->withQueryString(),
+                ->latest('submitted_at')->paginate(10)->withQueryString(),
             'average' => (int) round((float) ($totals->taxa_media ?? 0) * 100),
             'validGradesCount' => (int) ($totals->notas_validas ?? 0),
             'attemptsCount' => (int) ($totals->tentativas ?? 0),

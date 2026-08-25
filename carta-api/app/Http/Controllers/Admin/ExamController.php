@@ -25,7 +25,7 @@ class ExamController extends Controller
         return view('admin.exams.index', [
             'exams' => Exam::with(['school', 'creator'])->withCount(['questions', 'sessions'])
                 ->when($request->user()->isSchool(), fn ($query) => $query->where('school_id', $request->user()->school_id))
-                ->latest()->paginate(15),
+                ->latest()->paginate(10),
         ]);
     }
 

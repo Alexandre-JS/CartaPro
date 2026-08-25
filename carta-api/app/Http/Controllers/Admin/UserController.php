@@ -18,7 +18,8 @@ class UserController extends Controller
             'users' => User::with('school')
                 ->when($request->filled('q'), fn ($query) => $query->where(fn ($nested) => $nested->where('name', 'like', '%'.$request->string('q')->value().'%')->orWhere('email', 'like', '%'.$request->string('q')->value().'%')))
                 ->when($request->filled('role'), fn ($query) => $query->where('role', $request->string('role')->value()))
-                ->latest()->paginate(15)->withQueryString(),
+                ->latest()->paginate(10)->withQueryString(),
+            'schools' => School::where('is_active', true)->orderBy('name')->get(['id', 'name']),
         ]);
     }
 

@@ -20,11 +20,11 @@ class QuestionController extends Controller
 {
     public function index(Request $request): View
     {
-        $perPage = in_array($request->integer('per_page'), [15, 30, 50], true) ? $request->integer('per_page') : 15;
+        $perPage = in_array($request->integer('per_page'), [10, 30, 50], true) ? $request->integer('per_page') : 10;
         $sort = in_array($request->input('sort'), ['latest', 'oldest', 'updated', 'topic'], true) ? $request->input('sort') : 'latest';
         $topic = $request->string('topic')->trim()->value();
 
-        $questions = Question::with(['topic', 'author', 'school'])
+        $questions = Question::with('topic')
             ->when($request->user()->isSchool(), fn ($query) => $query->where('school_id', $request->user()->school_id))
             ->when($request->filled('q'), fn ($query) => $query->where(fn ($nested) => $nested
                 ->where('statement', 'like', '%'.$request->string('q')->value().'%')

@@ -32,7 +32,7 @@ class LessonController extends Controller
                     ->orWhere('summary', 'like', '%'.$request->string('q')->value().'%')))
                 ->when($request->filled('group'), fn ($query) => $query->where('group', $request->string('group')->value()))
                 ->orderBy('group')->orderBy('sort_order')->orderBy('title')
-                ->paginate(20)->withQueryString(),
+                ->paginate(10)->withQueryString(),
             'grupos' => config('estudo.grupos_licoes'),
             'porGrupo' => Lesson::selectRaw('`group`, count(*) as total')->groupBy('group')->pluck('total', 'group'),
         ]);

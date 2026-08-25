@@ -19,7 +19,7 @@ class SchoolController extends Controller
         return view('admin.schools.index', [
             'schools' => School::withCount('users')
                 ->when($request->filled('q'), fn ($query) => $query->where('name', 'like', '%'.$request->string('q')->value().'%'))
-                ->latest()->paginate(15)->withQueryString(),
+                ->latest()->paginate(10)->withQueryString(),
         ]);
     }
 

@@ -22,7 +22,7 @@ class ExamSessionController extends Controller
             'sessions' => ExamSession::with(['exam.school', 'classroom'])->withCount('attempts')
                 ->when($request->user()->isSchool(), fn ($query) => $query->whereHas('exam', fn ($exam) => $exam->where('school_id', $schoolId)))
                 ->when($request->user()->isInstructor(), fn ($query) => $query->whereHas('classroom.instructors', fn ($instructors) => $instructors->where('user_id', $request->user()->id)))
-                ->latest()->paginate(15),
+                ->latest()->paginate(10),
             'exams' => Exam::with('school')->where('is_active', true)->where('is_public', false)->whereNotNull('school_id')->when($request->user()->isSchool(), fn ($query) => $query->where('school_id', $schoolId))->orderBy('name')->get(),
             'classrooms' => Classroom::with('school')->where('is_active', true)->when($request->user()->isSchool(), fn ($query) => $query->where('school_id', $schoolId))->when($request->user()->isInstructor(), fn ($query) => $query->whereHas('instructors', fn ($instructors) => $instructors->where('user_id', $request->user()->id)))->orderBy('name')->get(),
         ]);

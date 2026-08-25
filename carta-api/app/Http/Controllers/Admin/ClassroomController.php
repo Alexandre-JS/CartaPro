@@ -18,7 +18,7 @@ class ClassroomController extends Controller
             ->when($request->user()->isSchool(), fn ($query) => $query->where('school_id', $request->user()->school_id))
             ->when($request->user()->isInstructor(), fn ($query) => $query->whereHas('instructors', fn ($instructors) => $instructors->where('user_id', $request->user()->id)))
             ->when($request->filled('school_id'), fn ($query) => $query->where('school_id', $request->integer('school_id')))
-            ->latest()->paginate(12)->withQueryString();
+            ->latest()->paginate(10)->withQueryString();
 
         return view('admin.classrooms.index', ['classrooms' => $classrooms, 'schools' => School::where('is_active', true)->orderBy('name')->get()]);
     }

@@ -119,9 +119,9 @@ class DetailController extends Controller
     public function exam(Request $request, Exam $exam): View
     {
         $this->assertExamAccess($request, $exam);
-        $exam->load(['school', 'creator', 'questions'])->loadCount('sessions');
+        $exam->load(['school', 'creator', 'questions.topic'])->loadCount(['sessions', 'attempts']);
 
-        return $this->detail($exam->name, 'Configuração e perguntas da prova.', route('admin.exams.index'), ['Acesso' => $exam->is_public ? 'Pública — aplicativo' : 'Privada — escola', 'Escola' => $exam->school?->name ?? 'Não associada', 'Criada por' => $exam->creator?->name ?? '—', 'Categorias' => implode(', ', $exam->license_categories ?: [$exam->license_category]), 'Tipo' => ucfirst($exam->type), 'Perguntas selecionadas' => $exam->questions->map(fn ($question, $index) => ($index + 1).'. '.$question->statement)->join("\n"), 'Nota de passagem' => $exam->pass_score.'/'.$exam->question_count.' (72%)', 'Sessões' => $exam->sessions_count, 'Estado' => $exam->is_active ? 'Ativa' : 'Inativa']);
+        return view('admin.exams.show', compact('exam'));
     }
 
     public function session(Request $request, ExamSession $session): View

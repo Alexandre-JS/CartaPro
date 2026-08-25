@@ -33,7 +33,7 @@ class PublicationController extends Controller
         return view('admin.publications.index', [
             'approvedCount' => Question::where('status', 'approved')->where('is_active', true)->count(),
             'byTopic' => Topic::where('is_active', true)->withCount(['questions' => fn ($query) => $query->where('status', 'approved')->where('is_active', true)])->orderBy('sort_order')->get(),
-            'packages' => ContentPackage::with('publisher')->latest('published_at')->paginate(12),
+            'packages' => ContentPackage::with('publisher')->latest('published_at')->paginate(10),
             'publishedExamsCount' => Exam::where(['is_public' => true, 'is_active' => true, 'publication_status' => 'published'])->count(),
         ]);
     }

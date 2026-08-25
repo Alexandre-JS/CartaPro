@@ -12,10 +12,12 @@ use App\Http\Controllers\Admin\LessonController;
 use App\Http\Controllers\Admin\LicenseCategoryController;
 use App\Http\Controllers\Admin\MobileUserController;
 use App\Http\Controllers\Admin\PaymentAdminController;
+use App\Http\Controllers\Admin\PlanController;
 use App\Http\Controllers\Admin\PublicationController;
 use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\ResultController;
 use App\Http\Controllers\Admin\SchoolController;
+use App\Http\Controllers\Admin\SchoolOperationsController;
 use App\Http\Controllers\Admin\SignCategoryController;
 use App\Http\Controllers\Admin\SignController;
 use App\Http\Controllers\Admin\StudentController;
@@ -118,6 +120,8 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/publications/{package}/download', [PublicationController::class, 'download'])->name('publications.download');
         Route::get('/publications/{package}', [DetailController::class, 'publication'])->whereNumber('package')->name('publications.show');
         Route::resource('unlocks', UnlockController::class)->only(['index', 'store', 'update', 'destroy']);
+        Route::get('/plans', [PlanController::class, 'index'])->name('plans.index');
+        Route::put('/plans/{plan}', [PlanController::class, 'update'])->whereNumber('plan')->name('plans.update');
         Route::patch('/unlocks/{unlock}/associar', [UnlockController::class, 'bind'])->name('unlocks.bind');
         // Devolução em 7 dias: retira o acesso ao mesmo tempo que se devolve o
         // dinheiro na carteira, que continua a ser um passo manual.
@@ -127,4 +131,12 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/unlocks/{unlock}', [DetailController::class, 'unlock'])->whereNumber('unlock')->name('unlocks.show');
     });
     Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
+    Route::get('/school-operations', [SchoolOperationsController::class, 'index'])->middleware('permission:classroom.manage')->name('school-operations.index');
+    Route::post('/instructors', [SchoolOperationsController::class, 'instructorStore'])->middleware('permission:instructor.manage')->name('instructors.store');
+    Route::put('/instructors/{instructor}', [SchoolOperationsController::class, 'instructorUpdate'])->middleware('permission:instructor.manage')->name('instructors.update');
+    Route::post('/instructors/{instructor}/classrooms', [SchoolOperationsController::class, 'instructorAttach'])->middleware('permission:instructor.manage')->name('instructors.attach');
+    Route::post('/school-memberships/invite', [SchoolOperationsController::class, 'membershipInvite'])->middleware('permission:classroom.manage')->name('school-memberships.invite');
+    Route::patch('/school-memberships/{membership}/status', [SchoolOperationsController::class, 'membershipStatus'])->middleware('permission:classroom.manage')->name('school-memberships.status');
+    Route::post('/assignments', [SchoolOperationsController::class, 'assignmentStore'])->middleware('permission:assignment.manage')->name('assignments.store');
+    Route::patch('/assignments/{assignment}/status', [SchoolOperationsController::class, 'assignmentStatus'])->middleware('permission:assignment.manage')->name('assignments.status');
 });

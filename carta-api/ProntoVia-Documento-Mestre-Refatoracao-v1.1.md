@@ -1189,6 +1189,239 @@ Referências adotadas: Carbon UI Shell e Data Table, GOV.UK Design System e WCAG
 
 **Estado da Fase 11 no painel web:** concluída em 25 de agosto de 2026. O shell e os estilos transversais cobrem todos os módulos; `Perguntas` e `Escolas` são as referências para a migração progressiva das views específicas.
 
+### Alinhamento com a Direção Visual Web v1.0 — Sidemenu
+
+- [x] largura desktop definida em `244px` e modo recolhido em `72px`;
+- [x] fundo índigo sólido `#1A1F5C`, sem gradiente;
+- [x] módulos organizados em `Visão geral`, `Aprendizagem`, `Conteúdo`, `Gestão` e `Sistema`;
+- [x] itens condicionados por perfil e permissões do backend;
+- [x] Bootstrap Icons usado como mapa iconográfico único;
+- [x] estado ativo discreto com barra lateral ciano, texto branco e fundo translúcido;
+- [x] hover com branco de baixa opacidade, sem glow;
+- [x] menu recolhível no desktop com preferência guardada localmente;
+- [x] offcanvas responsivo para tablet e mobile até `900px`;
+- [x] labels, `aria-current`, tooltips no modo recolhido e navegação por teclado preservados;
+- [x] validar build visual e testes no fecho da etapa do sidemenu — build concluído e suíte integral aprovada (206 testes, 966 asserções).
+
+### Alinhamento com a Direção Visual Web v1.0 — Topbar
+
+- [x] componente reutilizável aplicado ao shell administrativo;
+- [x] altura compacta e superfície branca com separador inferior discreto;
+- [x] controlo de recolhimento do sidemenu movido para a topbar no desktop;
+- [x] botão de abertura do menu preservado em tablet e mobile;
+- [x] pesquisa contextual exibida apenas nos módulos que possuem pesquisa real;
+- [x] acesso às notificações ligado à fila real de aprovação, condicionado por permissão;
+- [x] perfil compacto com nome, papel, escola e término de sessão;
+- [x] títulos e descrições mantidos no cabeçalho da página, sem competir com a topbar;
+- [x] Bootstrap Icons, foco visível, labels acessíveis e comportamento responsivo aplicados;
+- [x] validar build e testes no fecho da etapa do topbar — build concluído e suíte integral aprovada (207 testes, 977 asserções).
+
+### Alinhamento com a Direção Visual Web v1.0 — Dashboard
+
+- [x] cabeçalho de página com descrição curta e uma única ação primária;
+- [x] quatro KPIs no máximo, sem gradientes ou círculos decorativos;
+- [x] Bootstrap Icons com dimensão e função visual consistentes;
+- [x] evolução principal em área ampla e atenção necessária em área secundária;
+- [x] visão da escola orientada a desempenho, temas críticos e próxima ação;
+- [x] visão da plataforma orientada a adoção, utilização e prioridades editoriais;
+- [x] atividade escolar e editorial apresentada em superfícies densas e simples;
+- [x] hierarquia responsiva para desktop, tablet e mobile;
+- [x] validar build e testes no fecho da etapa do dashboard — build concluído e suíte integral aprovada (208 testes, 988 asserções).
+
+### Alinhamento com a Direção Visual Web v1.0 — Tabelas
+
+- [x] componente de tabela reutilizável consolidado;
+- [x] densidades confortável (`48px`) e compacta (`40px`) suportadas;
+- [x] cabeçalho simples e fixo, hover discreto e largura máxima disponível;
+- [x] toolbar previsível com pesquisa, filtros, limpeza e ação primária;
+- [x] componente reutilizável de ações de linha com `Ver` visível e menu de opções;
+- [x] paginação própria com intervalo apresentado, total e navegação acessível;
+- [x] estados vazios, captions e associação acessível ao título preservados;
+- [x] texto longo com truncamento visual e conteúdo integral em tooltip nativo;
+- [x] comportamento responsivo com rolagem horizontal controlada;
+- [x] padrão aplicado ao banco de `Perguntas` como referência;
+- [x] paginação padrão das listagens administrativas uniformizada em 10 registos por página;
+- [x] tabela de `Perguntas` reduzida às colunas essenciais: pergunta, tema, estado, atualização e ações;
+- [x] identificador técnico da pergunta removido da listagem e das ações visíveis;
+
+### Aplicação da Direção Visual — Utilizadores Mobile
+
+- [x] página alinhada ao cabeçalho, toolbar, tabela e paginação reutilizáveis;
+- [x] cinco colunas operacionais: utilizador, plano, atividade, estado e ações;
+- [x] contacto e último acesso apresentados como informação secundária;
+- [x] ação de detalhe visível e ativação/desativação no menu de linha;
+- [x] dez registos por página preservados;
+- [x] validar build e testes no fecho da etapa de Utilizadores Mobile — build concluído e suíte integral aprovada (209 testes, 1002 asserções).
+
+### Aplicação da Direção Visual — Turmas
+
+- [x] cabeçalho com ação primária de criação e contador de turmas;
+- [x] tabela com turma, escola, alunos, sessões, estado e ações;
+- [x] gestão de alunos preservada num painel expansível por turma;
+- [x] ações de detalhe, gestão de alunos e remoção agrupadas no menu de linha;
+- [x] paginação reutilizável de 10 registos e filtros por escola;
+- [x] formulário de criação mantido acessível sem dominar a listagem;
+- [x] validar build e testes no fecho da etapa de Turmas — build concluído e suíte integral aprovada (210 testes, 1007 asserções).
+
+### Aplicação da Direção Visual — Provas
+
+- [x] cabeçalho com descrição curta, contador e uma única ação primária;
+- [x] tabela reduzida a prova, acesso, publicação, perguntas, aprovação e ações;
+- [x] publicação, arquivamento, plano e cópia movidos para o menu de linha;
+- [x] estados semânticos preservados para acesso, publicação e plano;
+- [x] paginação reutilizável de 10 registos;
+- [x] diálogos de cópia e remoção preservados;
+- [x] validar build e testes no fecho da etapa de Provas — build concluído e suíte integral aprovada (211 testes, 1012 asserções).
+
+### Aplicação da Direção Visual — Detalhe da Prova
+
+- [x] detalhe específico de prova separado do detalhe genérico;
+- [x] cabeçalho com retorno, título, contexto e estado de acesso;
+- [x] resumo operacional com acesso, publicação, perguntas, nota, sessões e tentativas;
+- [x] configuração apresentada em definition list, sem excesso de cards;
+- [x] perguntas selecionadas apresentadas numa tabela própria e legível;
+- [x] informação editorial e publicação destacadas numa secção dedicada;
+- [x] validar build e testes no fecho da etapa do detalhe da Prova — build concluído e suíte integral aprovada (212 testes, 1017 asserções).
+
+### Aplicação da Direção Visual — Edição da Prova
+
+- [x] cabeçalho de página próprio com retorno às provas;
+- [x] informação geral separada da seleção de perguntas;
+- [x] campos relacionados mantidos em grelha de duas colunas;
+- [x] prova selada mantém aviso e perguntas não editáveis;
+- [x] códigos técnicos removidos da lista visual de perguntas;
+- [x] ações de cancelar e guardar numa barra inferior consistente;
+- [x] validar build e testes no fecho da etapa de edição da Prova — build concluído e suíte integral aprovada (213 testes, 1023 asserções).
+
+### Aplicação da Direção Visual — Sessões
+
+- [x] cabeçalho com contexto, contador e ação primária de criação numa área expansível;
+- [x] tabela operacional com código/link, prova, turma, submissões, estado e ações;
+- [x] copiar link, abrir link, iniciar, terminar e remover preservados;
+- [x] estados de sessão apresentados com etiquetas semânticas e leitura rápida;
+- [x] formulário de criação filtra turmas pela escola da prova escolhida;
+- [x] paginação reutilizável de 10 registos e estado vazio orientado à próxima ação;
+- [x] validar build e testes no fecho da etapa de Sessões — build concluído e suíte integral aprovada (214 testes, 1028 asserções).
+
+### Aplicação da Direção Visual — Resultados
+
+- [x] cabeçalho com contexto, contador e exportação CSV como ação secundária;
+- [x] resumo com média, notas válidas e provas submetidas sem excesso de cards;
+- [x] filtro de turma compacto e acesso direto ao painel analítico da turma;
+- [x] tabela reduzida às informações essenciais: aluno, prova/sessão, turma, resultado, aptidão e temas;
+- [x] data apresentada como informação secundária junto do aluno;
+- [x] detalhe e histórico agrupados no menu de ações da linha;
+- [x] paginação reutilizável de 10 registos e estado vazio orientado;
+- [x] validar build e testes no fecho da etapa de Resultados — build concluído e suíte integral aprovada (215 testes, 1034 asserções).
+
+### Aplicação da Direção Visual — Aprovações
+
+- [x] cabeçalho com contexto, contador e retorno rápido ao banco de perguntas;
+- [x] estados de revisão organizados em tabs com contagens visíveis;
+- [x] filtro de autoria/escola compacto e preservado para cada estado;
+- [x] fila de revisão com pergunta, opções, resposta correta e explicação na mesma superfície;
+- [x] códigos técnicos removidos da leitura principal da pergunta;
+- [x] ações de aprovar e rejeitar com campo de motivo claramente separadas;
+- [x] paginação reutilizável de 10 registos e estado vazio orientado;
+- [x] validar build e testes no fecho da etapa de Aprovações — build concluído e suíte integral aprovada (216 testes, 1039 asserções).
+
+### Aplicação da Direção Visual — Biblioteca de Sinais
+
+- [x] cabeçalho com contador e criação de sinal como ação primária;
+- [x] pesquisa por nome/significado e filtro por categoria numa toolbar compacta;
+- [x] grelha visual responsiva com pré-visualização, categoria, significado e estado;
+- [x] indicação discreta de conteúdo sem texto e plano completo;
+- [x] detalhe visível e edição/remoção agrupadas no menu de ações;
+- [x] paginação reutilizável de 10 registos e estado vazio orientado;
+- [x] validar build e testes no fecho da etapa da Biblioteca de Sinais — build concluído e suíte integral aprovada (217 testes, 1044 asserções).
+
+### Aplicação da Direção Visual — Fichas de Estudo
+
+- [x] cabeçalho com contador e criação de ficha como ação primária;
+- [x] resumo por área de estudo numa superfície contínua e sem excesso de cards;
+- [x] pesquisa por título/resumo e filtro por área numa toolbar previsível;
+- [x] tabela com ficha, área/tema, referências, leitura e estado;
+- [x] resumo da ficha truncado, sem expor identificadores técnicos na listagem;
+- [x] detalhe visível e edição/remoção agrupadas no menu de ações;
+- [x] paginação reutilizável de 10 registos e estado vazio orientado;
+- [x] validar build e testes no fecho da etapa das Fichas de Estudo — build concluído e suíte integral aprovada (218 testes, 1050 asserções).
+
+### Aplicação da Direção Visual — Biblioteca Legal
+
+- [x] cabeçalho com contador e criação de artigo como ação primária;
+- [x] alerta contextual para artigos sem capítulo, sem interromper a leitura da lista;
+- [x] pesquisa por número/título/texto e filtro por capítulo numa toolbar previsível;
+- [x] tabela com número, capítulo, título/conteúdo e acesso por plano;
+- [x] conteúdo legal truncado para leitura rápida, mantendo o detalhe disponível;
+- [x] detalhe visível e edição/remoção agrupadas no menu de ações;
+- [x] paginação reutilizável de 10 registos e estado vazio orientado;
+- [x] validar build e testes no fecho da etapa da Biblioteca Legal — build concluído e suíte integral aprovada (219 testes, 1055 asserções).
+
+### Aplicação da Direção Visual — Glossário de Termos
+
+- [x] cabeçalho com contador e criação de termo numa área expansível;
+- [x] formulário de criação mantido acessível sem dominar a listagem;
+- [x] pesquisa por termo ou definição numa toolbar compacta;
+- [x] tabela com termo, definição, base legal e acesso por plano;
+- [x] identificadores técnicos removidos da leitura principal;
+- [x] detalhe visível e remoção agrupada no menu de ações;
+- [x] paginação reutilizável de 10 registos e estado vazio orientado;
+- [x] validar build e testes no fecho da etapa do Glossário de Termos — build concluído e suíte integral aprovada (220 testes, 1061 asserções).
+
+### Aplicação da Direção Visual — Criação de Escolas e Utilizadores
+
+- [x] criação de escola transferida para diálogo reutilizável, mantendo a listagem como superfície principal;
+- [x] criação de utilizador transferida para diálogo reutilizável com papel, escola, palavra-passe e estado;
+- [x] edição permanece em página própria para preservar espaço e reduzir complexidade do modal;
+- [x] campos condicionais de escola mantidos conforme o papel escolhido;
+- [x] tabelas de escolas e utilizadores mantidas com paginação, filtros e ações agrupadas;
+- [x] validar build e testes no fecho da etapa de criação por diálogos — build concluído e suíte integral aprovada (221 testes, 1067 asserções).
+
+### Aplicação da Direção Visual — Pagamentos e Acessos
+
+- [x] página reposicionada como acompanhamento de pagamentos e acessos, sem confundir desbloqueio com conta;
+- [x] resumo operacional com total, ativos, associados e ações pendentes;
+- [x] alerta contextual para pagamentos ativos sem conta associada;
+- [x] registo manual de pagamento transferido para diálogo reutilizável;
+- [x] tabela com telefone, plano/método, datas, associação e estado;
+- [x] associação de conta e remoção agrupadas nas ações da linha;
+- [x] pesquisa por telefone/referência e paginação de 10 registos;
+- [x] validar build e testes no fecho da etapa de Pagamentos e Acessos — build concluído e suíte integral aprovada (222 testes, 1074 asserções).
+
+### Aplicação da Direção Visual — Publicações
+
+- [x] cabeçalho orientado à publicação com contador de versões e ação primária;
+- [x] prontidão separada do histórico: perguntas aprovadas, provas públicas e cobertura por tema;
+- [x] publicação de novo pacote transferida para diálogo reutilizável com notas da versão;
+- [x] histórico com versão, data, autor, conteúdo e estado sem excesso de cards;
+- [x] download autenticado, detalhe e restauração agrupados nas ações da linha;
+- [x] paginação reutilizável de 10 registos e estado vazio orientado;
+- [x] validar build e testes no fecho da etapa de Publicações — build concluído e suíte integral aprovada (223 testes, 1080 asserções).
+
+### Aplicação da Direção Visual — Temas e Categorias
+
+- [x] Temas com tabela operacional, contagem de perguntas e criação em diálogo;
+- [x] Categorias de sinais com hierarquia pai/subcategoria preservada e ações agrupadas;
+- [x] criação de categoria de sinais em diálogo e criação de subcategoria mantida no contexto da linha;
+- [x] Categorias de carta com criação e edição em diálogos reutilizáveis;
+- [x] identificadores técnicos removidos da leitura principal das listagens;
+- [x] estados, ordem, descrições e contagens apresentados de forma compacta;
+- [x] paginação e estados vazios mantidos nos módulos aplicáveis;
+- [x] validar build e testes no fecho da etapa de Temas e Categorias — build concluído e suíte integral aprovada (224 testes, 1092 asserções).
+
+### Aplicação da Direção Visual — Mensagens e Diálogos do Sistema
+
+- [x] mensagens de sucesso, atenção e erro consolidadas num componente reutilizável;
+- [x] toasts de sucesso com ícone semântico, título curto, texto, fecho manual e desaparecimento automático;
+- [x] toast de sucesso alinhado à identidade: superfície branca, título índigo, acento ciano e verde reservado ao ícone semântico;
+- [x] avisos e erros persistentes apresentados como alerts acessíveis quando exigem atenção;
+- [x] erros de validação apresentados numa lista única e navegável;
+- [x] região de mensagens aplicada globalmente ao layout administrativo;
+- [x] diálogos nativos existentes mantidos como padrão para confirmação e criação;
+- [x] validar build e testes no fecho da etapa de Mensagens e Diálogos — build concluído e suíte integral aprovada (225 testes, 1097 asserções).
+
+- [x] validar build e testes no fecho da etapa das tabelas — build concluído e suíte integral aprovada (208 testes, 994 asserções).
+
 ---
 
 # 31. Critério de sucesso arquitetural

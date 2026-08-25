@@ -42,7 +42,9 @@ return new class extends Migration
             $table->unsignedInteger('correct_answers')->default(0);
             $table->unsignedInteger('average_duration_ms')->nullable();
             $table->timestamp('last_practiced_at')->nullable();
-            $table->timestamp('calculated_at');
+            // MySQL strict mode rejects a non-null timestamp without a default.
+            // The learning service fills this value whenever it recalculates.
+            $table->timestamp('calculated_at')->nullable();
             $table->timestamps();
             $table->unique(['mobile_user_id', 'topic_id']);
         });
@@ -66,7 +68,7 @@ return new class extends Migration
             $table->unsignedTinyInteger('score')->default(0);
             $table->json('breakdown');
             $table->string('level', 30);
-            $table->timestamp('calculated_at');
+            $table->timestamp('calculated_at')->nullable();
             $table->timestamps();
         });
     }

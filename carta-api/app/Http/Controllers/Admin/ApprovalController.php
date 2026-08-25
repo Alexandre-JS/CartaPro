@@ -20,7 +20,7 @@ class ApprovalController extends Controller
             'status' => $status,
             'questions' => Question::with(['topic', 'reviewer', 'school'])->where('status', $status)
                 ->when($request->filled('school_id'), fn ($query) => $query->where('school_id', $request->integer('school_id')))
-                ->latest()->paginate(12)->withQueryString(),
+                ->latest()->paginate(10)->withQueryString(),
             'counts' => Question::selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status'),
             'schools' => School::where('is_active', true)->orderBy('name')->get(),
         ]);

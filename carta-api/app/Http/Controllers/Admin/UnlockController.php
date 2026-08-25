@@ -26,8 +26,11 @@ class UnlockController extends Controller
                         // ao cliente encontrar o registo escreva-o como escrever.
                         ->orWhere('phone_normalized', 'like', '%'.Phone::normalize($termo).'%');
                 }))
-                ->latest('unlocked_at')->paginate(20)->withQueryString(),
+                ->latest('unlocked_at')->paginate(10)->withQueryString(),
             'semConta' => Unlock::whereNull('mobile_user_id')->where('is_active', true)->count(),
+            'total' => Unlock::count(),
+            'ativos' => Unlock::where('is_active', true)->count(),
+            'associados' => Unlock::whereNotNull('mobile_user_id')->count(),
         ]);
     }
 
