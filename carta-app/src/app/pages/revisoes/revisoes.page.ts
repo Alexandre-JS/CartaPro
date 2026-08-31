@@ -3,14 +3,14 @@ import { RouterLink } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
 import { addIcons } from 'ionicons';
-import { arrowForwardOutline, bookOutline, checkmarkCircleOutline, refreshOutline, timeOutline } from 'ionicons/icons';
+import { arrowBackOutline, arrowForwardOutline, checkmarkCircleOutline, refreshOutline, timeOutline, warningOutline } from 'ionicons/icons';
 import { PerguntaCardComponent } from '../../components/pergunta-card/pergunta-card.component';
-import { ContentService } from '../../core/content.service';
 import { ProgressoService } from '../../core/progresso.service';
 import { SimuladoService } from '../../core/simulado.service';
 import { StorageService } from '../../core/storage.service';
 import { TemasService } from '../../core/temas.service';
 import { CategoriaCarta, Pergunta } from '../../models/pergunta.model';
+import { mensagemErroApi } from '../../core/api-error';
 
 /**
  * Fila "Revisões de hoje" — transversal a todos os temas.
@@ -35,6 +35,8 @@ export class RevisoesPage implements OnInit, OnDestroy {
     concluida = false;
     carregando = true;
     totalPendentes = 0;
+    erroCarregamento = '';
+    proximaRevisao = '';
 
     private categoria: CategoriaCarta = 'ligeiro';
     private mostradaEm = Date.now();
@@ -43,20 +45,13 @@ export class RevisoesPage implements OnInit, OnDestroy {
         private readonly storage: StorageService,
         private readonly simulado: SimuladoService,
         private readonly progresso: ProgressoService,
-        private readonly content: ContentService,
         private readonly temasService: TemasService,
     ) {
-        addIcons({ arrowForwardOutline, bookOutline, checkmarkCircleOutline, refreshOutline, timeOutline });
+        addIcons({ arrowBackOutline, arrowForwardOutline, checkmarkCircleOutline, refreshOutline, timeOutline, warningOutline });
     }
 
     async ngOnInit(): Promise<void> {
-        this.categoria = ((await this.storage.obterCategoria()) || 'ligeiro') as CategoriaCarta;
-        await this.temasService.carregar();
-
-        this.totalPendentes = await this.storage.contarRevisoesPendentes();
-        this.perguntas = await this.simulado.perguntasParaRevisao(this.categoria, 10);
-        this.carregando = false;
-        this.mostradaEm = Date.now();
+        await this.carregar();
     }
 
     ngOnDestroy(): void {
@@ -97,6 +92,15 @@ export class RevisoesPage implements OnInit, OnDestroy {
         if (acertou) {
             this.acertos++;
         }
+
+        const revisao = await this.storage.obterRevisao(this.perguntaAtual.id);
+        if (revisao) {
+            this.proximaRevisao = revisao.intervaloDias === 0
+                ? 'Esta pergunta volta ainda hoje.'
+                : revisao.intervaloDias === 1
+                    ? 'Próxima revisão amanhã.'
+                    : `Próxima revisão daqui a ${revisao.intervaloDias} dias.`;
+        }
     }
 
     avancar(): void {
@@ -112,19 +116,38 @@ export class RevisoesPage implements OnInit, OnDestroy {
         this.indice++;
         this.escolhida = null;
         this.respondida = false;
+        this.proximaRevisao = '';
         this.mostradaEm = Date.now();
     }
 
     async recarregar(): Promise<void> {
+        await this.carregar();
+    }
+
+    async carregar(): Promise<void> {
         this.carregando = true;
+        this.erroCarregamento = '';
         this.concluida = false;
         this.indice = 0;
         this.acertos = 0;
         this.escolhida = null;
         this.respondida = false;
-        this.totalPendentes = await this.storage.contarRevisoesPendentes();
-        this.perguntas = await this.simulado.perguntasParaRevisao(this.categoria, 10);
-        this.carregando = false;
-        this.mostradaEm = Date.now();
+        this.proximaRevisao = '';
+
+        try {
+            this.categoria = ((await this.storage.obterCategoria()) || 'ligeiro') as CategoriaCarta;
+            const [, totalPendentes, perguntas] = await Promise.all([
+                this.temasService.carregar(),
+                this.storage.contarRevisoesPendentes(),
+                this.simulado.perguntasParaRevisao(this.categoria, 10),
+            ]);
+            this.totalPendentes = totalPendentes;
+            this.perguntas = perguntas;
+            this.mostradaEm = Date.now();
+        } catch (erro) {
+            this.erroCarregamento = mensagemErroApi(erro);
+        } finally {
+            this.carregando = false;
+        }
     }
 }

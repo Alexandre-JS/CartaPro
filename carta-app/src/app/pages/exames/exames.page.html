@@ -1,19 +1,12 @@
 <ion-content [fullscreen]="true" class="exams-page">
   <main class="exams-shell">
-    <app-app-header titulo="Simular" subtitulo="Testa a tua preparação" />
-    <header class="exams-hero">
-      <div>
-        <span>Preparação para o INATRO</span>
-        <h1>Exames</h1>
-        <p>Provas completas e cronometradas, como no dia.</p>
-      </div>
-      <span class="hero-icon" aria-hidden="true"><ion-icon name="school-outline"></ion-icon></span>
-    </header>
+    <app-app-header titulo="Exames publicados" subtitulo="Provas completas em condições de exame" />
 
     <!-- O cabeçalho de secção dizia outra vez o que o hero já dizia
          ("escolha o seu exame"), e o switch grelha/lista era decoração: a
          lista é sempre a mesma informação. -->
     <section class="exams-content">
+      <header class="section-heading"><div><span>Catálogo</span><h1>Escolha uma prova</h1><p>O conteúdo Free está disponível sem conta. As provas ProntoVia+ aparecem identificadas.</p></div></header>
       @if (carregando) {
         <app-skeleton variante="cartao" [quantidade]="4" etiqueta="A carregar as provas"></app-skeleton>
       } @else {
@@ -48,12 +41,12 @@
                    aparecia como qualquer outra e o aluno só descobria ao tentar
                    entrar. Uma prova é servida inteira ou não é servida. -->
               @if (exame.bloqueado) {
-                <a class="start-action locked" routerLink="/desbloquear">
+                <a class="start-action locked" [routerLink]="autenticado ? '/desbloquear' : '/conta/entrar'" [queryParams]="autenticado ? null : { retorno: '/simular/exames' }">
                   <ion-icon name="lock-closed" aria-hidden="true"></ion-icon>
-                  Desbloquear
+                  {{ autenticado ? 'Desbloquear' : 'Entrar para desbloquear' }}
                 </a>
               } @else {
-                <a class="start-action" [routerLink]="['/simulado']" [queryParams]="{ exame: exame.numero }">
+                <a class="start-action" [routerLink]="['/simular/sessao']" [queryParams]="{ exame: exame.numero }">
                   <ion-icon [name]="exame.historico.length ? 'refresh-outline' : 'chevron-forward-outline'" aria-hidden="true"></ion-icon>
                   {{ exame.historico.length ? 'Refazer' : 'Iniciar' }}
                 </a>

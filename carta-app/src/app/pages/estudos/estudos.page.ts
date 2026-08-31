@@ -8,7 +8,7 @@ import { AppHeaderComponent } from '../../components/app-header/app-header.compo
 import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
 import { addIcons } from 'ionicons';
 import {
-    bookOutline, checkmarkCircleOutline, chevronForwardOutline, documentTextOutline, ellipseOutline, libraryOutline, searchOutline, textOutline, timeOutline, warningOutline,
+    bookOutline, checkmarkCircleOutline, chevronForwardOutline, documentTextOutline, ellipseOutline, libraryOutline, refreshOutline, searchOutline, textOutline, timeOutline, warningOutline,
 } from 'ionicons/icons';
 import { MaterialEstudoService } from '../../core/material-estudo.service';
 import { ProgressoEstudo } from '../../models/material-estudo.model';
@@ -16,6 +16,7 @@ import { ContentService } from '../../core/content.service';
 import { TemaDetalhe } from '../../models/pacote.model';
 import { ProgressoService } from '../../core/progresso.service';
 import { ProgressoTema } from '../../models/progresso.model';
+import { mensagemErroApi } from '../../core/api-error';
 
 /** Uma das quatro frentes do material de estudo. */
 interface SecaoEstudo {
@@ -50,11 +51,12 @@ export class EstudosPage implements OnInit {
     temas: TemaDetalhe[] = [];
     progressoTemas: ProgressoTema[] = [];
     carregando = true;
+    erroCarregamento = '';
     pesquisa = '';
 
     constructor(private readonly material: MaterialEstudoService, private readonly content: ContentService, private readonly progresso: ProgressoService) {
         addIcons({
-            bookOutline, checkmarkCircleOutline, chevronForwardOutline, documentTextOutline, ellipseOutline, libraryOutline, searchOutline, textOutline, timeOutline, warningOutline,
+            bookOutline, checkmarkCircleOutline, chevronForwardOutline, documentTextOutline, ellipseOutline, libraryOutline, refreshOutline, searchOutline, textOutline, timeOutline, warningOutline,
         });
     }
 
@@ -64,58 +66,69 @@ export class EstudosPage implements OnInit {
     }
 
     async ngOnInit(): Promise<void> {
-        const [estudo, progressoLeitura, temas] = await Promise.all([
-            this.material.carregar(),
-            this.material.progresso(),
-            this.content.listarTemasDetalhe(),
-        ]);
+        await this.carregar();
+    }
 
-        this.temas = temas;
-        this.progressoTemas = await this.progresso.estatisticasPorTema(temas.map((tema) => tema.slug));
+    async carregar(): Promise<void> {
+        this.carregando = true;
+        this.erroCarregamento = '';
 
-        this.secoes = [
-            {
-                id: 'sinais',
-                titulo: 'Sinais de trânsito',
-                descricao: 'Reconhecer pela forma, cor e significado',
-                unidade: 'sinais',
-                icone: 'warning-outline',
-                rota: '/sinais',
-                total: estudo.sinais.length,
-                progresso: progressoLeitura.sinais,
-            },
-            {
-                id: 'licoes',
-                titulo: 'Fichas por tema',
-                descricao: 'Regras, condução, primeiros socorros e mecânica',
-                unidade: 'fichas',
-                icone: 'library-outline',
-                rota: '/licoes',
-                total: estudo.licoes.length,
-                progresso: progressoLeitura.licoes,
-            },
-            {
-                id: 'codigo',
-                titulo: 'Código da Estrada',
-                descricao: 'O texto legal, organizado por capítulos',
-                unidade: 'artigos',
-                icone: 'document-text-outline',
-                rota: '/codigo',
-                total: estudo.artigos.length,
-                progresso: progressoLeitura.artigos,
-            },
-            {
-                id: 'glossario',
-                titulo: 'Glossário',
-                descricao: 'O vocabulário que aparece nas perguntas',
-                unidade: 'termos',
-                icone: 'text-outline',
-                rota: '/glossario',
-                total: estudo.glossario.length,
-            },
-        ];
+        try {
+            const [estudo, progressoLeitura, temas] = await Promise.all([
+                this.material.carregar(),
+                this.material.progresso(),
+                this.content.listarTemasDetalhe(),
+            ]);
 
-        this.carregando = false;
+            this.temas = temas;
+            this.progressoTemas = await this.progresso.estatisticasPorTema(temas.map((tema) => tema.slug));
+
+            this.secoes = [
+                {
+                    id: 'sinais',
+                    titulo: 'Sinais de trânsito',
+                    descricao: 'Reconhecer pela forma, cor e significado',
+                    unidade: 'sinais',
+                    icone: 'warning-outline',
+                    rota: '/aprender/sinais',
+                    total: estudo.sinais.length,
+                    progresso: progressoLeitura.sinais,
+                },
+                {
+                    id: 'licoes',
+                    titulo: 'Fichas por tema',
+                    descricao: 'Regras, condução, primeiros socorros e mecânica',
+                    unidade: 'fichas',
+                    icone: 'library-outline',
+                    rota: '/aprender/licoes',
+                    total: estudo.licoes.length,
+                    progresso: progressoLeitura.licoes,
+                },
+                {
+                    id: 'codigo',
+                    titulo: 'Código da Estrada',
+                    descricao: 'O texto legal, organizado por capítulos',
+                    unidade: 'artigos',
+                    icone: 'document-text-outline',
+                    rota: '/aprender/codigo',
+                    total: estudo.artigos.length,
+                    progresso: progressoLeitura.artigos,
+                },
+                {
+                    id: 'glossario',
+                    titulo: 'Glossário',
+                    descricao: 'O vocabulário que aparece nas perguntas',
+                    unidade: 'termos',
+                    icone: 'text-outline',
+                    rota: '/aprender/glossario',
+                    total: estudo.glossario.length,
+                },
+            ];
+        } catch (erro) {
+            this.erroCarregamento = mensagemErroApi(erro);
+        } finally {
+            this.carregando = false;
+        }
     }
 
     /** Só mostra secções com conteúdo publicado — cartões vazios não ajudam. */
@@ -128,7 +141,16 @@ export class EstudosPage implements OnInit {
     }
 
     get secoesPreview(): SecaoEstudo[] {
-        return this.secoesDisponiveis.slice(0, 2);
+        return this.secoesDisponiveis;
+    }
+
+    get mostrarPesquisa(): boolean {
+        return this.temas.length >= 6;
+    }
+
+    get temaParaContinuar(): TemaDetalhe | undefined {
+        const emCurso = this.progressoTemas.find((item) => item.respondidas > 0 && item.estado !== 'dominado');
+        return this.temas.find((tema) => tema.slug === emCurso?.tema) ?? this.temas[0];
     }
 
     progressoDoTema(slug: string): ProgressoTema {

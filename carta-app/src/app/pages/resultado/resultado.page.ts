@@ -12,6 +12,8 @@ import { StorageService } from '../../core/storage.service';
 import { TemasService } from '../../core/temas.service';
 import { Pergunta } from '../../models/pergunta.model';
 import { ProgressoTema, ResultadoResumo } from '../../models/progresso.model';
+import { AuthService } from '../../core/auth.service';
+import { mensagemErroApi } from '../../core/api-error';
 
 interface DetalheApresentado {
     pergunta: Pergunta;
@@ -37,6 +39,7 @@ export class ResultadoPage implements OnInit {
     /** Acertos muito rápidos: provável adivinhação, não domínio. */
     acertosSuspeitos = 0;
     publico = false;
+    mensagemErro = '';
 
     constructor(
         private readonly router: Router,
@@ -46,13 +49,19 @@ export class ResultadoPage implements OnInit {
         private readonly storage: StorageService,
         private readonly regras: RegrasService,
         private readonly temasService: TemasService,
+        private readonly auth: AuthService,
     ) {
         addIcons({ arrowBackOutline, arrowForwardOutline, bookOutline, checkmarkCircle, closeCircle, schoolOutline, trendingUpOutline });
     }
 
     async ngOnInit(): Promise<void> {
-        this.publico = this.route.snapshot.queryParamMap.get('publico') === '1';
-        await Promise.all([this.regras.carregar(), this.temasService.carregar()]);
+        this.publico = !(await this.auth.token());
+        try {
+            const [, , pacote] = await Promise.all([
+                this.regras.carregar(),
+                this.temasService.carregar(),
+                this.content.carregarPacote(),
+            ]);
 
         /*
          * Lido do armazenamento e não de `history.state`: recarregar a página
@@ -64,8 +73,9 @@ export class ResultadoPage implements OnInit {
             this.tempoSegundos = guardado.tempoSegundos;
             this.notaPassagem = guardado.notaPassagem || this.regras.notaPassagem(guardado.resumo.total);
 
+            const porId = new Map(pacote.perguntas.map((pergunta) => [pergunta.id, pergunta]));
             for (const detalhe of guardado.detalhes) {
-                const pergunta = await this.content.obterPergunta(detalhe.perguntaId);
+                const pergunta = porId.get(detalhe.perguntaId);
                 if (pergunta) {
                     this.detalhes.push({ pergunta, escolhida: detalhe.escolhida });
                 }
@@ -74,7 +84,7 @@ export class ResultadoPage implements OnInit {
 
         this.valores = this.regras.valores(this.resumo.acertos, this.resumo.total);
 
-        const estatisticas = await this.progresso.estatisticasPorTema(await this.content.listarTemas());
+        const estatisticas = await this.progresso.estatisticasPorTema(pacote.temas);
         /*
          * "Fracos" já não inclui os temas nunca praticados — antes o ecrã
          * listava dezenas de temas que o aluno nem tinha visto, o que tornava
@@ -85,7 +95,11 @@ export class ResultadoPage implements OnInit {
         const diagnostico = await this.progresso.diagnosticoAvancado();
         this.acertosSuspeitos = diagnostico.acertosSuspeitos;
 
-        this.carregando = false;
+        } catch (erro) {
+            this.mensagemErro = mensagemErroApi(erro);
+        } finally {
+            this.carregando = false;
+        }
     }
 
     get percentagem(): number {
@@ -114,7 +128,7 @@ export class ResultadoPage implements OnInit {
     }
 
     get aprovado(): boolean {
-        return this.regras.aprovado(this.resumo.acertos, this.resumo.total);
+        return this.resumo.total > 0 && this.resumo.acertos >= this.notaPassagem;
     }
 
     get naoRespondidas(): number {
@@ -139,14 +153,14 @@ export class ResultadoPage implements OnInit {
     }
 
     repetirAdaptativo(): Promise<boolean> {
-        return this.router.navigate(['/simulado'], { queryParams: { modo: 'adaptativo', ...(this.publico ? { publico: 1 } : {}) } });
+        return this.router.navigate(['/praticar/erros']);
     }
 
     novoExame(): Promise<boolean> {
-        return this.publico ? this.router.navigate(['/simulado'], { queryParams: { publico: 1 } }) : this.router.navigate(['/exames']);
+        return this.router.navigate(['/simular/configurar']);
     }
 
     voltarInicio(): Promise<boolean> {
-        return this.router.navigateByUrl(this.publico ? '/estudos' : '/inicio');
+        return this.router.navigateByUrl('/simular');
     }
 }

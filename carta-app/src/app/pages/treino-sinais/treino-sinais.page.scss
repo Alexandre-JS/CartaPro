@@ -1,53 +1,45 @@
-:host { display: block; }
-
-.train-page { --background: var(--app-color-page); }
-.train-shell { width: min(100%, 560px); min-height: 100%; margin: 0 auto; padding-bottom: calc(28px + env(safe-area-inset-bottom)); overflow: hidden; background: var(--app-color-light-gray); box-shadow: 0 0 42px rgb(22 22 22 / 10%); }
-
-.train-header { position: relative; display: grid; grid-template-columns: 42px 1fr auto; align-items: center; gap: 12px; min-height: 138px; padding: max(28px, env(safe-area-inset-top)) 18px 20px; overflow: hidden; color: var(--pv-white); background-color: var(--app-color-brand-panel); background-image: url('/assets/backgrounds/ESCOLA-DE-CONDUCAO.jpg'); background-position: center 42%; background-size: cover; }
-.train-header::before { position: absolute; inset: 0; background: rgb(26 31 92 / 55%); content: ''; }
-.train-header > * { position: relative; z-index: 1; }
-.train-header .icon-button { display: grid; width: 40px; height: 40px; place-items: center; border: 0; border-radius: 50%; color: var(--pv-white); background: rgb(255 255 255 / 13%); cursor: pointer; }
-.train-header span { font-size: .58rem; text-transform: uppercase; letter-spacing: .07em; opacity: .85; }
-.train-header h1 { margin: 4px 0 0; font-size: 1.08rem; font-weight: 600; line-height: 1.3; }
-.header-count { display: grid; min-width: 52px; height: 40px; place-items: center; padding: 0 10px; border-radius: 12px; background: rgb(255 255 255 / 15%); font-size: .8rem !important; font-weight: 700; text-transform: none !important; letter-spacing: 0 !important; opacity: 1 !important; }
-
-.progress-bar { display: block; height: 4px; overflow: hidden; background: var(--pv-border); }
-.progress-bar i { display: block; height: 100%; background: var(--app-color-green-dark); transition: width .25s ease; }
-
-.train-content { display: grid; gap: 14px; padding: 16px 18px 0; }
-
-.answer-actions { display: grid; gap: 8px; }
-.final-actions { display: grid; gap: 8px; margin-top: 4px; }
-
-.primary-button, .outline-button, .ghost-button { display: flex; min-height: 50px; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 12px; font: inherit; font-size: .8rem; font-weight: 700; text-decoration: none; cursor: pointer; }
-.primary-button { color: var(--pv-white); background: var(--app-color-action); }
-.outline-button { border: 1px solid var(--app-color-green); color: var(--app-color-green-dark); background: var(--pv-white); }
-.ghost-button { min-height: 44px; color: var(--app-color-text-muted); background: none; font-weight: 600; }
-
-.score-card { display: grid; justify-items: center; padding: 24px 20px; border: 1px solid var(--app-color-border-subtle); border-radius: 18px; background: var(--pv-white); text-align: center; }
-.score-card > ion-icon { color: var(--app-color-road-gray); font-size: 2.4rem; }
-.score-card.good > ion-icon { color: var(--app-color-green-dark); }
-.score-card strong { margin-top: 10px; font-size: 1.6rem; font-weight: 700; }
-.score-card > span { color: var(--app-color-text-muted); font-size: .74rem; }
-.score-card p { max-width: 320px; margin: 12px 0 0; font-size: .78rem; line-height: 1.6; }
-
-.missed h2 { margin: 0 0 8px; font-size: .82rem; font-weight: 700; }
-.missed-row { display: grid; grid-template-columns: 54px 1fr auto; align-items: center; gap: 11px; margin-bottom: 8px; padding: 10px 14px 10px 10px; border: 1px solid var(--app-color-border-subtle); border-radius: 14px; background: var(--pv-white); color: inherit; text-decoration: none; }
-.missed-row .thumb { display: grid; height: 54px; place-items: center; border-radius: 10px; background: var(--pv-bg); }
-.missed-row .thumb img { width: auto; max-width: 46px; max-height: 46px; }
-.missed-row .thumb ion-icon { color: var(--app-color-road-gray); font-size: 1.4rem; }
-.missed-row strong { display: block; font-size: .78rem; line-height: 1.35; }
-.missed-row small { display: block; color: var(--app-color-text-muted); font-size: .68rem; line-height: 1.4; }
-.missed-row > ion-icon:last-child { color: var(--app-color-disabled); font-size: 1rem; }
-
-.hint { margin: 0; color: var(--app-color-text-muted); font-size: .76rem; line-height: 1.6; text-align: center; }
-
-.empty-state { display: grid; place-items: center; padding: 46px 22px; text-align: center; }
-.empty-state > ion-icon { color: var(--app-color-green-dark); font-size: 2.8rem; }
-.empty-state h2 { margin: 14px 0 6px; font-size: 1.05rem; }
-.empty-state p { max-width: 320px; margin: 0 0 18px; color: var(--app-color-text-muted); font-size: .78rem; line-height: 1.55; }
-.empty-state .primary-button { padding: 0 22px; }
-
-@media (min-width: 700px) {
-  .train-shell { min-height: calc(100vh - 48px); margin-block: 24px; border-radius: 28px; }
-}
+:host { display: block; min-width: 0; }
+.train-page { --background: var(--pv-background); }
+.train-shell { width: min(100%, var(--pv-content-reading)); min-height: 100%; margin: 0 auto; background: var(--pv-background); }
+.train-header { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; min-height: 72px; align-items: center; gap: var(--pv-space-03); padding: max(var(--pv-space-03), env(safe-area-inset-top)) var(--pv-space-page) var(--pv-space-03); border-bottom: 1px solid var(--pv-border-subtle); background: var(--pv-layer-01); }
+.train-header .icon-button { display: grid; width: var(--pv-touch-target); height: var(--pv-touch-target); place-items: center; border: 0; color: var(--pv-text-primary); background: transparent; }
+.train-header .icon-button ion-icon { font-size: 22px; }
+.train-header > div { min-width: 0; }
+.train-header span { color: var(--pv-text-secondary); font-size: var(--pv-type-caption); }
+.train-header h1 { overflow: hidden; margin: var(--pv-space-01) 0 0; font-size: var(--pv-type-item); font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.header-count { color: var(--pv-text-secondary); font-size: var(--pv-type-meta); font-weight: 600; }
+.progress-bar { display: block; height: 5px; overflow: hidden; background: var(--pv-border-subtle); }
+.progress-bar i { display: block; height: 100%; background: var(--pv-progress); }
+.train-content { display: grid; gap: var(--pv-space-05); width: 100%; box-sizing: border-box; padding: var(--pv-space-06) var(--pv-space-page) calc(var(--pv-space-07) + env(safe-area-inset-bottom)); }
+.answer-actions, .final-actions { display: grid; gap: var(--pv-space-03); }
+.primary-button, .outline-button, .ghost-button { display: inline-flex; min-height: var(--pv-touch-target); align-items: center; justify-content: center; gap: var(--pv-space-03); padding-inline: var(--pv-space-05); border-radius: var(--pv-radius-default); font: inherit; font-size: var(--pv-type-body-sm); font-weight: 600; text-decoration: none; }
+.primary-button { border: 0; color: var(--pv-on-interactive); background: var(--pv-interactive); }
+.outline-button { border: 1px solid var(--pv-interactive); color: var(--pv-interactive); background: var(--pv-layer-01); }
+.ghost-button { border: 0; color: var(--pv-interactive); background: transparent; }
+.score-card { display: grid; justify-items: center; gap: var(--pv-space-03); padding: var(--pv-space-06); border: 1px solid var(--pv-border-subtle); border-radius: var(--pv-radius-tile); background: var(--pv-layer-01); text-align: center; }
+.score-card > ion-icon { color: var(--pv-text-secondary); font-size: 40px; }
+.score-card.good > ion-icon { color: var(--pv-success); }
+.score-card strong { font-size: var(--pv-type-display); }
+.score-card > span { color: var(--pv-text-secondary); font-size: var(--pv-type-body-sm); }
+.score-card p { max-width: 340px; margin: 0; color: var(--pv-text-secondary); font-size: var(--pv-type-body-sm); line-height: var(--pv-line-body); }
+.missed h2 { margin: 0 0 var(--pv-space-03); font-size: var(--pv-type-heading); }
+.missed-row { display: grid; grid-template-columns: 56px minmax(0, 1fr) 18px; min-height: 72px; align-items: center; gap: var(--pv-space-03); padding: var(--pv-space-03); border-bottom: 1px solid var(--pv-border-subtle); color: var(--pv-text-primary); background: var(--pv-layer-01); text-decoration: none; }
+.missed-row:first-of-type { border-radius: var(--pv-radius-tile) var(--pv-radius-tile) 0 0; }
+.missed-row:last-child { border-bottom: 0; border-radius: 0 0 var(--pv-radius-tile) var(--pv-radius-tile); }
+.missed-row .thumb { display: grid; width: 56px; height: 56px; place-items: center; background: var(--pv-layer-02); }
+.missed-row .thumb img { max-width: 48px; max-height: 48px; }
+.missed-row strong, .missed-row small { display: block; }
+.missed-row strong { font-size: var(--pv-type-body-sm); }
+.missed-row small { color: var(--pv-text-secondary); font-size: var(--pv-type-caption); line-height: 1.4; }
+.missed-row > ion-icon:last-child { color: var(--pv-text-secondary); }
+.hint { margin: 0; color: var(--pv-text-secondary); font-size: var(--pv-type-body-sm); line-height: var(--pv-line-body); text-align: center; }
+.empty-state { display: grid; min-height: 400px; place-content: center; justify-items: center; padding: var(--pv-space-06); text-align: center; }
+.empty-state > ion-icon { color: var(--pv-interactive); font-size: 44px; }
+.empty-state h2 { margin: var(--pv-space-04) 0 var(--pv-space-02); font-size: var(--pv-type-heading); }
+.empty-state p { max-width: 340px; margin: 0 0 var(--pv-space-05); color: var(--pv-text-secondary); font-size: var(--pv-type-body-sm); line-height: var(--pv-line-body); }
+.load-error { display: grid; width: 100%; box-sizing: border-box; grid-template-columns: 32px minmax(0, 1fr); gap: var(--pv-space-04); padding: var(--pv-space-05); border: 1px solid var(--pv-orange-100); border-radius: var(--pv-radius-tile); background: var(--pv-orange-050); }
+.load-error > ion-icon { color: var(--pv-warning-text); font-size: 24px; }
+.load-error h2 { margin: 0; font-size: var(--pv-type-heading); }
+.load-error p { margin: var(--pv-space-02) 0 0; overflow-wrap: anywhere; color: var(--pv-text-secondary); font-size: var(--pv-type-body-sm); }
+.load-error button { grid-column: 2; display: inline-flex; min-height: var(--pv-touch-target); align-items: center; gap: var(--pv-space-03); justify-self: start; padding-inline: var(--pv-space-05); border: 1px solid var(--pv-interactive); border-radius: var(--pv-radius-default); color: var(--pv-interactive); background: var(--pv-layer-01); font: inherit; font-weight: 600; }
+@media (min-width: 600px) { .train-content { padding-inline: var(--pv-space-07); } }

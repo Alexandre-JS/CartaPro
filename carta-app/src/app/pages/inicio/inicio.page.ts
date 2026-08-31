@@ -5,7 +5,7 @@ import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
 import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
 import { addIcons } from 'ionicons';
-import { bookOutline, bulbOutline, checkmarkCircleOutline, chevronForwardOutline, documentTextOutline, lockClosedOutline, notificationsOutline, refreshOutline, timeOutline, warningOutline } from 'ionicons/icons';
+import { bookOutline, bulbOutline, checkmarkCircleOutline, chevronForwardOutline, createOutline, documentTextOutline, personCircleOutline, refreshOutline, timeOutline, warningOutline } from 'ionicons/icons';
 import { AcessoService } from '../../core/acesso.service';
 import { ContentService } from '../../core/content.service';
 import { ProgressoService } from '../../core/progresso.service';
@@ -15,6 +15,7 @@ import { StorageService } from '../../core/storage.service';
 import { TemasService } from '../../core/temas.service';
 import { TreinoSinaisService } from '../../core/treino-sinais.service';
 import { AuthService } from '../../core/auth.service';
+import { mensagemErroApi } from '../../core/api-error';
 import { CategoriaCarta } from '../../models/pergunta.model';
 import { HistoricoExame, ProgressoTema } from '../../models/progresso.model';
 
@@ -41,6 +42,7 @@ export class InicioPage implements OnInit {
     historico: HistoricoExame[] = [];
     primeiroNome = 'Estudante';
     carregando = true;
+    erroCarregamento = '';
     /** Fila de tarefas por ordem de urgência; só a cabeça vai a destaque. */
     passos: PassoEstudo[] = [];
     /** Perguntas por trás do cadeado (0 quando o plano é completo). */
@@ -59,39 +61,53 @@ export class InicioPage implements OnInit {
         private readonly treino: TreinoSinaisService,
         private readonly auth: AuthService,
     ) {
-        addIcons({ bookOutline, bulbOutline, checkmarkCircleOutline, chevronForwardOutline, documentTextOutline, lockClosedOutline, notificationsOutline, refreshOutline, timeOutline, warningOutline });
+        addIcons({ bookOutline, bulbOutline, checkmarkCircleOutline, chevronForwardOutline, createOutline, documentTextOutline, personCircleOutline, refreshOutline, timeOutline, warningOutline });
     }
 
     async ngOnInit(): Promise<void> {
-        this.autenticado = !!(await this.auth.token());
-        const categoriaGuardada = await this.storage.obterCategoria();
-        if (categoriaGuardada) {
-            this.categoria = categoriaGuardada as CategoriaCarta;
+        await this.carregar();
+    }
+
+    async carregar(): Promise<void> {
+        this.carregando = true;
+        this.erroCarregamento = '';
+
+        try {
+            this.autenticado = !!(await this.auth.token());
+            const categoriaGuardada = await this.storage.obterCategoria();
+            if (categoriaGuardada) {
+                this.categoria = categoriaGuardada as CategoriaCarta;
+            }
+
+            // Revalida o plano no máximo uma vez por dia e recarrega o pacote
+            // se o acesso mudou (pagou ou expirou).
+            await this.acesso.revalidarSeNecessario();
+            await Promise.all([this.temasService.carregar(), this.regras.carregar()]);
+
+            const [nomesTemas, historico, revisoes, perfil, bloqueado, sinaisPorReforcar] = await Promise.all([
+                this.content.listarTemas(),
+                this.storage.listarExames(),
+                this.storage.listarRevisoesPendentes(),
+                // A página é pública. Sem token, o perfil é apenas a
+                // preferência local e não pode chamar /mobile/me.
+                this.autenticado ? this.perfil.obter() : this.perfil.obterLocal(),
+                this.acesso.conteudoBloqueado(),
+                this.treino.totalParaReforcar(),
+            ]);
+
+            this.primeiroNome = perfil.nome.trim().split(/\s+/)[0] || 'Estudante';
+            this.bloqueadas = bloqueado.total;
+            this.plano = (await this.storage.obterEstadoAcesso()).plano;
+            this.historico = historico;
+            this.temas = await this.progresso.estatisticasPorTema(nomesTemas);
+
+            await this.montarFila(revisoes.length, revisoes[0]?.tema, sinaisPorReforcar);
+        } catch (erro) {
+            this.erroCarregamento = mensagemErroApi(erro);
+        } finally {
+            // Um erro de rede ou de sessão nunca pode deixar o skeleton preso.
+            this.carregando = false;
         }
-
-        // Revalida o plano no máximo uma vez por dia e recarrega o pacote se
-        // o acesso mudou (pagou ou expirou).
-        await this.acesso.revalidarSeNecessario();
-        await Promise.all([this.temasService.carregar(), this.regras.carregar()]);
-
-        const [nomesTemas, historico, revisoes, perfil, bloqueado, sinaisPorReforcar] = await Promise.all([
-            this.content.listarTemas(),
-            this.storage.listarExames(),
-            this.storage.listarRevisoesPendentes(),
-            this.perfil.obter(),
-            this.acesso.conteudoBloqueado(),
-            this.treino.totalParaReforcar(),
-        ]);
-
-        this.primeiroNome = perfil.nome.trim().split(/\s+/)[0] || 'Estudante';
-        this.bloqueadas = bloqueado.total;
-        this.plano = (await this.storage.obterEstadoAcesso()).plano;
-        this.historico = historico;
-        this.temas = await this.progresso.estatisticasPorTema(nomesTemas);
-
-        await this.montarFila(revisoes.length, revisoes[0]?.tema, sinaisPorReforcar);
-
-        this.carregando = false;
     }
 
     get passoPrincipal(): PassoEstudo | null {
@@ -103,13 +119,17 @@ export class InicioPage implements OnInit {
     }
 
     get prontidao(): number {
-        if (!this.autenticado || !this.historico.length) return 0;
+        if (!this.historico.length) return 0;
         const ultimo = this.historico[0];
         return ultimo.total ? Math.round((ultimo.acertos / ultimo.total) * 100) : 0;
     }
 
     get tituloProntidao(): string {
-        return this.autenticado ? (this.historico.length ? 'Em preparação' : 'A começar') : 'Cria conta para acompanhar';
+        return this.historico.length ? 'Em preparação' : 'Ainda estamos a conhecer a sua preparação';
+    }
+
+    get estadoPersistencia(): string {
+        return this.autenticado ? 'Progresso sincronizado' : 'Progresso guardado neste dispositivo';
     }
 
     /**
@@ -125,7 +145,7 @@ export class InicioPage implements OnInit {
                 motivo: 'Revê agora, enquanto a memória ainda está fresca.',
                 icone: 'time-outline',
                 accao: 'Revisar',
-                rota: ['/revisoes'],
+                rota: ['/praticar/revisoes'],
             });
         }
 
@@ -138,7 +158,7 @@ export class InicioPage implements OnInit {
                 motivo: `${recomendacao.motivo} · ${recomendacao.totalPerguntas} perguntas · ${recomendacao.minutosEstimados} min`,
                 icone: 'bulb-outline',
                 accao: recomendacao.acao === 'reforcar' ? 'Reforçar' : 'Estudar',
-                rota: ['/estudo', recomendacao.tema],
+                rota: ['/praticar/tema', recomendacao.tema],
                 query: { categoria: this.categoria },
             });
         }
@@ -149,7 +169,7 @@ export class InicioPage implements OnInit {
                 motivo: 'Sinais que já falhaste no treino de reconhecimento.',
                 icone: 'warning-outline',
                 accao: 'Treinar',
-                rota: ['/treino-sinais'],
+                rota: ['/praticar/sinais'],
                 query: { modo: 'reforco' },
             });
         }
@@ -160,7 +180,7 @@ export class InicioPage implements OnInit {
                 motivo: 'Um exame completo mostra onde estás antes do INATRO.',
                 icone: 'document-text-outline',
                 accao: 'Começar',
-                rota: ['/exames'],
+                rota: ['/simular/configurar'],
             });
         }
 

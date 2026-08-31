@@ -1,7 +1,7 @@
 <ion-content [fullscreen]="true" class="code-page">
   <main class="code-shell">
     <header class="code-header">
-      <a class="icon-button" routerLink="/estudos" aria-label="Voltar aos estudos">
+      <a class="icon-button" routerLink="/aprender" aria-label="Voltar a Aprender">
         <ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>
       </a>
       <div>
@@ -37,7 +37,7 @@
           <ion-icon name="document-text-outline" aria-hidden="true"></ion-icon>
           <h2>Sem artigos publicados</h2>
           <p>A CartaPro ainda não publicou o texto do Código. As fichas de estudo e os sinais já estão disponíveis.</p>
-          <a class="primary-button" routerLink="/licoes">Ver fichas de estudo</a>
+          <a class="primary-button" routerLink="/aprender/licoes">Ver fichas de estudo</a>
         </section>
       } @else if (pesquisando) {
         <h2 class="section-title">{{ resultados.length }} resultado(s) para "{{ pesquisa }}"</h2>
@@ -81,7 +81,7 @@
                   }
                 }
                 @for (licao of licoesDoArtigo; track licao.slug) {
-                  <a class="lesson-link" [routerLink]="['/licao', licao.slug]">
+                  <a class="lesson-link" [routerLink]="['/aprender/licoes', licao.slug]">
                     <ion-icon name="book-outline" aria-hidden="true"></ion-icon>
                     Ficha: {{ licao.titulo }}
                   </a>
@@ -139,7 +139,7 @@
                           }
                         }
                         @for (licao of licoesDoArtigo; track licao.slug) {
-                          <a class="lesson-link" [routerLink]="['/licao', licao.slug]">
+                          <a class="lesson-link" [routerLink]="['/aprender/licoes', licao.slug]">
                             <ion-icon name="book-outline" aria-hidden="true"></ion-icon>
                             Ficha: {{ licao.titulo }}
                           </a>

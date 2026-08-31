@@ -1,0 +1,27 @@
+<ion-content [fullscreen]="true" class="school-page">
+  <main class="school-shell" [class.in-exam]="!!prova && !resultado">
+    @if (prova && !resultado) {
+      <header class="exam-header"><button type="button" (click)="reiniciarEntrada()" aria-label="Sair da prova"><ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon></button><strong>Questão {{ indice + 1 }} de {{ prova.perguntas.length }}</strong><span><ion-icon name="time-outline" aria-hidden="true"></ion-icon>{{ tempoFormatado }}</span></header>
+      <div class="progress" role="progressbar" [attr.aria-valuenow]="progresso" aria-valuemin="0" aria-valuemax="100"><i [style.width.%]="progresso"></i></div>
+      @if (perguntaAtual; as pergunta) {
+        <section class="school-question"><p class="question-theme">{{ nomeTema(pergunta.tema) }}</p><h1>{{ pergunta.enunciado }}</h1>@if (pergunta.imagem) {<img [src]="pergunta.imagem" [alt]="pergunta.enunciado">}<div class="answers">@for (opcao of pergunta.opcoes; track $index) {<button type="button" [class.selected]="respostas[pergunta.id] === $index" (click)="escolher($index)"><span>{{ ['A', 'B', 'C', 'D'][$index] || $index + 1 }}</span>{{ opcao }}</button>}</div></section>
+        @if (mensagemErro) {<p class="inline-error" role="alert">{{ mensagemErro }}</p>}
+        <footer class="exam-controls">@if (indice > 0) {<button type="button" class="previous" (click)="anterior()"><ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>Anterior</button>}@if (indice < prova.perguntas.length - 1) {<button type="button" class="next" (click)="seguinte()">Seguinte<ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon></button>} @else {<button type="button" class="next" [disabled]="submetendo" (click)="finalizar()">{{ submetendo ? 'A submeter…' : 'Finalizar prova' }}</button>}</footer>
+      }
+    } @else if (resultado) {
+      <header class="entry-header"><a routerLink="/simular" aria-label="Voltar a Simular"><ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon></a><span><small>Prova escolar</small><strong>Resultado submetido</strong></span></header>
+      <section class="school-result" [class.failed]="!resultado.aprovado"><ion-icon [name]="resultado.aprovado ? 'checkmark-circle-outline' : 'close-circle-outline'" aria-hidden="true"></ion-icon><p>{{ resultado.aprovado ? 'Aprovado' : 'Em preparação' }}</p><h1>{{ resultado.percentagem }}%</h1><dl><div><dt>Acertos</dt><dd>{{ resultado.pontuacao }} de {{ resultado.total }}</dd></div><div><dt>Nota</dt><dd>{{ resultado.valores }} valores</dd></div><div><dt>Mínimo</dt><dd>{{ resultado.notaPassagem }} acertos</dd></div></dl><p class="submission-note">A resposta foi entregue à escola.</p><button type="button" (click)="reiniciarEntrada()">Entrar noutra prova</button><a routerLink="/simular">Voltar a Simular</a></section>
+      <app-bottom-nav ativo="exames"></app-bottom-nav>
+    } @else {
+      <header class="entry-header"><a routerLink="/simular" aria-label="Voltar a Simular"><ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon></a><span><small>Simular</small><strong>Prova escolar</strong></span></header>
+      <section class="school-intro"><span><ion-icon name="school-outline" aria-hidden="true"></ion-icon></span><p class="section-label">Atividade da escola</p><h1>Entre com o código da sessão</h1><p>O código é fornecido pelo instrutor. Esta área é separada dos seus simulados individuais.</p></section>
+      <section class="entry-form">
+        <form (submit)="$event.preventDefault(); consultar()"><label for="school-code">Código da prova</label><div class="code-row"><input id="school-code" name="codigo" [(ngModel)]="codigo" autocomplete="off" autocapitalize="characters" placeholder="Ex.: ABC123" [disabled]="carregando"><button type="submit" [disabled]="carregando || !codigo.trim()">{{ carregando && !sessao ? 'A verificar…' : 'Continuar' }}</button></div></form>
+        @if (mensagemErro) {<p class="inline-error" role="alert"><ion-icon name="warning-outline" aria-hidden="true"></ion-icon>{{ mensagemErro }}</p>}
+        @if (sessao) {<article class="session-card"><div><p class="section-label">{{ sessao.turma.nome }}</p><h2>{{ sessao.prova.nome }}</h2><p>{{ sessao.prova.perguntas }} questões · {{ sessao.prova.minutos }} minutos</p></div><span [class.closed]="!sessao.aberta">{{ sessao.aberta ? 'Em curso' : 'Encerrada' }}</span></article>@if (sessao.aberta) {<form class="name-form" (submit)="$event.preventDefault(); identificar()"><label for="student-name">O seu nome completo</label><input id="student-name" name="nome" [(ngModel)]="nome" autocomplete="name" placeholder="Como aparece na pauta"><small>Usamos o nome apenas para validar a sua inscrição na turma.</small><button type="submit" [disabled]="carregando || nome.trim().length < 3">{{ carregando ? 'A entrar…' : 'Iniciar prova' }}</button></form>}}
+        <div class="assigned"><ion-icon name="document-text-outline" aria-hidden="true"></ion-icon><span><strong>Tem uma atividade atribuída?</strong><small>Abra a sua área escolar para ver tarefas ligadas à conta.</small></span><a routerLink="/escola">Ver atividades</a></div>
+      </section>
+      <app-bottom-nav ativo="exames"></app-bottom-nav>
+    }
+  </main>
+</ion-content>

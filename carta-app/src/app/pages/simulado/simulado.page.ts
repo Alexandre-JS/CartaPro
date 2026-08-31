@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
+import { ActivatedRoute, Router } from '@angular/router';
+import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline, arrowForwardOutline, documentTextOutline, timeOutline } from 'ionicons/icons';
 import { CategoriaCarta, Pergunta } from '../../models/pergunta.model';
@@ -13,12 +13,12 @@ import { RegrasService } from '../../core/regras.service';
 import { PerguntaCardComponent } from '../../components/pergunta-card/pergunta-card.component';
 import { TAMANHO_SIMULADO } from '../../config/simulado.config';
 import { ExameApiService } from '../../core/exame-api.service';
-import { AuthService } from '../../core/auth.service';
+import { mensagemErroApi } from '../../core/api-error';
 
 @Component({
     standalone: true,
     selector: 'app-simulado',
-    imports: [RouterLink, IonButton, IonContent, IonIcon, PerguntaCardComponent],
+    imports: [IonContent, IonIcon, PerguntaCardComponent],
     templateUrl: './simulado.page.html',
     styleUrls: ['./simulado.page.scss'],
 })
@@ -37,8 +37,8 @@ export class SimuladoPage implements OnInit, OnDestroy {
     notaPassagem = 0;
     retomado = false;
     carregando = true;
-    publico = false;
     iniciada = false;
+    mensagemErro = '';
 
     private temporizador?: ReturnType<typeof setInterval>;
     private finalizando = false;
@@ -64,39 +64,47 @@ export class SimuladoPage implements OnInit, OnDestroy {
         private readonly content: ContentService,
         private readonly regras: RegrasService,
         private readonly examesApi: ExameApiService,
-        private readonly auth: AuthService,
     ) {
         addIcons({ arrowBackOutline, arrowForwardOutline, documentTextOutline, timeOutline });
     }
 
     async ngOnInit(): Promise<void> {
         const parametros = this.route.snapshot.queryParamMap;
-        this.categoria = (parametros.get('categoria') || 'ligeiro') as CategoriaCarta;
+        this.categoria = (parametros.get('categoria') || (await this.storage.obterCategoria()) || 'ligeiro') as CategoriaCarta;
         const adaptativo = parametros.get('modo') === 'adaptativo';
-        this.publico = parametros.get('publico') === '1' || !(await this.auth.token());
         this.numeroExame = Number(parametros.get('exame')) || 0;
-        if (this.numeroExame && !(await this.auth.token())) {
-            await this.router.navigateByUrl('/entrar');
-            return;
-        }
         this.origem = this.numeroExame ? 'exame' : 'simulado';
-        this.chaveEstado = this.numeroExame ? `exame:${this.numeroExame}` : `simulado:${this.categoria}:${adaptativo ? 'adaptativo' : 'normal'}`;
+        const totalPedido = Math.max(1, Math.min(100, Number(parametros.get('total')) || TAMANHO_SIMULADO));
+        const duracaoMinutos = Math.max(1, Math.min(180, Number(parametros.get('duracao')) || 0));
+        const chaveRetoma = parametros.get('retomar');
+        this.chaveEstado = chaveRetoma || (this.numeroExame
+            ? `exame:${this.numeroExame}`
+            : `simulado:${this.categoria}:${adaptativo ? 'adaptativo' : 'normal'}:${totalPedido}:${duracaoMinutos || 'oficial'}`);
 
-        await this.regras.carregar();
+        try {
+            await this.regras.carregar();
+            const retomavel = await this.storage.obterSimuladoEmCurso(this.chaveEstado);
+            if (retomavel) {
+                this.numeroExame = retomavel.numeroExame;
+                this.origem = this.numeroExame ? 'exame' : 'simulado';
+            }
+            if (retomavel && (await this.retomar(retomavel))) {
+                this.retomado = true;
+            } else {
+                await this.iniciarNovo(adaptativo, totalPedido, duracaoMinutos);
+            }
 
-        const retomavel = await this.storage.obterSimuladoEmCurso(this.chaveEstado);
-        if (retomavel && (await this.retomar(retomavel))) {
-            this.retomado = true;
-            this.iniciada = true;
-        } else {
-            await this.iniciarNovo(adaptativo);
-        }
-
-        this.carregando = false;
-        if (this.iniciada) {
-            this.perguntaMostradaEm = Date.now();
-            this.atualizarTempo();
-            this.arrancarTemporizador();
+            this.iniciada = !!this.perguntas.length;
+            if (this.iniciada) {
+                this.perguntaMostradaEm = Date.now();
+                this.atualizarTempo();
+                this.arrancarTemporizador();
+                await this.guardarEstado();
+            }
+        } catch (erro) {
+            this.mensagemErro = mensagemErroApi(erro);
+        } finally {
+            this.carregando = false;
         }
     }
 
@@ -142,18 +150,6 @@ export class SimuladoPage implements OnInit, OnDestroy {
 
     get tempoTotalFormatado(): string {
         return this.formatar(this.duracaoTotalSegundos);
-    }
-
-    iniciarSimulado(): void {
-        if (this.iniciada || !this.perguntas.length) {
-            return;
-        }
-        this.iniciada = true;
-        this.iniciadoEm = Date.now();
-        this.perguntaMostradaEm = Date.now();
-        this.atualizarTempo();
-        this.arrancarTemporizador();
-        void this.guardarEstado();
     }
 
     get ultimaPergunta(): boolean {
@@ -220,18 +216,18 @@ export class SimuladoPage implements OnInit, OnDestroy {
     }
 
     sair(): Promise<boolean> {
-        return this.router.navigateByUrl(this.publico ? '/estudos' : '/exames');
+        return this.router.navigateByUrl('/simular');
     }
 
-    private async iniciarNovo(adaptativo: boolean): Promise<void> {
+    private async iniciarNovo(adaptativo: boolean, totalPedido: number, duracaoMinutos: number): Promise<void> {
         if (this.numeroExame) {
             const exame = await this.examesApi.obter(this.numeroExame);
             this.perguntas = exame.perguntas;
             this.duracaoTotalSegundos = (exame.minutos || this.regras.para(this.categoria).minutos) * 60;
             this.notaPassagem = exame.notaPassagem || this.regras.notaPassagem(exame.perguntas.length, this.categoria);
         } else {
-            this.perguntas = await this.simulado.montarSimulado(this.categoria, adaptativo);
-            this.duracaoTotalSegundos = this.regras.duracaoSegundos(this.categoria);
+            this.perguntas = await this.simulado.montarSimulado(this.categoria, adaptativo, totalPedido);
+            this.duracaoTotalSegundos = duracaoMinutos ? duracaoMinutos * 60 : this.regras.duracaoSegundos(this.categoria);
             this.notaPassagem = this.regras.notaPassagem(this.perguntas.length, this.categoria);
         }
 
@@ -245,20 +241,16 @@ export class SimuladoPage implements OnInit, OnDestroy {
 
     /** Reconstrói uma prova interrompida a partir dos ids guardados. */
     private async retomar(estado: SimuladoEmCurso): Promise<boolean> {
-        const perguntas: Pergunta[] = [];
+        const disponiveis = this.numeroExame
+            ? (await this.examesApi.obter(this.numeroExame)).perguntas
+            : (await this.content.carregarPacote()).perguntas;
+        const porId = new Map(disponiveis.map((pergunta) => [pergunta.id, pergunta]));
+        const perguntas = estado.perguntaIds.map((id) => porId.get(id)).filter((pergunta): pergunta is Pergunta => !!pergunta);
 
-        for (const id of estado.perguntaIds) {
-            const pergunta = this.numeroExame
-                ? (await this.examesApi.obter(this.numeroExame)).perguntas.find((item) => item.id === id)
-                : await this.content.obterPergunta(id);
-
-            if (!pergunta) {
-                // Conteúdo mudou desde a interrupção: recomeça limpo.
-                await this.storage.limparSimuladoEmCurso(estado.chave);
-                return false;
-            }
-
-            perguntas.push(pergunta);
+        if (perguntas.length !== estado.perguntaIds.length) {
+            // Conteúdo mudou desde a interrupção: recomeça limpo.
+            await this.storage.limparSimuladoEmCurso(estado.chave);
+            return false;
         }
 
         const decorridos = Math.floor((Date.now() - estado.iniciadoEm) / 1000);
@@ -275,10 +267,8 @@ export class SimuladoPage implements OnInit, OnDestroy {
         this.duracaoTotalSegundos = estado.duracaoTotalSegundos;
         this.totalQuestoes = perguntas.length;
         this.iniciadoEm = estado.iniciadoEm;
-        this.indice = Math.max(0, estado.respondidas.findIndex((respondida) => !respondida));
-        if (this.indice === -1) {
-            this.indice = perguntas.length - 1;
-        }
+        const primeiraPendente = estado.respondidas.findIndex((respondida) => !respondida);
+        this.indice = primeiraPendente === -1 ? perguntas.length - 1 : primeiraPendente;
 
         return true;
     }
@@ -361,7 +351,7 @@ export class SimuladoPage implements OnInit, OnDestroy {
         await this.storage.limparSimuladoEmCurso(this.chaveEstado);
         void this.storage.sincronizarAgora().catch(() => undefined);
 
-        await this.router.navigate(['/resultado'], { queryParams: this.publico ? { publico: 1 } : undefined });
+        await this.router.navigate(['/simular/resultado']);
     }
 
     private formatar(segundos: number): string {

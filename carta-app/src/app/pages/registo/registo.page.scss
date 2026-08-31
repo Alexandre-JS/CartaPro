@@ -1,98 +1,92 @@
 :host { display: block; }
 
-.register-page { --background: url('/assets/backgrounds/estrada-aprendiz-mocambique.webp') center / cover no-repeat; }
+.register-page { --background: var(--pv-background); }
 
 .register-shell {
-  display: flex;
-  flex-direction: column;
-  width: min(100%, 480px);
+  width: min(100%, 560px);
   min-height: 100%;
   margin: 0 auto;
-  overflow: hidden;
-  background-color: transparent;
-  box-shadow: 0 0 42px rgb(22 22 22 / 10%);
+  padding-bottom: max(var(--pv-space-07), env(safe-area-inset-bottom));
 }
 
 .register-header {
   position: relative;
   display: grid;
-  flex: 0 0 auto;
-  min-height: 118px;
+  min-height: calc(80px + env(safe-area-inset-top));
   place-items: center;
-  padding: max(20px, env(safe-area-inset-top)) 24px 14px;
-  color: var(--app-color-text);
-  background: transparent;
+  padding: env(safe-area-inset-top) var(--pv-space-05) 0;
+  border-bottom: 1px solid var(--pv-border-subtle);
+  background: var(--pv-layer-01);
 }
 
 .back-button {
   position: absolute;
-  top: max(22px, env(safe-area-inset-top));
-  left: 18px;
+  top: max(var(--pv-space-05), env(safe-area-inset-top));
+  left: var(--pv-space-05);
   display: grid;
-  width: 40px;
-  height: 40px;
+  width: var(--pv-touch-target);
+  height: var(--pv-touch-target);
   place-items: center;
-  border-radius: 50%;
-  color: var(--app-color-green-dark);
-  background: var(--app-color-green-light);
+  color: var(--pv-interactive);
   text-decoration: none;
 }
 
-.back-button ion-icon { font-size: 1.35rem; }
-
-.brand-lockup { display: flex; align-items: center; justify-content: center; gap: 8px; }
-.brand-icon { width: 58px; height: 58px; border-radius: 15px; object-fit: cover; box-shadow: 0 5px 14px rgb(22 22 22 / 12%); }
-.brand-name { font-size: 1.9rem; font-weight: 600; line-height: 1; letter-spacing: -1.5px; }
-.brand-name strong { color: var(--app-color-green-dark); font-weight: 600; }
-.brand-lockup p { margin: 5px 0 0; font-size: .6rem; white-space: nowrap; }
-.brand-lockup em { color: var(--app-color-green-dark); font-style: normal; font-weight: 600; }
+.back-button ion-icon { font-size: 22px; }
+.brand-lockup { display: flex; align-items: center; gap: var(--pv-space-03); }
+.brand-icon { width: 44px; height: 44px; border-radius: var(--pv-radius-default); object-fit: cover; }
+.brand-name { color: var(--pv-text-primary); font-size: var(--pv-type-heading); font-weight: 600; line-height: 1; }
+.brand-name strong { color: var(--pv-interactive); font-weight: 700; }
+.brand-lockup p { margin: var(--pv-space-02) 0 0; color: var(--pv-text-secondary); font-size: 10px; }
+.brand-lockup em { color: var(--pv-cyan-700); font-style: normal; font-weight: 600; }
 
 .register-card {
-  position: relative;
-  z-index: 2;
-  flex: 1 0 auto;
-  padding: 12px 24px max(26px, env(safe-area-inset-bottom));
-  background: transparent;
+  margin: var(--pv-space-05);
+  padding: var(--pv-space-06) var(--pv-space-05);
+  border: 1px solid var(--pv-border-subtle);
+  border-radius: var(--pv-radius-sheet);
+  background: var(--pv-layer-01);
 }
 
-.form-heading { margin-bottom: 18px; text-align: center; }
-.form-heading h1 { margin: 0; color: var(--app-color-green-dark); font-size: 1.4rem; font-weight: 600; }
-.form-heading p { margin: 6px 0 0; color: var(--app-color-text-muted); font-size: .8rem; }
+.form-heading { margin-bottom: var(--pv-space-06); }
+.form-heading h1 { margin: 0; color: var(--pv-text-primary); font-size: var(--pv-type-title); line-height: var(--pv-line-tight); }
+.form-heading p { margin: var(--pv-space-03) 0 0; color: var(--pv-text-secondary); font-size: var(--pv-type-body-sm); }
+.field-group { margin-bottom: var(--pv-space-04); }
 
-.field-group { margin-bottom: 11px; }
 .form-field {
-  --min-height: 51px;
-  --padding-start: 14px;
-  --inner-padding-end: 8px;
-  --background: rgb(255 255 255 / 84%);
-  --border-radius: 10px;
-  border: 1px solid var(--app-color-border);
-  border-radius: 10px;
+  --min-height: 52px;
+  --padding-start: var(--pv-space-04);
+  --inner-padding-end: var(--pv-space-03);
+  --background: var(--pv-layer-01);
+  --border-radius: var(--pv-radius-input);
+  border: 1px solid var(--pv-border-subtle);
+  border-radius: var(--pv-radius-input);
 }
-.form-field:focus-within { border-color: var(--app-color-green); box-shadow: 0 0 0 3px rgb(26 31 92 / 12%); }
-.form-field.field-error { border-color: var(--app-color-red); }
-.form-field ion-icon { margin-right: 12px; color: var(--app-color-road-gray); font-size: 1.12rem; }
-ion-note { display: block; margin: 5px 4px 0; font-size: .7rem; }
+
+.form-field:focus-within { border-color: var(--pv-focus); box-shadow: 0 0 0 2px var(--pv-cyan-100); }
+.form-field.field-error { border-color: var(--pv-danger); }
+.form-field ion-icon { margin-right: var(--pv-space-03); color: var(--pv-text-secondary); font-size: 19px; }
+ion-note { display: block; margin: var(--pv-space-02) var(--pv-space-02) 0; font-size: var(--pv-type-caption); line-height: var(--pv-line-body); }
 
 .register-button {
-  --background: var(--app-color-action);
-  --border-radius: 9px;
-  --box-shadow: 0 7px 16px rgb(26 31 92 / 20%);
-  --color: var(--app-color-white);
-  height: 50px;
-  margin: 18px 0 0;
+  --background: var(--pv-interactive);
+  --border-radius: var(--pv-radius-button);
+  --box-shadow: none;
+  --color: var(--pv-on-interactive);
+  height: var(--pv-touch-target);
+  margin: var(--pv-space-05) 0 0;
+  font-size: var(--pv-type-body-sm);
   font-weight: 600;
   text-transform: none;
 }
 
-.login-link { margin: 18px 0 0; text-align: center; color: var(--pv-white); font-size: .78rem; }
-.login-link a { color: var(--pv-white); font-weight: 600; text-decoration: none; }
+.api-errors { display: grid; gap: var(--pv-space-02); margin-top: var(--pv-space-04); padding: var(--pv-space-03); border: 1px solid var(--app-color-danger-border); border-radius: var(--pv-radius-default); background: var(--app-color-danger-soft); }
+.api-errors ion-note { margin: 0; }
+.login-shortcut { margin-top: var(--pv-space-02); color: var(--pv-interactive); font-size: var(--pv-type-caption); font-weight: 600; }
+.login-link { margin: var(--pv-space-05) 0 0; color: var(--pv-text-secondary); font-size: var(--pv-type-body-sm); text-align: center; }
+.login-link a { color: var(--pv-interactive); font-weight: 600; text-decoration: none; }
 
 @media (min-width: 700px) {
-  .register-shell { min-height: min(920px, calc(100vh - 48px)); margin-block: 24px; border-radius: 28px; }
+  .register-shell { padding-top: 24px; }
+  .register-header { border: 1px solid var(--pv-border-subtle); border-radius: var(--pv-radius-sheet) var(--pv-radius-sheet) 0 0; }
+  .register-card { margin: 0; border-top: 0; border-radius: 0 0 var(--pv-radius-sheet) var(--pv-radius-sheet); }
 }
-
-/* Lista de erros devolvidos pela API (um por campo). */
-.api-errors { display: grid; gap: 6px; margin-top: 10px; padding: 11px 13px; border: 1px solid var(--pv-bg); border-radius: 10px; background: var(--pv-bg); }
-.api-errors ion-note { font-size: .74rem; line-height: 1.45; }
-.login-shortcut { margin-top: 4px; color: var(--app-color-green-dark); font-size: .74rem; font-weight: 700; text-decoration: underline; }

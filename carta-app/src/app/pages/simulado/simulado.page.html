@@ -21,23 +21,13 @@
       <p class="resume-notice" role="status">Retomámos a prova onde a deixaste — o tempo continua a contar.</p>
     }
 
-    @if (!carregando && !iniciada && perguntas.length) {
-      <section class="exam-intro">
-        <span class="intro-icon"><ion-icon name="document-text-outline" aria-hidden="true"></ion-icon></span>
-        <span class="intro-eyebrow">{{ numeroExame ? 'Exame oficial' : 'Simulado completo' }}</span>
-        <h1>{{ numeroExame ? 'Reproduz as condições do exame' : 'Testa a tua preparação' }}</h1>
-        <p>Responde a todas as perguntas dentro do tempo. {{ numeroExame ? 'A correção aparece apenas no resultado final.' : 'A correção e o resultado aparecem no fim.' }}</p>
-        <dl class="exam-facts"><div><dt>Questões</dt><dd>{{ totalQuestoes }}</dd></div><div><dt>Tempo</dt><dd>{{ tempoTotalFormatado }}</dd></div></dl>
-        <button type="button" class="start-button" (click)="iniciarSimulado()">Iniciar simulado <ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon></button>
-        <a routerLink="/estudos">Voltar</a>
-      </section>
-    } @else if (perguntaAtual; as pergunta) {
+    @if (perguntaAtual; as pergunta) {
       <section class="question-area">
         <app-pergunta-card
           [pergunta]="pergunta"
           [respondida]="respondida"
           [escolhida]="escolhida"
-          [mostrarFeedback]="numeroExame === 0"
+          [mostrarFeedback]="false"
           (escolha)="responder($event)">
         </app-pergunta-card>
       </section>
@@ -62,9 +52,9 @@
     } @else if (!carregando) {
       <section class="empty-state">
         <ion-icon name="document-text-outline" aria-hidden="true"></ion-icon>
-        <h1>Nenhuma questão disponível</h1>
-        <p>Não existem perguntas disponíveis para esta categoria neste momento.</p>
-        <ion-button routerLink="/inicio">Voltar ao início</ion-button>
+        <h1>{{ mensagemErro ? 'Não foi possível iniciar' : 'Nenhuma questão disponível' }}</h1>
+        <p>{{ mensagemErro || 'Não existem perguntas disponíveis para esta categoria neste momento.' }}</p>
+        <button type="button" class="nav-button next" (click)="sair()">Voltar a Simular</button>
       </section>
     }
   </main>

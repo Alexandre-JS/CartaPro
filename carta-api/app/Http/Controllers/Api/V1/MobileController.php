@@ -207,7 +207,7 @@ class MobileController extends Controller
 
     public function exams(Request $request): JsonResponse
     {
-        $paid = $this->entitlements->isPaid($request->user());
+        $paid = $request->user() && $this->entitlements->isPaid($request->user());
 
         return response()->json(['data' => Exam::where(['is_active' => true, 'is_public' => true, 'publication_status' => 'published'])
             ->withCount(['questions', 'questions as locked_questions_count' => fn ($query) => $query->where('is_locked', true)])
@@ -224,7 +224,7 @@ class MobileController extends Controller
         abort_unless($exam->is_active && $exam->is_public && $exam->publication_status === 'published', 404);
         $exam->load(['questions.topic', 'questions.sign']);
 
-        $paid = $this->entitlements->isPaid($request->user());
+        $paid = $request->user() && $this->entitlements->isPaid($request->user());
 
         /*
          * O cadeado da própria prova era ignorado aqui: filtravam-se as

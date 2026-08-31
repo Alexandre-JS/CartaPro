@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
     IonButton,
     IonContent,
@@ -11,9 +11,10 @@ import {
     IonNote,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { lockClosedOutline, mailOutline } from 'ionicons/icons';
+import { arrowBackOutline, lockClosedOutline, mailOutline } from 'ionicons/icons';
 import { AuthService } from '../../core/auth.service';
 import { mensagemDeErro } from '../../core/erros-api';
+import { retornoSeguro } from '../../core/auth.guard';
 
 @Component({
     standalone: true,
@@ -37,13 +38,16 @@ export class LoginPage {
     submetido = false;
     processando = false;
     mensagemErro = '';
+    readonly retorno: string;
 
     constructor(
         formBuilder: FormBuilder,
         private readonly router: Router,
+        route: ActivatedRoute,
         private readonly auth: AuthService,
     ) {
-        addIcons({ lockClosedOutline, mailOutline });
+        addIcons({ arrowBackOutline, lockClosedOutline, mailOutline });
+        this.retorno = retornoSeguro(route.snapshot.queryParamMap.get('retorno'));
         this.formulario = formBuilder.nonNullable.group({
             identificador: ['', [Validators.required]],
             palavraPasse: ['', [Validators.required, Validators.minLength(4)]],
@@ -62,7 +66,7 @@ export class LoginPage {
         try {
             const { identificador, palavraPasse } = this.formulario.getRawValue();
             await this.auth.entrar(identificador, palavraPasse);
-            await this.router.navigateByUrl('/inicio');
+            await this.router.navigateByUrl(this.retorno, { replaceUrl: true });
         } catch (error: any) {
             if (error?.status === 0 || error?.name === 'TimeoutError') {
                 this.mensagemErro = 'Sem ligação à API. Verifica a internet e tenta novamente.';

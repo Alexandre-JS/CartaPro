@@ -1,81 +1,46 @@
-:host { display: block; }
-.exams-page { --background: var(--app-color-page); }
-.exams-shell { width: min(100%, 560px); min-height: 100%; margin: 0 auto; padding-bottom: calc(78px + env(safe-area-inset-bottom)); overflow: hidden; background: var(--app-color-light-gray); box-shadow: 0 0 42px rgb(22 22 22 / 10%); }
-.exams-hero { position: relative; display: grid; grid-template-columns: 1fr 76px; align-items: center; min-height: 210px; padding: max(38px, env(safe-area-inset-top)) 22px 54px; overflow: hidden; color: var(--pv-white); background-color: var(--app-color-brand-panel); background-image: url('/assets/backgrounds/exames.jpg'); background-position: center 48%; background-size: cover; }
-.exams-hero::before { position: absolute; inset: 0; background: rgb(26 31 92 / 55%); content: ''; }
-.exams-hero::after { position: absolute; right: -8%; bottom: -43px; left: -8%; height: 75px; border-radius: 50%; background: var(--app-color-light-gray); content: ''; }
-.exams-hero div { position: relative; z-index: 2; }
-.exams-hero div > span { font-size: .6rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; opacity: .87; }
-.exams-hero h1 { margin: 5px 0; font-size: 1.7rem; font-weight: 600; }
-.exams-hero p { max-width: 340px; margin: 0; font-size: .72rem; line-height: 1.5; opacity: .94; }
-.hero-icon { position: relative; z-index: 2; display: grid; width: 70px; height: 70px; place-items: center; border-radius: 19px; background: rgb(255 255 255 / 14%); transform: rotate(5deg); }
-.hero-icon ion-icon { font-size: 2.4rem; }
-.exams-content { position: relative; z-index: 3; margin-top: -30px; padding: 22px 16px 28px; border-radius: 18px 18px 0 0; background: var(--app-color-light-gray); }
-.section-heading { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin: 0 0 14px; }
-.section-heading span { color: var(--app-color-green-dark); font-size: .57rem; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; }
-.section-heading h2 { margin: 3px 0 0; font-size: .92rem; }
-.exam-list { display: grid; gap: 12px; }
-.exam-item { overflow: hidden; border: 1px solid var(--pv-border); border-radius: 14px; background: var(--pv-white); box-shadow: 0 4px 14px rgb(22 22 22 / 5%); }
-.exam-item.pending { border-color: var(--pv-border); }
-.exam-item.failed { border-color: rgb(255 138 0 / 38%); }
-.exam-item.attention { border-color: rgb(255 138 0 / 65%); }
-.exam-item.passed { border-color: rgb(26 31 92 / 45%); }
-.exam-card { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; align-items: center; gap: 11px; min-height: 84px; padding: 13px; color: var(--app-color-text); }
-.exam-copy { display: grid; min-width: 0; gap: 1px; }
-.status-label { margin-top: 5px; color: var(--app-color-text-muted); font-size: .55rem; font-weight: 600; }
-.failed .status-label { color: var(--app-color-red); }
-.attention .status-label { color: var(--app-color-warning-text); }
-.passed .status-label { color: var(--app-color-green-dark); }
-.start-action { grid-column: 1 / -1; display: flex; height: 36px; align-items: center; justify-content: center; gap: 5px; border-radius: 8px; color: var(--pv-white); background: var(--app-color-green-dark); font-size: .65rem; font-weight: 700; text-decoration: none; }
-.start-action ion-icon { font-size: .9rem; }
-.history-toggle { display: flex; width: 100%; min-height: 35px; align-items: center; justify-content: space-between; padding: 7px 12px; border: 0; border-top: 1px solid var(--pv-border); color: var(--app-color-green-dark); background: var(--pv-bg); font: inherit; font-size: .59rem; font-weight: 700; cursor: pointer; }
-.history-list { display: grid; border-top: 1px solid var(--pv-border); }
-.history-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 12px; border-bottom: 1px solid var(--pv-border); }
+:host { display: block; min-width: 0; }
+.exams-page { --background: var(--pv-background); }
+.exams-shell { width: min(100%, var(--pv-content-reading)); min-height: 100%; margin: 0 auto; padding-bottom: calc(80px + env(safe-area-inset-bottom)); background: var(--pv-background); }
+.exams-content { display: grid; gap: var(--pv-space-05); padding: var(--pv-space-06) var(--pv-space-page); }
+.section-heading span { color: var(--pv-focus); font-size: var(--pv-type-caption); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.section-heading h1 { margin: var(--pv-space-02) 0 0; font-size: var(--pv-type-title); }
+.section-heading p { margin: var(--pv-space-03) 0 0; color: var(--pv-text-secondary); font-size: var(--pv-type-body-sm); line-height: 1.5; }
+.exam-list { display: grid; gap: var(--pv-space-04); }
+.exam-item { overflow: hidden; border: 1px solid var(--pv-border-subtle); border-radius: var(--pv-radius-tile); background: var(--pv-layer-01); }
+.exam-item.failed, .exam-item.attention { border-color: var(--pv-orange-100); }
+.exam-item.passed { border-color: var(--pv-green-100); }
+.exam-item.locked { background: var(--pv-background); }
+.exam-card { display: grid; grid-template-columns: 48px minmax(0, 1fr); align-items: center; gap: var(--pv-space-04); padding: var(--pv-space-04); }
+.exam-icon { display: grid; width: 48px; height: 48px; place-items: center; border-radius: 50%; color: var(--pv-interactive); background: var(--pv-interactive-soft); }
+.exam-icon app-icone-prova { width: 30px; height: 30px; }
+.passed .exam-icon { color: var(--pv-success); background: var(--pv-green-050); }
+.attention .exam-icon, .failed .exam-icon, .locked .exam-icon { color: var(--pv-warning-text); background: var(--pv-orange-050); }
+.exam-copy { display: grid; min-width: 0; gap: var(--pv-space-02); }
+.exam-eyebrow { color: var(--pv-text-secondary); font-size: var(--pv-type-caption); }
+.exam-copy > strong { font-size: var(--pv-type-body); font-weight: 600; line-height: 1.3; }
+.exam-meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--pv-space-03); }
+.exam-meta em { display: inline-flex; align-items: center; gap: var(--pv-space-02); color: var(--pv-text-secondary); font-size: var(--pv-type-caption); font-style: normal; }
+.exam-meta .pill { padding: var(--pv-space-02) var(--pv-space-03); border-radius: var(--pv-radius-pill); background: var(--pv-background); }
+.exam-progress { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--pv-space-03); margin-top: var(--pv-space-02); color: var(--pv-interactive); }
+.exam-progress::before { grid-area: 1 / 1; height: 4px; border-radius: var(--pv-radius-pill); background: var(--pv-border-subtle); content: ''; }
+.exam-progress i { grid-area: 1 / 1; height: 4px; border-radius: var(--pv-radius-pill); background: currentColor; }
+.exam-progress b { font-size: var(--pv-type-caption); }
+.status-label { color: var(--pv-text-secondary); font-size: var(--pv-type-caption); font-weight: 500; }
+.failed .status-label, .attention .status-label { color: var(--pv-warning-text); }
+.passed .status-label { color: var(--pv-success); }
+.start-action { grid-column: 1 / -1; display: inline-flex; min-height: var(--pv-touch-target); align-items: center; justify-content: center; gap: var(--pv-space-02); margin-top: var(--pv-space-02); border-radius: var(--pv-radius-default); color: var(--pv-on-interactive); background: var(--pv-interactive); font-size: var(--pv-type-body-sm); font-weight: 600; text-decoration: none; }
+.start-action.locked { color: var(--pv-warning-text); background: var(--pv-orange-050); }
+.history-toggle { display: flex; width: 100%; min-height: var(--pv-touch-target); align-items: center; justify-content: space-between; padding: 0 var(--pv-space-04); border: 0; border-top: 1px solid var(--pv-border-subtle); color: var(--pv-interactive); background: var(--pv-background); font: inherit; font-size: var(--pv-type-caption); font-weight: 600; }
+.history-list { display: grid; border-top: 1px solid var(--pv-border-subtle); }
+.history-row { display: flex; min-height: 54px; align-items: center; justify-content: space-between; gap: var(--pv-space-04); padding: var(--pv-space-03) var(--pv-space-04); border-bottom: 1px solid var(--pv-border-subtle); }
 .history-row:last-child { border-bottom: 0; }
-.history-row span { display: grid; gap: 2px; }
+.history-row span { display: grid; gap: var(--pv-space-02); }
 .history-row span:last-child { text-align: right; }
-.history-row strong { font-size: .64rem; }
-.history-row small { color: var(--app-color-text-muted); font-size: .52rem; }
-@media (min-width: 700px) { .exams-shell { min-height: calc(100vh - 48px); margin-block: 24px; border-radius: 28px; } }
-@media (max-width: 430px) { .exam-card { grid-template-columns: 52px minmax(0, 1fr); } .start-action { grid-column: 1 / -1; width: 100%; } }
-
-/* Prova fechada: visível para o aluno saber que existe, sem parecer avariada. */
-.exam-item.locked { border-color: var(--app-color-warning-border); background: var(--pv-bg); }
-.exam-item.locked .exam-copy > strong { color: var(--app-color-text-muted); }
-.start-action.locked { color: var(--app-color-warning-text); background: var(--app-color-warning-soft); }
-
-/* Identidade visual da prova: volante, estrada e visto, num círculo tingido
-   pelo estado. As cores são as da folha de identidade. */
-.exam-icon { display: grid; width: 54px; height: 54px; place-items: center; border-radius: 50%; }
-.exam-icon app-icone-prova { width: 34px; height: 34px; }
-.pending .exam-icon { color: var(--pv-text-secondary); background: var(--pv-bg); }
-.passed .exam-icon { color: var(--app-color-success-text); background: var(--app-color-success-soft); }
-.attention .exam-icon { color: var(--pv-orange); background: var(--app-color-warning-soft); }
-.failed .exam-icon { color: var(--app-color-danger-text); background: var(--app-color-danger-soft); }
-.exam-item.locked .exam-icon { color: var(--pv-orange); background: var(--pv-orange); }
-
-.exam-eyebrow { color: var(--app-color-text-muted); font-size: .52rem; }
-.exam-copy > strong { font-size: .82rem; line-height: 1.25; }
-.exam-meta { display: flex; align-items: center; gap: 8px; margin-top: 5px; }
-.exam-meta em { display: inline-flex; align-items: center; gap: 4px; color: var(--app-color-text-muted); font-size: .55rem; font-style: normal; }
-.exam-meta .pill { padding: 3px 8px; border-radius: 20px; background: var(--app-color-divider); font-weight: 600; }
-.passed .exam-meta .pill { color: var(--app-color-success-text); background: var(--app-color-success-soft); }
-.attention .exam-meta .pill { color: var(--pv-orange); background: var(--app-color-warning-soft); }
-.failed .exam-meta .pill { color: var(--app-color-danger-text); background: var(--app-color-danger-soft); }
-
-/* Barra do último resultado — o número que antes só aparecia em texto. */
-.exam-progress { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 9px; margin-top: 8px; }
-.exam-progress::before { grid-area: 1 / 1; height: 5px; border-radius: 4px; background: var(--app-color-divider); content: ''; }
-.exam-progress i { grid-area: 1 / 1; height: 5px; border-radius: 4px; background: currentColor; }
-.exam-progress b { font-size: .6rem; }
-.passed .exam-progress { color: var(--app-color-success-text); }
-.attention .exam-progress { color: var(--pv-orange); }
-.failed .exam-progress { color: var(--app-color-danger-text); }
-.pending .exam-progress { color: var(--pv-text-secondary); }
-
-/* Estados de vazio e de erro: usavam classes que esta página nunca definiu. */
-.empty-state { display: grid; justify-items: center; gap: 9px; padding: 40px 20px; text-align: center; }
-.empty-state ion-icon { color: var(--app-color-road-gray); font-size: 2.6rem; }
-.empty-state strong { font-size: .82rem; }
-.empty-state p { max-width: 34ch; margin: 0; color: var(--app-color-text-muted); font-size: .64rem; line-height: 1.5; }
-.empty-state .primary-button { display: inline-flex; min-height: 44px; align-items: center; gap: 8px; margin-top: 6px; padding: 0 18px; border: 0; border-radius: 12px; color: var(--pv-white); background: var(--app-color-action); font: inherit; font-size: .72rem; font-weight: 700; cursor: pointer; }
+.history-row strong { font-size: var(--pv-type-body-sm); }
+.history-row small { color: var(--pv-text-secondary); font-size: var(--pv-type-caption); }
+.empty-state { display: grid; justify-items: center; gap: var(--pv-space-03); padding: var(--pv-space-08) var(--pv-space-05); border: 1px dashed var(--pv-border-strong); border-radius: var(--pv-radius-tile); text-align: center; }
+.empty-state ion-icon { color: var(--pv-text-secondary); font-size: 36px; }
+.empty-state strong { font-size: var(--pv-type-heading); }
+.empty-state p { max-width: 40ch; margin: 0; overflow-wrap: anywhere; color: var(--pv-text-secondary); font-size: var(--pv-type-body-sm); line-height: 1.5; }
+.empty-state .primary-button { display: inline-flex; min-height: var(--pv-touch-target); align-items: center; gap: var(--pv-space-03); padding-inline: var(--pv-space-05); border: 0; border-radius: var(--pv-radius-default); color: var(--pv-on-interactive); background: var(--pv-interactive); font: inherit; font-weight: 600; }
+@media (min-width: 600px) { .exams-content { padding-inline: var(--pv-space-07); } .exam-card { grid-template-columns: 48px minmax(0, 1fr) auto; } .start-action { grid-column: auto; min-width: 130px; margin-top: 0; } }

@@ -1,5 +1,6 @@
 <ion-content [fullscreen]="true" class="login-page">
   <main class="login-shell">
+    <a class="account-back" [routerLink]="retorno" aria-label="Voltar"><ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon></a>
     <section class="brand" aria-label="CartaPro">
       <div class="brand-lockup">
         <img src="assets/icon/icon CartaPro.png" alt="" class="brand-icon">
@@ -56,7 +57,7 @@
         @if (mensagemErro) {
           <ion-note color="danger" class="login-error">
             {{ mensagemErro }}
-            <a routerLink="/registo">Criar conta</a>
+            <a routerLink="/conta/criar" [queryParams]="{ retorno: retorno }">Criar conta</a>
           </ion-note>
         }
         <ion-button expand="block" type="submit" class="login-button" [disabled]="processando">
@@ -64,8 +65,8 @@
         </ion-button>
       </form>
 
-      <p class="register">Ainda não tens conta? <button type="button" routerLink="/registo">Criar conta</button></p>
-      <a class="explore-link" routerLink="/estudos">Explorar conteúdo Free sem criar conta</a>
+      <p class="register">Ainda não tens conta? <button type="button" routerLink="/conta/criar" [queryParams]="{ retorno: retorno }">Criar conta</button></p>
+      <a class="explore-link" [routerLink]="retorno">Agora não</a>
     </section>
   </main>
 </ion-content>

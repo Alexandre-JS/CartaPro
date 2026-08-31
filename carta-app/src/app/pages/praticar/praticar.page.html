@@ -1,0 +1,60 @@
+<ion-content [fullscreen]="true" class="practice-page">
+  <main class="practice-shell">
+    <app-app-header titulo="Praticar" subtitulo="Treino guiado pelo seu progresso" />
+
+    <section class="practice-content">
+      @if (carregando) {
+        <app-skeleton variante="lista" [quantidade]="6" etiqueta="A preparar os seus treinos"></app-skeleton>
+      } @else if (erroCarregamento) {
+        <section class="load-error" role="alert">
+          <ion-icon name="warning-outline" aria-hidden="true"></ion-icon>
+          <div><h2>Não conseguimos carregar Praticar</h2><p>{{ erroCarregamento }}</p></div>
+          <button type="button" (click)="carregar()"><ion-icon name="refresh-outline" aria-hidden="true"></ion-icon>Tentar novamente</button>
+        </section>
+      } @else {
+        @if (recomendado; as treino) {
+          <section class="recommended" aria-labelledby="recommended-title">
+            <p class="section-label">Treino recomendado</p>
+            <div><span class="recommended-icon"><ion-icon name="bulb-outline" aria-hidden="true"></ion-icon></span><span><h2 id="recommended-title">{{ treino.titulo }}</h2><p>{{ treino.descricao }}</p></span></div>
+            <a [routerLink]="treino.rota" [queryParams]="treino.query || null">{{ treino.acao }}</a>
+          </section>
+        }
+
+        <section class="practice-modes" aria-labelledby="modes-title">
+          <div class="section-heading"><p class="section-label">Escolher treino</p><h2 id="modes-title">Pratique ao seu ritmo</h2></div>
+          <nav class="mode-list" aria-label="Modos de prática">
+            <a routerLink="/praticar/erros"><span class="mode-icon danger"><ion-icon name="alert-circle-outline" aria-hidden="true"></ion-icon></span><span><strong>Meus erros</strong><small>Voltar às perguntas que falhou</small></span><em>{{ totalErros }}</em><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>
+            <a routerLink="/praticar/sinais"><span class="mode-icon"><ion-icon name="warning-outline" aria-hidden="true"></ion-icon></span><span><strong>Sinais</strong><small>Reconhecimento e reforço de falhados</small></span><em>{{ sinaisPorReforcar }}</em><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>
+            <a routerLink="/praticar/revisoes"><span class="mode-icon"><ion-icon name="time-outline" aria-hidden="true"></ion-icon></span><span><strong>Revisões</strong><small>Repetição espaçada no momento certo</small></span><em>{{ totalRevisoes }}</em><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>
+            <a routerLink="/praticar/novas"><span class="mode-icon"><ion-icon name="help-circle-outline" aria-hidden="true"></ion-icon></span><span><strong>Nunca respondidas</strong><small>Conheça perguntas ainda não vistas</small></span><em>{{ totalNovas }}</em><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>
+            <a routerLink="/praticar/sessao" [queryParams]="{ total: 5 }"><span class="mode-icon"><ion-icon name="flash-outline" aria-hidden="true"></ion-icon></span><span><strong>Sessão rápida</strong><small>Cinco perguntas · cerca de 5 minutos</small></span><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>
+          </nav>
+        </section>
+
+        <section class="topics" aria-labelledby="practice-topics-title">
+          <div class="section-heading"><p class="section-label">Por tema</p><h2 id="practice-topics-title">Escolha o que quer reforçar</h2></div>
+          <div class="topic-list">
+            @for (tema of temas; track tema.slug) {
+              @let progressoTema = progressoDoTema(tema.slug);
+              <a [routerLink]="['/praticar/tema', tema.slug]" [queryParams]="{ categoria: categoria }">
+                <span><strong>{{ tema.nome }}</strong><small>{{ progressoTema.respondidas ? progressoTema.respondidas + ' respostas' : 'Ainda não iniciado' }}</small><span class="topic-progress"><i [style.width.%]="progressoTema.taxaRecente * 100"></i></span></span>
+                <em>{{ progressoTema.taxaRecente * 100 | number:'1.0-0' }}%</em>
+                <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
+              </a>
+            }
+          </div>
+        </section>
+
+        <section class="premium" aria-labelledby="premium-title">
+          <div class="section-heading"><p class="section-label">ProntoVia+</p><h2 id="premium-title">Modos avançados</h2></div>
+          <div class="premium-list">
+            <a [routerLink]="plano === 'pago' ? '/simular/configurar' : '/conta/entrar'" [queryParams]="plano === 'pago' ? { modo: 'adaptativo', categoria: categoria } : { retorno: '/praticar' }"><ion-icon name="create-outline" aria-hidden="true"></ion-icon><span><strong>Treino adaptativo</strong><small>Prioriza os temas que mais precisam de atenção</small></span>@if (plano !== 'pago') {<ion-icon name="lock-closed-outline" aria-label="ProntoVia+"></ion-icon>} @else {<ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>}</a>
+            <a [routerLink]="plano === 'pago' ? '/simular/configurar' : '/conta/entrar'" [queryParams]="plano === 'pago' ? { categoria: categoria } : { retorno: '/praticar' }"><ion-icon name="flash-outline" aria-hidden="true"></ion-icon><span><strong>Sessão intensiva</strong><small>Cobertura completa com ritmo de exame</small></span>@if (plano !== 'pago') {<ion-icon name="lock-closed-outline" aria-label="ProntoVia+"></ion-icon>} @else {<ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>}</a>
+          </div>
+        </section>
+      }
+    </section>
+
+    <app-bottom-nav ativo="praticar"></app-bottom-nav>
+  </main>
+</ion-content>

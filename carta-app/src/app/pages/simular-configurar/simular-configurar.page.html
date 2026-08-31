@@ -1,0 +1,23 @@
+<ion-content [fullscreen]="true" class="config-page">
+  <main class="config-shell">
+    <header class="config-header"><a routerLink="/simular" aria-label="Voltar a Simular"><ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon></a><span><small>Simular</small><strong>Configurar simulado</strong></span></header>
+
+    @if (carregando) {
+      <section class="loading" aria-live="polite">A preparar as opções…</section>
+    } @else if (erroCarregamento) {
+      <section class="load-error" role="alert"><ion-icon name="warning-outline" aria-hidden="true"></ion-icon><div><h1>Não foi possível configurar</h1><p>{{ erroCarregamento }}</p></div><button type="button" (click)="carregar()"><ion-icon name="refresh-outline" aria-hidden="true"></ion-icon>Tentar novamente</button></section>
+    } @else {
+      <form class="config-form" (submit)="$event.preventDefault(); iniciar()">
+        <section aria-labelledby="category-title"><p class="step-label">1 · Categoria</p><h1 id="category-title">Que prova vai preparar?</h1><div class="choice-list categories">@for (opcao of categorias; track opcao.valor) {<button type="button" [class.selected]="categoria === opcao.valor" (click)="escolherCategoria(opcao.valor)"><span><strong>{{ opcao.nome }}</strong><small>{{ opcao.descricao }}</small></span>@if (categoria === opcao.valor) {<ion-icon name="checkmark-circle" aria-hidden="true"></ion-icon>}</button>}</div></section>
+
+        <section aria-labelledby="total-title"><p class="step-label">2 · Questões</p><h2 id="total-title">Escolha o tamanho</h2><div class="segmented">@for (opcao of totais; track opcao) {<button type="button" [class.selected]="total === opcao" [disabled]="opcao > totalDisponivel" (click)="total = opcao"><strong>{{ opcao }}</strong><small>questões</small></button>}</div>@if (totalDisponivel < 25) {<p class="support-copy">Existem {{ totalDisponivel }} questões disponíveis nesta categoria.</p>}</section>
+
+        <section aria-labelledby="mode-title"><p class="step-label">3 · Modo</p><h2 id="mode-title">Como selecionar as questões?</h2><div class="choice-list"><button type="button" [class.selected]="modo === 'normal'" (click)="escolherModo('normal')"><span><strong>Equilibrado</strong><small>Cobertura variada dos temas</small></span>@if (modo === 'normal') {<ion-icon name="checkmark-circle" aria-hidden="true"></ion-icon>}</button><button type="button" [class.selected]="modo === 'adaptativo'" [class.locked]="plano !== 'pago'" (click)="escolherModo('adaptativo')"><span><strong>Adaptativo · ProntoVia+</strong><small>Prioriza os seus pontos fracos</small></span>@if (plano !== 'pago') {<ion-icon name="lock-closed-outline" aria-label="Exclusivo ProntoVia+"></ion-icon>} @else if (modo === 'adaptativo') {<ion-icon name="checkmark-circle" aria-hidden="true"></ion-icon>}</button></div></section>
+
+        <section aria-labelledby="duration-title"><p class="step-label">4 · Duração</p><h2 id="duration-title">Defina o ritmo</h2><div class="segmented"><button type="button" [class.selected]="duracao === 10" (click)="duracao = 10"><strong>10</strong><small>minutos</small></button><button type="button" [class.selected]="duracao === regras.para(categoria).minutos" (click)="duracao = regras.para(categoria).minutos"><strong>{{ regras.para(categoria).minutos }}</strong><small>tempo oficial</small></button></div></section>
+
+        <footer><div><span>{{ total }} questões</span><span>{{ duracao }} minutos</span></div><button type="submit" [disabled]="!totalDisponivel">Iniciar simulado</button></footer>
+      </form>
+    }
+  </main>
+</ion-content>

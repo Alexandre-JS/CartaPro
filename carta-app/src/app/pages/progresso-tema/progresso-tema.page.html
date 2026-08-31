@@ -1,0 +1,27 @@
+<ion-content [fullscreen]="true" class="topic-progress-page">
+  <main class="topic-progress-shell">
+    <header class="topic-header"><a routerLink="/progresso" aria-label="Voltar ao Progresso"><ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon></a><span><small>Progresso por tema</small><strong>{{ nome || 'A carregar…' }}</strong></span></header>
+
+    <section class="topic-content">
+      @if (carregando) {
+        <p class="loading">A calcular o progresso deste tema…</p>
+      } @else if (erroCarregamento) {
+        <section class="load-error" role="alert"><ion-icon name="warning-outline" aria-hidden="true"></ion-icon><div><h1>Não conseguimos carregar o tema</h1><p>{{ erroCarregamento }}</p></div><button type="button" (click)="carregar()">Tentar novamente</button></section>
+      } @else {
+        <header class="topic-intro"><p class="section-label">{{ categoria === 'ligeiro' ? 'Veículos ligeiros' : categoria === 'pesado' ? 'Veículos pesados' : 'Transporte público' }}</p><h1>{{ nome }}</h1>@if (descricao) {<p>{{ descricao }}</p>}</header>
+
+        <section class="topic-score"><div><strong>{{ taxaRecente }}%</strong><span>taxa recente</span></div><dl><div><dt>Total praticado</dt><dd>{{ totalPraticado }}</dd></div><div><dt>Perguntas vistas</dt><dd>{{ perguntasPraticadas }}/{{ totalPerguntas }}</dd></div><div><dt>Taxa global</dt><dd>{{ taxaGlobal }}%</dd></div><div><dt>Evolução</dt><dd [class.negative]="evolucao < 0">{{ evolucao > 0 ? '+' : '' }}{{ evolucao }} pp</dd></div></dl></section>
+
+        <section class="recent" aria-labelledby="recent-title"><div class="section-heading"><p class="section-label">Evolução</p><h2 id="recent-title">Últimas respostas</h2></div>@if (ultimasRespostas.length) {<div class="answer-timeline">@for (resposta of ultimasRespostas; track resposta.id || resposta.data) {<span [class.correct]="resposta.acertou" [attr.aria-label]="resposta.acertou ? 'Resposta correta' : 'Resposta errada'"><ion-icon [name]="resposta.acertou ? 'checkmark-circle-outline' : 'close-circle-outline'" aria-hidden="true"></ion-icon></span>}</div><p>Da resposta mais antiga para a mais recente.</p>} @else {<p class="empty-copy">Ainda não existem respostas neste tema.</p>}</section>
+
+        <section class="review-summary"><ion-icon name="time-outline" aria-hidden="true"></ion-icon><span><strong>{{ revisoesPendentes }} revisões pendentes</strong><small>{{ revisoesTotal }} perguntas acompanhadas pelo sistema de revisão</small></span><a routerLink="/praticar/revisoes">Abrir</a></section>
+
+        <section class="errors" aria-labelledby="errors-title"><div class="section-heading"><p class="section-label">Diagnóstico</p><h2 id="errors-title">Erros frequentes</h2></div><div class="error-list">@for (erro of errosFrequentes; track erro.pergunta.id) {<article><span><ion-icon name="alert-circle-outline" aria-hidden="true"></ion-icon></span><div><strong>{{ erro.pergunta.enunciado }}</strong><small>Falhada {{ erro.vezes }} {{ erro.vezes === 1 ? 'vez' : 'vezes' }}</small></div></article>} @empty {<p class="empty-copy">Ainda não existem erros suficientes para apresentar um padrão.</p>}</div></section>
+
+        <section class="topic-recommendation"><p class="section-label">Recomendação</p><h2>{{ recomendacaoTitulo }}</h2><p>{{ recomendacaoTexto }}</p><a [routerLink]="rotaRecomendacao" [queryParams]="revisoesPendentes ? null : { categoria: categoria }">{{ revisoesPendentes ? 'Rever agora' : 'Iniciar prática' }}<ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon></a></section>
+      }
+    </section>
+
+    <app-bottom-nav ativo="progresso"></app-bottom-nav>
+  </main>
+</ion-content>

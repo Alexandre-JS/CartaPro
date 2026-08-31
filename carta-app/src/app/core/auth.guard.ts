@@ -9,7 +9,7 @@ import { Preferences } from '@capacitor/preferences';
  * sem sessão — e, como o conteúdo passou a exigir autenticação na API, as
  * páginas ficariam vazias com erros por token ausente.
  */
-export const authGuard: CanActivateFn = async () => {
+export const authGuard: CanActivateFn = async (_route, state) => {
     const router = inject(Router);
     const { value } = await Preferences.get({ key: 'mobileAuthToken' });
 
@@ -17,12 +17,11 @@ export const authGuard: CanActivateFn = async () => {
         return true;
     }
 
-    await router.navigateByUrl('/entrar');
-    return false;
+    return router.createUrlTree(['/conta/entrar'], { queryParams: { retorno: state.url } });
 };
 
 /** Impede que quem já tem sessão volte ao ecrã de entrada. */
-export const guestGuard: CanActivateFn = async () => {
+export const guestGuard: CanActivateFn = async (route) => {
     const router = inject(Router);
     const { value } = await Preferences.get({ key: 'mobileAuthToken' });
 
@@ -30,6 +29,12 @@ export const guestGuard: CanActivateFn = async () => {
         return true;
     }
 
-    await router.navigateByUrl('/inicio');
-    return false;
+    return router.parseUrl(retornoSeguro(route.queryParamMap.get('retorno')));
 };
+
+/** Só aceita destinos internos; impede redirecionamentos para outro domínio. */
+export function retornoSeguro(valor: string | null | undefined, omissao = '/inicio'): string {
+    if (!valor || !valor.startsWith('/') || valor.startsWith('//')) return omissao;
+    if (valor.startsWith('/conta/entrar') || valor.startsWith('/conta/criar') || valor.startsWith('/conta/guardar')) return omissao;
+    return valor;
+}

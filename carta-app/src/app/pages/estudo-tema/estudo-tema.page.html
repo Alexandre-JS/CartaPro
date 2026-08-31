@@ -1,52 +1,34 @@
-<ion-content [fullscreen]="true" class="study-page">
-  <main class="study-shell">
-    <header class="study-header">
-      <a routerLink="/estudos" aria-label="Voltar aos estudos"><ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon></a>
-      <div><span>{{ modoRevisao ? 'Revisão pendente' : 'Estudo por tema' }}</span><h1>{{ nomeTema }}</h1></div>
-      <span class="header-icon"><ion-icon name="book-outline" aria-hidden="true"></ion-icon></span>
+<ion-content [fullscreen]="true" class="session-page">
+  <main class="session-shell">
+    <header class="session-header">
+      <a routerLink="/praticar" aria-label="Voltar a Praticar"><ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon></a>
+      <div><span>{{ etiquetaSessao }}</span><h1>{{ nomeSessao }}</h1></div>
+      @if (iniciada && !concluida && perguntas.length) {<strong>{{ indice + 1 }}/{{ perguntas.length }}</strong>}
     </header>
 
-    <section class="study-content">
-      <!-- Sem este ramo, o ecrã abria em "Nenhuma questão disponível" e só
-           depois é que as perguntas apareciam. -->
+    <section class="session-content">
       @if (carregando) {
-        <app-skeleton variante="cartao" [quantidade]="1" etiqueta="A preparar a sessão de estudo"></app-skeleton>
+        <app-skeleton variante="cartao" [quantidade]="1" etiqueta="A preparar a sessão de prática"></app-skeleton>
+      } @else if (erroCarregamento) {
+        <section class="load-error" role="alert"><ion-icon name="warning-outline" aria-hidden="true"></ion-icon><div><h2>Não foi possível preparar a sessão</h2><p>{{ erroCarregamento }}</p></div><button type="button" (click)="carregar()"><ion-icon name="refresh-outline" aria-hidden="true"></ion-icon>Tentar novamente</button></section>
       } @else if (!iniciada && perguntaAtual) {
         <article class="session-intro">
-          <span>{{ modoRevisao ? 'Revisão focada' : 'Sessão recomendada' }}</span>
-          <h2>{{ nomeTema }}</h2>
-          <p>{{ modoRevisao ? 'Estas são as questões que precisam de revisão. Responde sem consultar o material.' : 'Responde sem consultar o material. Depois de cada resposta, lê a explicação antes de continuar.' }}</p>
-          <div><strong>{{ perguntas.length }}</strong><small>perguntas</small><i></i><strong>{{ perguntas.length * 2 }}</strong><small>minutos</small></div>
-          <button type="button" (click)="iniciarSessao()">Começar</button>
+          <p class="section-label">{{ etiquetaSessao }}</p><h2>{{ nomeSessao }}</h2><p>{{ descricaoSessao }}</p>
+          @if (totalDisponivel > 5) {
+            <fieldset class="session-size"><legend>Duração da sessão</legend><button type="button" [class.active]="tamanhoSessao === 5" (click)="configurarTamanho(5)"><strong>5</strong><small>perguntas</small></button><button type="button" [class.active]="tamanhoSessao === 10" [disabled]="totalDisponivel < 10" (click)="configurarTamanho(10)"><strong>10</strong><small>perguntas</small></button></fieldset>
+          }
+          <div class="session-meta"><span><strong>{{ perguntas.length }}</strong> perguntas</span><span><strong>≈ {{ perguntas.length }}</strong> minutos</span></div>
+          <button class="primary-button" type="button" (click)="iniciarSessao()">Começar sessão</button>
         </article>
       } @else if (concluida) {
-        <article class="session-result">
-          <span class="result-icon"><ion-icon name="ribbon-outline" aria-hidden="true"></ion-icon></span>
-          <span>Sessão concluída</span>
-          <h2>{{ acertosSessao }} de {{ perguntas.length }} respostas corretas</h2>
-          <p>{{ percentagemSessao >= 80 ? (modoRevisao ? 'Revisão concluída. Estas questões voltarão no momento adequado.' : 'Bom trabalho. Continua a rever este tema para manter o conhecimento.') : 'Este tema ainda precisa de reforço. As próximas sessões voltarão a trabalhar estes conceitos.' }}</p>
-          <a routerLink="/estudos">Voltar ao plano de estudo</a>
-        </article>
+        <article class="session-result"><span class="result-icon"><ion-icon name="checkmark-circle-outline" aria-hidden="true"></ion-icon></span><p class="section-label">Sessão concluída</p><h2>{{ acertosSessao }} de {{ perguntas.length }} respostas corretas</h2><strong>{{ percentagemSessao }}%</strong><p>{{ percentagemSessao >= 80 ? 'Bom trabalho. Continue a praticar para consolidar este resultado.' : 'Ainda há pontos a reforçar. As perguntas falhadas ficam no seu histórico local.' }}</p><a class="primary-button" routerLink="/praticar">Voltar a Praticar</a></article>
       } @else if (perguntaAtual; as pergunta) {
-        <div class="question-heading">
-          <span>Sessão em curso</span>
-          <strong>Passo {{ indice + 1 }} de {{ perguntas.length }}</strong>
-        </div>
-        <div class="progress-track"><span [style.width.%]="((indice + 1) / perguntas.length) * 100"></span></div>
-
+        <div class="question-progress"><span>Questão {{ indice + 1 }} de {{ perguntas.length }}</span><strong>{{ ((indice + 1) / perguntas.length) * 100 | number:'1.0-0' }}%</strong></div>
+        <div class="progress-track" role="progressbar" aria-label="Progresso da sessão" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="((indice + 1) / perguntas.length) * 100"><span [style.width.%]="((indice + 1) / perguntas.length) * 100"></span></div>
         <app-pergunta-card [pergunta]="pergunta" [respondida]="respondida" [escolhida]="escolhida" (escolha)="escolhida = $event"></app-pergunta-card>
-
-        <button class="action-button" type="button" [disabled]="escolhida === null" (click)="confirmarOuAvancar()">
-          {{ respondida ? (indice === perguntas.length - 1 ? 'Concluir sessão' : 'Continuar') : 'Confirmar resposta' }}
-          <ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon>
-        </button>
+        <button class="primary-button action-button" type="button" [disabled]="escolhida === null" (click)="confirmarOuAvancar()">{{ respondida ? (indice === perguntas.length - 1 ? 'Concluir sessão' : 'Continuar') : 'Confirmar resposta' }}<ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon></button>
       } @else {
-        <div class="empty-state">
-          <ion-icon name="reader-outline" aria-hidden="true"></ion-icon>
-          <h2>Nenhuma questão disponível</h2>
-          <p>{{ modoRevisao ? 'Não existem revisões pendentes neste tema.' : 'Este tema ainda não possui perguntas livres para a categoria selecionada.' }}</p>
-          <a routerLink="/estudos">Escolher outro tema</a>
-        </div>
+        <div class="empty-state"><ion-icon name="reader-outline" aria-hidden="true"></ion-icon><h2>Nenhuma questão disponível</h2><p>{{ textoVazio }}</p><a routerLink="/praticar">Escolher outro treino</a></div>
       }
     </section>
   </main>

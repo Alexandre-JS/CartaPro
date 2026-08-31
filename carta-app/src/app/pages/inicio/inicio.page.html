@@ -1,103 +1,82 @@
 <ion-content [fullscreen]="true" class="home-page">
   <main class="home-shell">
-    <header class="hero">
-      <div class="hero-top">
-        <div>
-          <p class="eyebrow">ProntoVia</p>
-        </div>
-        <a class="hero-profile" routerLink="/perfil" aria-label="Abrir notificações e perfil">
-          <ion-icon name="notifications-outline" aria-hidden="true"></ion-icon>
-        </a>
+    <header class="home-header">
+      <div class="home-heading">
+        <span>ProntoVia</span>
+        <h1>Olá{{ primeiroNome !== 'Estudante' ? ', ' + primeiroNome : '' }}</h1>
+        <p>Continue a sua preparação.</p>
       </div>
-      <div class="hero-shape" aria-hidden="true"></div>
+      <a class="account-action" routerLink="/perfil" aria-label="Abrir perfil e definições">
+        <ion-icon name="person-circle-outline" aria-hidden="true"></ion-icon>
+      </a>
     </header>
 
-    <section class="dashboard">
-      <section class="readiness-home">
-        <div class="readiness-ring" [style.--readiness]="prontidao + '%'" [class.locked]="!autenticado"><strong>{{ autenticado ? prontidao + '%' : '—' }}</strong></div>
-        <div><span>SUA PRONTIDÃO</span><h2>Prontidão</h2><p>{{ tituloProntidao }}</p></div>
-      </section>
-      <section class="continue-home">
-        <div class="section-heading"><div><span>CONTINUE DE ONDE PAROU</span></div></div>
-        <a class="continue-row" [routerLink]="autenticado && passoPrincipal ? passoPrincipal.rota : ['/estudos']" [queryParams]="autenticado && passoPrincipal ? (passoPrincipal.query || null) : null"><span><strong>{{ autenticado && passoPrincipal ? passoPrincipal.titulo : 'Escolhe um tema para começar' }}</strong><small>{{ autenticado && passoPrincipal ? passoPrincipal.motivo : 'Conteúdo Free disponível sem conta' }}</small></span><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>
-      </section>
-      <!-- Um tutor dá uma instrução de cada vez. A recomendação de estudo, as
-           revisões e o reforço de sinais competiam por atenção em cartões
-           iguais e sobrepostos: quando havia revisões pendentes, a recomendação
-           apontava para o mesmo tema e o aluno via a mesma tarefa duas vezes,
-           por duas rotas diferentes. Agora é uma fila com prioridade e só a
-           cabeça é destaque. -->
+    <div class="sync-state"><span class="sync-dot" [class.synced]="autenticado"></span>{{ estadoPersistencia }}</div>
+
+    <section class="home-content">
       @if (carregando) {
-        <section class="section-block">
-          <div class="section-heading"><div><span>Plano de hoje</span><h2>Fazer agora</h2></div></div>
-          <app-skeleton variante="cartao" [quantidade]="1" etiqueta="A preparar o teu plano de estudo"></app-skeleton>
-        </section>
-        <section class="section-block">
-          <app-skeleton variante="lista" [quantidade]="2" etiqueta="A carregar atividade recente"></app-skeleton>
+        <app-skeleton variante="cartao" [quantidade]="2" etiqueta="A preparar o próximo passo"></app-skeleton>
+      } @else if (erroCarregamento) {
+        <section class="load-error" role="alert">
+          <ion-icon name="warning-outline" aria-hidden="true"></ion-icon>
+          <div><h2>Não conseguimos carregar o Início</h2><p>{{ erroCarregamento }}</p></div>
+          <button type="button" (click)="carregar()"><ion-icon name="refresh-outline" aria-hidden="true"></ion-icon>Tentar novamente</button>
         </section>
       } @else {
-      @if (passoPrincipal; as passo) {
-        <section class="section-block">
-          <div class="section-heading"><div><span>Plano de hoje</span><h2>Fazer agora</h2></div></div>
-          <a class="recommendation-card" [routerLink]="passo.rota" [queryParams]="passo.query || null">
-            <span class="recommend-icon"><ion-icon [name]="passo.icone" aria-hidden="true"></ion-icon></span>
-            <span class="recommend-copy"><strong>{{ passo.titulo }}</strong><small>{{ passo.motivo }}</small></span>
-            <span class="recommend-action">{{ passo.accao }} <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></span>
-          </a>
+        <section class="next-step" aria-labelledby="next-step-title">
+          <p class="section-label">Próximo passo</p>
+          @if (passoPrincipal; as passo) {
+            <div class="next-step-copy">
+              <span class="next-icon"><ion-icon [name]="passo.icone" aria-hidden="true"></ion-icon></span>
+              <div><h2 id="next-step-title">{{ passo.titulo }}</h2><p>{{ passo.motivo }}</p></div>
+            </div>
+            <a class="primary-action" [routerLink]="passo.rota" [queryParams]="passo.query || null">{{ passo.accao }}</a>
+          } @else {
+            <div class="next-step-copy">
+              <span class="next-icon"><ion-icon name="book-outline" aria-hidden="true"></ion-icon></span>
+              <div><h2 id="next-step-title">Escolha um tema para começar</h2><p>Avance ao seu ritmo com o conteúdo disponível.</p></div>
+            </div>
+            <a class="primary-action" routerLink="/aprender">Começar</a>
+          }
         </section>
-      }
 
-      @if (outrosPassos.length) {
-        <section class="section-block">
-          <div class="section-heading"><div><span>A seguir</span><h2>Também te espera</h2></div></div>
-          <div class="next-list">
-            @for (passo of outrosPassos; track passo.titulo) {
-              <a class="next-row" [routerLink]="passo.rota" [queryParams]="passo.query || null">
-                <ion-icon [name]="passo.icone" aria-hidden="true"></ion-icon>
-                <span><strong>{{ passo.titulo }}</strong><small>{{ passo.motivo }}</small></span>
-                <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
-              </a>
-            }
-          </div>
+        <section class="readiness" aria-labelledby="readiness-title">
+          <div class="section-heading"><div><p class="section-label">Prontidão</p><h2 id="readiness-title">{{ tituloProntidao }}</h2></div><strong>{{ historico.length ? prontidao + '%' : '—' }}</strong></div>
+          <div class="progress-track" role="progressbar" aria-label="Prontidão" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="prontidao"><span [style.width.%]="prontidao"></span></div>
+          @if (ultimoExame; as exame) {
+            <p class="readiness-note">Último simulado: {{ exame.acertos }} de {{ exame.total }} respostas certas.</p>
+          } @else {
+            <p class="readiness-note">Faça um simulado para obter a primeira indicação.</p>
+          }
         </section>
-      }
 
-      <section class="quick-home">
-        <div class="section-heading"><div><span>AÇÕES RÁPIDAS</span></div></div>
-        <div class="quick-list">
-          <a routerLink="/estudos"><ion-icon name="book-outline" aria-hidden="true"></ion-icon><span>Escolher tema para estudar</span><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>
-          <a routerLink="/simulado"><ion-icon name="checkmark-circle-outline" aria-hidden="true"></ion-icon><span>Iniciar simulado</span><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>
-          <a routerLink="/revisoes"><ion-icon name="refresh-outline" aria-hidden="true"></ion-icon><span>Revisar erros</span><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>
-          <a routerLink="/desempenho"><ion-icon name="document-text-outline" aria-hidden="true"></ion-icon><span>Meus relatórios</span><ion-icon name="lock-closed-outline" aria-hidden="true"></ion-icon></a>
-        </div>
-      </section>
-
-      <!-- Cadeado real: o plano gratuito vê quanto conteúdo existe por trás,
-           mas o servidor nunca lhe envia essas perguntas. -->
-      @if (plano === 'gratis' && bloqueadas > 0) {
-        <section class="section-block locked-section">
-          <a class="recommendation-card locked" routerLink="/desbloquear">
-            <span class="recommend-icon"><ion-icon name="lock-closed-outline" aria-hidden="true"></ion-icon></span>
-            <span class="recommend-copy"><strong>Mais {{ bloqueadas }} perguntas à tua espera</strong><small>Desbloqueia o banco completo e chega ao INATRO sem surpresas.</small></span>
-            <span class="recommend-action">Ver <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></span>
-          </a>
+        <section class="quick-actions" aria-labelledby="quick-title">
+          <div class="section-heading"><div><p class="section-label">Ações</p><h2 id="quick-title">Escolha como avançar</h2></div></div>
+          <nav class="action-list" aria-label="Ações de estudo">
+            <a routerLink="/aprender"><ion-icon name="book-outline" aria-hidden="true"></ion-icon><span><strong>Aprender</strong><small>Explore temas e lições</small></span><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>
+            <a routerLink="/praticar"><ion-icon name="create-outline" aria-hidden="true"></ion-icon><span><strong>Praticar</strong><small>Treine temas, erros e revisões</small></span><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>
+            <a routerLink="/simular"><ion-icon name="checkmark-circle-outline" aria-hidden="true"></ion-icon><span><strong>Simular</strong><small>Teste a sua preparação</small></span><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>
+            <a routerLink="/praticar/revisoes"><ion-icon name="refresh-outline" aria-hidden="true"></ion-icon><span><strong>Rever</strong><small>Consolide o que já praticou</small></span><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>
+          </nav>
         </section>
-      }
 
-      <!-- Feedback concreto da última prova. Os números agregados — taxa geral,
-           médias, histórico completo — vivem só no separador Desempenho. -->
-      <section class="section-block activity-section">
-        <div class="section-heading"><div><span>Atividade recente</span><h2>Último exame</h2></div><a routerLink="/desempenho">Ver histórico</a></div>
-        @if (ultimoExame; as exame) {
-          <article class="activity-card">
-            <span class="exam-number"><small>Exame</small><strong>{{ numeroExame(exame.numero) }}</strong></span>
-            <span class="activity-copy"><strong>{{ exame.acertos }} de {{ exame.total }} certas</strong><small>{{ exame.data | date:'dd/MM/yyyy' }} · {{ exameAprovado(exame) ? 'chegava para passar' : 'ainda não chegava para passar' }}</small></span>
-            <span class="activity-score" [class.good]="exameAprovado(exame)">{{ percentagemExame(exame) }}%</span>
-          </article>
-        } @else {
-          <a routerLink="/exames" class="empty-activity"><ion-icon name="document-text-outline" aria-hidden="true"></ion-icon><span><strong>Ainda não fizeste exames</strong><small>Escolhe um exame para veres onde estás.</small></span><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>
+        @if (!autenticado) {
+          <aside class="account-note">
+            <div><strong>Leve o seu progresso consigo</strong><p>Crie uma conta quando quiser sincronizar e recuperar os seus estudos noutro dispositivo.</p></div>
+            <a routerLink="/conta/guardar" [queryParams]="{ retorno: '/inicio' }">Guardar progresso</a>
+          </aside>
         }
-      </section>
+
+        @if (ultimoExame; as exame) {
+          <section class="recent-activity" aria-labelledby="activity-title">
+            <div class="section-heading"><div><p class="section-label">Atividade recente</p><h2 id="activity-title">Último simulado</h2></div></div>
+            <article class="activity-row">
+              <span class="exam-number">{{ numeroExame(exame.numero) }}</span>
+              <span><strong>{{ percentagemExame(exame) }}% de respostas certas</strong><small>{{ exame.data | date:'dd/MM/yyyy' }} · {{ exameAprovado(exame) ? 'Em boa preparação' : 'Vale a pena reforçar' }}</small></span>
+              <a routerLink="/simular/resultado" aria-label="Abrir último resultado"><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>
+            </article>
+          </section>
+        }
       }
     </section>
 

@@ -1,16 +1,14 @@
 <ion-content [fullscreen]="true" class="library-page">
   <main class="library-shell">
-    <app-app-header titulo="Biblioteca" subtitulo="Material de estudo" [voltarPara]="'/estudos'" />
+    <app-app-header titulo="Biblioteca" subtitulo="Documentos complementares" [voltarPara]="'/aprender'" />
     <section class="library-content">
-      <p class="library-intro">Escolhe um material para ler com calma e consultar sempre que precisares.</p>
+      <p class="library-intro">Consulte documentos de referência. Os temas, lições, sinais e glossário continuam organizados na área Aprender.</p>
       <div class="library-list">
-        @for (material of materiais; track material.rota) {
-          <a class="library-card" [routerLink]="material.rota">
-            <span class="library-icon"><ion-icon [name]="material.icone" aria-hidden="true"></ion-icon></span>
-            <span><strong>{{ material.titulo }}</strong><small>{{ material.descricao }}</small><em>{{ material.total }} itens disponíveis</em></span>
-            <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
-          </a>
-        }
+        <a class="library-card" href="assets/conteudo/codigo-estrada-inatro.pdf" target="_blank" rel="noopener">
+          <span class="library-icon"><ion-icon name="document-text-outline" aria-hidden="true"></ion-icon></span>
+          <span><strong>Código da Estrada — INATRO</strong><small>Documento oficial em PDF para consulta.</small><em>Disponível no dispositivo</em></span>
+          <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
+        </a>
       </div>
     </section>
     <app-bottom-nav ativo="estudos"></app-bottom-nav>

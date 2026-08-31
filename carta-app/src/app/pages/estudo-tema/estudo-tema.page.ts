@@ -1,27 +1,31 @@
+import { DecimalPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
-import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
 import { addIcons } from 'ionicons';
-import { arrowBackOutline, arrowForwardOutline, bookOutline, readerOutline, ribbonOutline } from 'ionicons/icons';
+import { arrowBackOutline, arrowForwardOutline, checkmarkCircleOutline, readerOutline, refreshOutline, warningOutline } from 'ionicons/icons';
 import { PerguntaCardComponent } from '../../components/pergunta-card/pergunta-card.component';
+import { SkeletonComponent } from '../../components/skeleton/skeleton.component';
+import { mensagemErroApi } from '../../core/api-error';
 import { ProgressoService } from '../../core/progresso.service';
 import { SimuladoService } from '../../core/simulado.service';
 import { StorageService } from '../../core/storage.service';
 import { TemasService } from '../../core/temas.service';
-import { TAMANHO_SESSAO_ESTUDO } from '../../config/simulado.config';
 import { CategoriaCarta, Pergunta } from '../../models/pergunta.model';
 import { ProgressoTema } from '../../models/progresso.model';
+
+type ModoPratica = 'tema' | 'erros' | 'novas' | 'rapida';
 
 @Component({
     standalone: true,
     selector: 'app-estudo-tema',
-    imports: [RouterLink, IonContent, IonIcon, PerguntaCardComponent, SkeletonComponent],
+    imports: [DecimalPipe, RouterLink, IonContent, IonIcon, PerguntaCardComponent, SkeletonComponent],
     templateUrl: './estudo-tema.page.html',
     styleUrls: ['./estudo-tema.page.scss'],
 })
 export class EstudoTemaPage implements OnInit {
     tema = '';
+    modo: ModoPratica = 'tema';
     perguntas: Pergunta[] = [];
     progressoTema: ProgressoTema | null = null;
     indice = 0;
@@ -30,9 +34,12 @@ export class EstudoTemaPage implements OnInit {
     iniciada = false;
     concluida = false;
     acertosSessao = 0;
-    modoRevisao = false;
     carregando = true;
-    /** Instante em que a pergunta atual apareceu — base da telemetria. */
+    erroCarregamento = '';
+    tamanhoSessao = 5;
+
+    private bancoPerguntas: Pergunta[] = [];
+    private categoria: CategoriaCarta = 'ligeiro';
     private mostradaEm = Date.now();
 
     constructor(
@@ -42,47 +49,77 @@ export class EstudoTemaPage implements OnInit {
         private readonly storage: StorageService,
         private readonly temasService: TemasService,
     ) {
-        addIcons({ arrowBackOutline, arrowForwardOutline, bookOutline, readerOutline, ribbonOutline });
+        addIcons({ arrowBackOutline, arrowForwardOutline, checkmarkCircleOutline, readerOutline, refreshOutline, warningOutline });
     }
 
     async ngOnInit(): Promise<void> {
-        this.tema = this.route.snapshot.paramMap.get('tema') || '';
-        const categoria = (this.route.snapshot.queryParamMap.get('categoria') || 'ligeiro') as CategoriaCarta;
-        this.modoRevisao = this.route.snapshot.queryParamMap.get('modo') === 'revisao';
-        await this.temasService.carregar();
+        this.modo = (this.route.snapshot.data['modoPratica'] || 'tema') as ModoPratica;
+        this.tema = this.route.snapshot.paramMap.get('slug') || this.route.snapshot.paramMap.get('tema') || '';
+        this.categoria = (this.route.snapshot.queryParamMap.get('categoria') || (await this.storage.obterCategoria()) || 'ligeiro') as CategoriaCarta;
+        const totalPedido = Number(this.route.snapshot.queryParamMap.get('total'));
+        this.tamanhoSessao = totalPedido === 10 ? 10 : 5;
+        await this.carregar();
+    }
 
-        if (this.modoRevisao) {
-            const pendentes = await this.storage.listarRevisoesPendentes();
-            const idsPendentes = new Set(
-                pendentes.filter((revisao) => revisao.tema === this.tema).map((revisao) => revisao.perguntaId),
-            );
-            const doTema = await this.simulado.perguntasPorTema(this.tema, categoria, Number.MAX_SAFE_INTEGER);
-            this.perguntas = doTema.filter((pergunta) => idsPendentes.has(pergunta.id)).slice(0, TAMANHO_SESSAO_ESTUDO);
-        } else {
-            // A amostragem já vem ponderada por recência: deixa de ser sempre
-            // o mesmo grupo de 5 perguntas do topo do banco.
-            this.perguntas = await this.simulado.perguntasPorTema(this.tema, categoria, TAMANHO_SESSAO_ESTUDO);
+    async carregar(): Promise<void> {
+        this.carregando = true;
+        this.erroCarregamento = '';
+        this.reiniciarEstado();
+
+        try {
+            const [, perguntas] = await Promise.all([
+                this.temasService.carregar(),
+                this.selecionarPerguntas(),
+            ]);
+            this.bancoPerguntas = perguntas;
+            this.configurarTamanho(this.tamanhoSessao);
+            if (this.tema) await this.atualizarProgresso();
+        } catch (erro) {
+            this.erroCarregamento = mensagemErroApi(erro);
+        } finally {
+            this.carregando = false;
         }
-
-        await this.atualizarProgresso();
-
-        this.carregando = false;
     }
 
-    get perguntaAtual(): Pergunta | null {
-        return this.perguntas[this.indice] || null;
-    }
+    get perguntaAtual(): Pergunta | null { return this.perguntas[this.indice] || null; }
 
-    get progressoPercentagem(): number {
-        return Math.round((this.progressoTema?.taxaRecente || 0) * 100);
-    }
-
-    get nomeTema(): string {
+    get nomeSessao(): string {
+        if (this.modo === 'erros') return 'Meus erros';
+        if (this.modo === 'novas') return 'Nunca respondidas';
+        if (this.modo === 'rapida') return 'Sessão rápida';
         return this.temasService.nome(this.tema);
     }
 
-    get percentagemSessao(): number {
-        return this.perguntas.length ? Math.round((this.acertosSessao / this.perguntas.length) * 100) : 0;
+    get etiquetaSessao(): string {
+        if (this.modo === 'erros') return 'Reforço dirigido';
+        if (this.modo === 'novas') return 'Primeiro contacto';
+        if (this.modo === 'rapida') return 'Prática curta';
+        return 'Prática por tema';
+    }
+
+    get descricaoSessao(): string {
+        if (this.modo === 'erros') return 'Repita perguntas que falhou anteriormente e leia o feedback antes de continuar.';
+        if (this.modo === 'novas') return 'Trabalhe apenas perguntas que ainda não aparecem no histórico deste dispositivo.';
+        if (this.modo === 'rapida') return 'Uma sessão curta, misturada por temas, para manter o ritmo diário.';
+        return 'Pratique este tema sem consultar o material e leia a explicação depois de cada resposta.';
+    }
+
+    get textoVazio(): string {
+        if (this.modo === 'erros') return 'Não existem perguntas erradas no histórico local.';
+        if (this.modo === 'novas') return 'Já respondeu a todas as perguntas disponíveis nesta categoria.';
+        return 'Não existem perguntas disponíveis para esta sessão.';
+    }
+
+    get totalDisponivel(): number { return this.bancoPerguntas.length; }
+    get percentagemSessao(): number { return this.perguntas.length ? Math.round((this.acertosSessao / this.perguntas.length) * 100) : 0; }
+
+    configurarTamanho(total: number): void {
+        if (this.iniciada) return;
+        this.tamanhoSessao = total;
+        this.perguntas = this.bancoPerguntas.slice(0, total);
+        this.indice = 0;
+        this.escolhida = null;
+        this.respondida = false;
     }
 
     iniciarSessao(): void {
@@ -91,30 +128,49 @@ export class EstudoTemaPage implements OnInit {
     }
 
     async confirmarOuAvancar(): Promise<void> {
-        if (!this.perguntaAtual || this.escolhida === null) {
-            return;
-        }
+        if (!this.perguntaAtual || this.escolhida === null) return;
+
         if (!this.respondida) {
             const acertou = await this.progresso.registarResposta(this.perguntaAtual, {
                 escolhida: this.escolhida,
                 duracaoMs: Date.now() - this.mostradaEm,
-                origem: this.modoRevisao ? 'revisao' : 'estudo',
+                origem: 'estudo',
             });
-            if (acertou) {
-                this.acertosSessao++;
-            }
-            await this.atualizarProgresso();
+            if (acertou) this.acertosSessao++;
+            if (this.tema) await this.atualizarProgresso();
             this.respondida = true;
             return;
         }
+
         if (this.indice === this.perguntas.length - 1) {
             this.concluida = true;
+            void this.storage.sincronizarAgora().catch(() => undefined);
             return;
         }
+
         this.indice++;
         this.escolhida = null;
         this.respondida = false;
         this.mostradaEm = Date.now();
+    }
+
+    private async selecionarPerguntas(): Promise<Pergunta[]> {
+        const limite = Number.MAX_SAFE_INTEGER;
+        if (this.modo === 'erros') return this.simulado.perguntasErradas(this.categoria, limite);
+        if (this.modo === 'novas') return this.simulado.perguntasNuncaRespondidas(this.categoria, limite);
+        if (this.modo === 'rapida') return this.simulado.montarSimulado(this.categoria, false, limite);
+        return this.simulado.perguntasPorTema(this.tema, this.categoria, limite);
+    }
+
+    private reiniciarEstado(): void {
+        this.perguntas = [];
+        this.bancoPerguntas = [];
+        this.indice = 0;
+        this.escolhida = null;
+        this.respondida = false;
+        this.iniciada = false;
+        this.concluida = false;
+        this.acertosSessao = 0;
     }
 
     private async atualizarProgresso(): Promise<void> {

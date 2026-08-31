@@ -4,7 +4,7 @@ import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { bookOutline, clipboardOutline, createOutline, homeOutline, statsChartOutline } from 'ionicons/icons';
 
-export type SeccaoNav = 'inicio' | 'exames' | 'estudos' | 'desempenho' | 'perfil' | 'praticar';
+export type SeccaoNav = 'inicio' | 'exames' | 'estudos' | 'progresso' | 'perfil' | 'praticar';
 
 /**
  * Barra de navegação principal.

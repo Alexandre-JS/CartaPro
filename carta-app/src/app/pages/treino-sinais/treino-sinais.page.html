@@ -19,6 +19,8 @@
 
     @if (carregando) {
       <section class="train-content"><app-skeleton variante="cartao" [quantidade]="1" etiqueta="A preparar o treino"></app-skeleton></section>
+    } @else if (erroCarregamento) {
+      <section class="train-content"><section class="load-error" role="alert"><ion-icon name="warning-outline" aria-hidden="true"></ion-icon><div><h2>Não foi possível preparar o treino</h2><p>{{ erroCarregamento }}</p></div><button type="button" (click)="repetir()"><ion-icon name="refresh-outline" aria-hidden="true"></ion-icon>Tentar novamente</button></section></section>
     } @else if (!perguntas.length) {
       <section class="empty-state">
         <ion-icon name="warning-outline" aria-hidden="true"></ion-icon>
@@ -27,7 +29,7 @@
           É preciso pelo menos dois sinais com imagem e significado publicados para gerar perguntas.
           Escolhe outra categoria ou volta à biblioteca.
         </p>
-        <a class="primary-button" routerLink="/sinais">Ver a biblioteca</a>
+        <a class="primary-button" routerLink="/aprender/sinais">Ver a biblioteca</a>
       </section>
     } @else if (concluido) {
       <section class="train-content">
@@ -48,7 +50,7 @@
           <section class="missed">
             <h2>Sinais a rever ({{ falhados.length }})</h2>
             @for (sinal of falhados; track sinal.slug) {
-              <a class="missed-row" [routerLink]="['/sinal', sinal.slug]">
+              <a class="missed-row" [routerLink]="['/aprender/sinais', sinal.slug]">
                 <span class="thumb">
                   @if (sinal.imagem) {
                     <img [src]="sinal.imagem" [alt]="sinal.nome" loading="lazy">
@@ -74,7 +76,7 @@
             </button>
           }
           <button type="button" class="outline-button" (click)="repetir()">Nova sessão</button>
-          <a class="ghost-button" routerLink="/sinais">Voltar à biblioteca</a>
+          <a class="ghost-button" routerLink="/praticar">Voltar a Praticar</a>
         </div>
       </section>
     } @else if (perguntaAtual) {
@@ -89,7 +91,7 @@
         @if (respondida) {
           <div class="answer-actions">
             @if (sinalAtual) {
-              <a class="ghost-button" [routerLink]="['/sinal', sinalAtual]">Ver ficha do sinal</a>
+              <a class="ghost-button" [routerLink]="['/aprender/sinais', sinalAtual]">Ver ficha do sinal</a>
             }
             <button type="button" class="primary-button" (click)="avancar()">
               {{ ultima ? 'Ver resultado' : 'Próximo sinal' }}

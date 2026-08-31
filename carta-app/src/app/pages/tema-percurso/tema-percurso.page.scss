@@ -1,0 +1,40 @@
+:host { display: block; }
+.path-page { --background: var(--pv-background); }
+.path-shell { width: min(100%, var(--pv-content-reading)); min-height: 100%; margin: 0 auto; padding-bottom: calc(80px + env(safe-area-inset-bottom)); background: var(--pv-background); }
+.path-header { display: grid; grid-template-columns: var(--pv-touch-target) minmax(0, 1fr); min-height: 72px; align-items: center; gap: var(--pv-space-03); padding: max(var(--pv-space-03), env(safe-area-inset-top)) var(--pv-space-page) var(--pv-space-03); border-bottom: 1px solid var(--pv-border-subtle); background: var(--pv-layer-01); }
+.path-header > a { display: grid; width: var(--pv-touch-target); height: var(--pv-touch-target); place-items: center; color: var(--pv-interactive); }
+.path-header > a ion-icon { font-size: 22px; }
+.path-header div { min-width: 0; }
+.path-header span { color: var(--pv-text-secondary); font-size: var(--pv-type-caption); }
+.path-header h1 { overflow: hidden; margin: var(--pv-space-02) 0 0; font-size: var(--pv-type-heading); text-overflow: ellipsis; white-space: nowrap; }
+.path-content { display: grid; gap: var(--pv-space-07); padding: var(--pv-space-06) var(--pv-space-page); }
+.section-label { margin: 0; color: var(--pv-focus); font-size: var(--pv-type-caption); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.path-summary { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--pv-space-04); }
+.path-summary h2 { margin: var(--pv-space-02) 0; font-size: var(--pv-type-title); }
+.path-summary p:last-child { margin: 0; color: var(--pv-text-secondary); font-size: var(--pv-type-body-sm); }
+.path-summary > strong { align-self: center; font-size: var(--pv-type-display); font-weight: 600; }
+.path-progress { grid-column: 1 / -1; height: 8px; overflow: hidden; border-radius: var(--pv-radius-pill); background: var(--pv-border-subtle); }
+.path-progress i { display: block; height: 100%; border-radius: inherit; background: var(--pv-progress); }
+.continue-block { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--pv-space-04); padding: var(--pv-space-05); border-left: 4px solid var(--pv-interactive); background: var(--pv-layer-01); }
+.continue-block div { display: grid; gap: var(--pv-space-02); }
+.continue-block span { color: var(--pv-focus); font-size: var(--pv-type-caption); font-weight: 600; text-transform: uppercase; }
+.continue-block strong { font-size: var(--pv-type-item); }
+.continue-block small { color: var(--pv-text-secondary); font-size: var(--pv-type-caption); }
+.continue-block a { display: grid; min-height: var(--pv-touch-target); place-items: center; padding-inline: var(--pv-space-05); border-radius: var(--pv-radius-default); color: var(--pv-on-interactive); background: var(--pv-interactive); font-size: var(--pv-type-body-sm); font-weight: 600; text-decoration: none; }
+.section-heading { display: grid; gap: var(--pv-space-02); }
+.section-heading h2 { margin: 0; font-size: var(--pv-type-heading); }
+.checkpoint-section { display: grid; gap: var(--pv-space-05); }
+.checkpoint-list { display: grid; margin: 0; padding: 0; list-style: none; }
+.checkpoint-list li { position: relative; display: grid; grid-template-columns: 32px minmax(0, 1fr) var(--pv-touch-target); min-height: 72px; align-items: start; gap: var(--pv-space-04); }
+.checkpoint-marker { z-index: 1; display: grid; width: 32px; height: 32px; place-items: center; border-radius: 50%; color: var(--pv-text-secondary); background: var(--pv-layer-02); }
+.checkpoint-marker ion-icon { font-size: 20px; }
+.checkpoint-line { position: absolute; top: 32px; bottom: 0; left: 15px; width: 2px; background: var(--pv-border-subtle); }
+.checkpoint-list li > div { display: grid; gap: var(--pv-space-02); padding-block: var(--pv-space-02) var(--pv-space-05); }
+.checkpoint-list strong { font-size: var(--pv-type-item); font-weight: 500; }
+.checkpoint-list small { color: var(--pv-text-secondary); font-size: var(--pv-type-caption); }
+.checkpoint-list li > a { display: grid; width: var(--pv-touch-target); height: var(--pv-touch-target); place-items: center; color: var(--pv-interactive); }
+.checkpoint-list .concluido .checkpoint-marker { color: var(--pv-on-interactive); background: var(--pv-success); }
+.checkpoint-list .atual .checkpoint-marker { color: var(--pv-on-interactive); background: var(--pv-interactive); }
+.checkpoint-list .atual strong { color: var(--pv-interactive); font-weight: 600; }
+.checkpoint-list .bloqueado .checkpoint-marker { color: var(--pv-warning-text); background: var(--pv-orange-050); }
+@media (min-width: 600px) { .path-header, .path-content { padding-inline: var(--pv-space-07); } }

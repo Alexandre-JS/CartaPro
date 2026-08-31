@@ -1,34 +1,37 @@
-:host { display: block; }
-
-.review-page { --background: var(--app-color-page); }
-.review-shell { width: min(100%, 560px); min-height: 100%; margin: 0 auto; padding-bottom: calc(88px + env(safe-area-inset-bottom)); overflow: hidden; background: var(--app-color-light-gray); box-shadow: 0 0 42px rgb(22 22 22 / 10%); }
-
-.review-header { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 138px; padding: max(28px, env(safe-area-inset-top)) 18px 24px; overflow: hidden; color: var(--pv-white); background-color: var(--app-color-brand-panel); background-image: url('/assets/backgrounds/ESCOLA-DE-CONDUCAO.jpg'); background-position: center 42%; background-size: cover; }
-.review-header::before { position: absolute; inset: 0; background: rgb(26 31 92 / 55%); content: ''; }
-.review-header > * { position: relative; z-index: 1; }
-.review-header span { font-size: .58rem; text-transform: uppercase; letter-spacing: .07em; opacity: .85; }
-.review-header h1 { margin: 4px 0 0; font-size: 1.1rem; font-weight: 600; }
-.review-counter { display: flex; align-items: center; gap: 6px; padding: 7px 11px; border-radius: 10px; background: rgb(255 255 255 / 15%); }
-.review-counter ion-icon { font-size: .9rem; }
-.review-counter strong { font-size: .78rem; font-variant-numeric: tabular-nums; }
-
-.review-hint { margin: 16px 18px 0; color: var(--app-color-text-muted); font-size: .74rem; line-height: 1.5; }
-.review-hint strong { color: var(--app-color-green-dark); text-transform: capitalize; }
-
-.question-area { padding: 16px 18px 0; }
-
-.review-controls { display: flex; justify-content: flex-end; padding: 18px; }
-
-.primary-button, .outline-button { display: inline-flex; min-height: 47px; align-items: center; justify-content: center; gap: 8px; padding: 0 20px; border: 0; border-radius: 11px; font: inherit; font-size: .74rem; font-weight: 700; text-decoration: none; cursor: pointer; }
-.primary-button { color: var(--pv-white); background: var(--app-color-action); }
-.outline-button { margin-top: 10px; border: 1px solid var(--app-color-green); color: var(--app-color-green-dark); background: transparent; }
-
-.empty-state { display: grid; place-items: center; padding: 44px 28px; text-align: center; }
-.empty-state > ion-icon { color: var(--app-color-green-dark); font-size: 3rem; }
-.empty-state h2 { margin: 16px 0 7px; font-size: 1.15rem; }
-.empty-state p { max-width: 320px; margin: 0 0 20px; color: var(--app-color-text-muted); font-size: .78rem; line-height: 1.55; }
-
-
-@media (min-width: 700px) {
-  .review-shell { min-height: calc(100vh - 48px); margin-block: 24px; border-radius: 28px; }
-}
+:host { display: block; min-width: 0; }
+.review-page { --background: var(--pv-background); }
+.review-shell { width: min(100%, var(--pv-content-reading)); min-height: 100%; margin: 0 auto; background: var(--pv-background); }
+.review-header { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; min-height: 72px; align-items: center; gap: var(--pv-space-03); padding: max(var(--pv-space-03), env(safe-area-inset-top)) var(--pv-space-page) var(--pv-space-03); border-bottom: 1px solid var(--pv-border-subtle); background: var(--pv-layer-01); }
+.review-header > a { display: grid; width: var(--pv-touch-target); height: var(--pv-touch-target); place-items: center; color: var(--pv-text-primary); text-decoration: none; }
+.review-header > a ion-icon { font-size: 22px; }
+.review-header div { min-width: 0; }
+.review-header span { color: var(--pv-text-secondary); font-size: var(--pv-type-caption); }
+.review-header h1 { margin: var(--pv-space-01) 0 0; font-size: var(--pv-type-item); }
+.review-header > strong { color: var(--pv-text-secondary); font-size: var(--pv-type-meta); }
+.review-content { display: grid; gap: var(--pv-space-05); width: 100%; box-sizing: border-box; padding: var(--pv-space-06) var(--pv-space-page) calc(var(--pv-space-07) + env(safe-area-inset-bottom)); }
+.review-progress { display: flex; justify-content: space-between; color: var(--pv-text-secondary); font-size: var(--pv-type-caption); }
+.review-progress strong { color: var(--pv-text-primary); }
+.progress-track { height: 5px; overflow: hidden; border-radius: var(--pv-radius-pill); background: var(--pv-border-subtle); }
+.progress-track span { display: block; height: 100%; background: var(--pv-progress); }
+.review-hint { margin: 0; color: var(--pv-text-secondary); font-size: var(--pv-type-caption); }
+.review-hint strong { color: var(--pv-text-primary); }
+app-pergunta-card { display: block; }
+.next-review { display: flex; min-height: 40px; align-items: center; gap: var(--pv-space-03); margin: 0; padding-inline: var(--pv-space-04); border-left: 3px solid var(--pv-focus); color: var(--pv-text-secondary); background: var(--pv-cyan-050); font-size: var(--pv-type-caption); }
+.next-review ion-icon { color: var(--pv-focus); font-size: 18px; }
+.primary-button, .outline-button { display: inline-flex; min-height: var(--pv-touch-target); align-items: center; justify-content: center; gap: var(--pv-space-03); padding-inline: var(--pv-space-05); border-radius: var(--pv-radius-default); font: inherit; font-size: var(--pv-type-body-sm); font-weight: 600; text-decoration: none; }
+.primary-button { border: 0; color: var(--pv-on-interactive); background: var(--pv-interactive); }
+.outline-button { border: 1px solid var(--pv-interactive); color: var(--pv-interactive); background: var(--pv-layer-01); }
+.action-button { width: 100%; }
+.section-label { margin: 0; color: var(--pv-focus) !important; font-size: var(--pv-type-caption) !important; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.empty-state { display: grid; min-height: 400px; place-content: center; justify-items: center; text-align: center; }
+.empty-state > ion-icon { color: var(--pv-success); font-size: 48px; }
+.empty-state h2 { margin: var(--pv-space-04) 0 var(--pv-space-02); font-size: var(--pv-type-heading); }
+.empty-state > strong { margin-bottom: var(--pv-space-03); color: var(--pv-interactive); font-size: var(--pv-type-display); }
+.empty-state p { max-width: 340px; margin: 0 0 var(--pv-space-05); color: var(--pv-text-secondary); font-size: var(--pv-type-body-sm); line-height: var(--pv-line-body); }
+.empty-state .outline-button { margin-top: var(--pv-space-03); }
+.load-error { display: grid; width: 100%; box-sizing: border-box; grid-template-columns: 32px minmax(0, 1fr); gap: var(--pv-space-04); padding: var(--pv-space-05); border: 1px solid var(--pv-orange-100); border-radius: var(--pv-radius-tile); background: var(--pv-orange-050); }
+.load-error > ion-icon { color: var(--pv-warning-text); font-size: 24px; }
+.load-error h2 { margin: 0; font-size: var(--pv-type-heading); }
+.load-error p { margin: var(--pv-space-02) 0 0; overflow-wrap: anywhere; color: var(--pv-text-secondary); font-size: var(--pv-type-body-sm); }
+.load-error button { grid-column: 2; display: inline-flex; min-height: var(--pv-touch-target); align-items: center; gap: var(--pv-space-03); justify-self: start; padding-inline: var(--pv-space-05); border: 1px solid var(--pv-interactive); border-radius: var(--pv-radius-default); color: var(--pv-interactive); background: var(--pv-layer-01); font: inherit; font-weight: 600; }
+@media (min-width: 600px) { .review-content { padding-inline: var(--pv-space-07); } }

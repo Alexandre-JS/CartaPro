@@ -13,6 +13,8 @@ import { StorageService } from '../../core/storage.service';
 import { HistoricoExame } from '../../models/progresso.model';
 import { ExameApiService } from '../../core/exame-api.service';
 import { ExameApiResumo } from '../../models/exame-api.model';
+import { AuthService } from '../../core/auth.service';
+import { mensagemErroApi } from '../../core/api-error';
 
 interface ExameDisponivel {
     bloqueado: boolean;
@@ -37,11 +39,13 @@ export class ExamesPage implements OnInit {
     mensagemErro = '';
     carregando = true;
     historicoAberto?: number;
+    autenticado = false;
 
     constructor(
         private readonly storage: StorageService,
         private readonly examesApi: ExameApiService,
         private readonly regras: RegrasService,
+        private readonly auth: AuthService,
     ) {
         addIcons({ bookOutline, checkmarkCircleOutline, lockClosed, chevronDownOutline, chevronForwardOutline, chevronUpOutline, cloudOfflineOutline, documentTextOutline, refreshOutline, schoolOutline, timeOutline });
     }
@@ -58,13 +62,14 @@ export class ExamesPage implements OnInit {
     async carregar(): Promise<void> {
         this.carregando = true;
         this.mensagemErro = '';
+        this.autenticado = !!(await this.auth.token());
         await this.regras.carregar();
 
         try {
             const [catalogo, historico] = await Promise.all([this.examesApi.listar(), this.storage.listarExames()]);
             this.exames = catalogo.map((exame: ExameApiResumo) => ({ id: exame.id, nome: exame.nome, numero: exame.id, perguntas: exame.perguntas, minutos: exame.minutos, notaPassagem: exame.notaPassagem, bloqueado: !!exame.bloqueado, historico: historico.filter((tentativa) => tentativa.numero === exame.id) }));
-        } catch (error: any) {
-            this.mensagemErro = error?.message || 'Não foi possível carregar as provas.';
+        } catch (error) {
+            this.mensagemErro = mensagemErroApi(error);
         } finally {
             this.carregando = false;
         }
@@ -91,11 +96,11 @@ export class ExamesPage implements OnInit {
             return 'pending';
         }
 
-        if (this.regras.aprovado(ultima.acertos, ultima.total)) {
+        if (ultima.acertos >= this.notaMinima(exame)) {
             return 'passed';
         }
 
-        const faltam = this.regras.notaPassagem(ultima.total) - ultima.acertos;
+        const faltam = this.notaMinima(exame) - ultima.acertos;
         return faltam <= 2 ? 'attention' : 'failed';
     }
 
@@ -110,7 +115,7 @@ export class ExamesPage implements OnInit {
             return 'Aprovado';
         }
 
-        const faltam = this.regras.notaPassagem(ultima.total) - ultima.acertos;
+        const faltam = this.notaMinima(exame) - ultima.acertos;
         return estado === 'attention'
             ? `Faltou ${faltam} para passar`
             : `Reprovado (${this.percentagem(ultima)}%)`;

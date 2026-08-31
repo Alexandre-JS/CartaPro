@@ -1,7 +1,7 @@
 <ion-content [fullscreen]="true" class="lessons-page">
   <main class="lessons-shell">
     <header class="lessons-header">
-      <a class="icon-button" routerLink="/estudos" aria-label="Voltar aos estudos">
+      <a class="icon-button" routerLink="/aprender" aria-label="Voltar a Aprender">
         <ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>
       </a>
       <div>
@@ -50,7 +50,7 @@
               : 'A CartaPro ainda não publicou fichas de estudo. Entretanto podes estudar os sinais e o Código.' }}
           </p>
           @if (!total) {
-            <a class="primary-button" routerLink="/sinais">Estudar sinais</a>
+            <a class="primary-button" routerLink="/aprender/sinais">Estudar sinais</a>
           }
         </section>
       } @else {
@@ -71,7 +71,7 @@
               <!-- A ficha bloqueada mostra título e resumo; o corpo não vem do
                    servidor. Retirá-la da lista tornava o cadeado invisível. -->
               <a class="lesson-card" [class.locked]="licao.bloqueado"
-                 [routerLink]="licao.bloqueado ? '/desbloquear' : ['/licao', licao.slug]">
+                 [routerLink]="licao.bloqueado ? '/desbloquear' : ['/aprender/licoes', licao.slug]">
                 <span class="lesson-main">
                   <strong>{{ licao.titulo }}</strong>
                   @if (licao.resumo) {

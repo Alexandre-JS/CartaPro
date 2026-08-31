@@ -1,93 +1,39 @@
 <ion-content [fullscreen]="true" class="profile-page">
   <main class="profile-shell">
-    <app-app-header titulo="Perfil" subtitulo="A tua conta" [mostrarPerfil]="false" />
-    <header class="profile-hero">
-      <!-- O selo do plano só aparece depois de o servidor responder: mostrar
-           "Plano Gratuito" por omissão dizia a um assinante que não tinha
-           pago, durante todo o carregamento. -->
-      <div class="identity">
-        <div class="avatar">{{ carregando ? '·' : iniciais }}</div>
-        @if (carregando) {
-          <div class="identity-loading"><app-skeleton variante="texto" [quantidade]="1" etiqueta="A carregar a tua conta"></app-skeleton></div>
-        } @else {
-          <div><h2>{{ formulario.controls.nome.value || 'Utilizador CartaPro' }}</h2><p>{{ formulario.controls.email.value }}</p><span [class.premium]="plano === 'pago'">Plano {{ plano === 'pago' ? 'Premium' : 'Gratuito' }}</span></div>
-        }
-      </div>
-    </header>
+    <app-app-header titulo="Perfil e definições" subtitulo="Conta, preferências e suporte" [mostrarPerfil]="false" />
 
-    <!-- A stats-card com questões e taxa de acerto era a terceira cópia dos
-         mesmos números; vivem no separador Desempenho. Aqui trata-se da conta.
-         As linhas "Privacidade e segurança" e "Ajuda e suporte" e o interruptor
-         de notificações eram controlos sem ligação nenhuma: não abriam nada nem
-         guardavam estado. -->
     <section class="profile-content">
-      <section class="profile-section">
-        <div class="section-heading">
-          <div><span>Conta</span><h2>Dados pessoais</h2></div>
-          @if (!carregando) {
-            <button type="button" class="edit-button" (click)="editando = !editando">
-              <ion-icon [name]="editando ? 'close-outline' : 'pencil-outline'" aria-hidden="true"></ion-icon>
-              {{ editando ? 'Fechar' : 'Editar' }}
-            </button>
-          }
-        </div>
+      @if (carregando) {
+        <app-skeleton variante="cartao" [quantidade]="2" etiqueta="A carregar o perfil"></app-skeleton>
+        <app-skeleton variante="lista" [quantidade]="4"></app-skeleton>
+      } @else {
+        @if (autenticado) {
+          <section class="identity-card"><span class="avatar">{{ iniciais }}</span><div><p class="section-label">Conta ProntoVia</p><h1>{{ formulario.controls.nome.value }}</h1><p>{{ formulario.controls.email.value }}</p><em [class.premium]="plano === 'pago'">{{ plano === 'pago' ? 'ProntoVia+' : 'ProntoVia Free' }}</em></div></section>
 
-        @if (!carregando && !editando) {
-          <div class="account-summary">
-            <div><ion-icon name="mail-outline" aria-hidden="true"></ion-icon><span><small>Email</small><strong>{{ formulario.controls.email.value }}</strong></span></div>
-            <div><ion-icon name="call-outline" aria-hidden="true"></ion-icon><span><small>Telemóvel</small><strong>{{ formulario.controls.telefone.value || 'Não indicado' }}</strong></span></div>
-          </div>
+          @if (erroConta) {<section class="inline-error" role="alert"><ion-icon name="warning-outline" aria-hidden="true"></ion-icon><span><strong>Não foi possível confirmar a conta</strong><small>{{ erroConta }}</small></span></section>}
+
+          <section class="account-section" aria-labelledby="personal-title"><div class="section-heading"><div><p class="section-label">Conta</p><h2 id="personal-title">Dados pessoais</h2></div><button type="button" (click)="editando = !editando"><ion-icon [name]="editando ? 'close-outline' : 'pencil-outline'" aria-hidden="true"></ion-icon>{{ editando ? 'Fechar' : 'Editar' }}</button></div>
+            @if (!editando) {<div class="detail-list"><div><ion-icon name="mail-outline" aria-hidden="true"></ion-icon><span><small>Email</small><strong>{{ formulario.controls.email.value }}</strong></span></div><div><ion-icon name="call-outline" aria-hidden="true"></ion-icon><span><small>Telefone</small><strong>{{ formulario.controls.telefone.value }}</strong></span></div></div>}
+            @if (editando) {<form [formGroup]="formulario" (ngSubmit)="guardar()" novalidate><div class="field-group"><ion-item lines="none" class="form-field" [class.field-error]="submetido && formulario.controls.nome.invalid"><ion-icon name="person-outline" slot="start" aria-hidden="true"></ion-icon><ion-input formControlName="nome" type="text" autocomplete="name" label="Nome completo" labelPlacement="stacked"></ion-input></ion-item></div><div class="field-group"><ion-item lines="none" class="form-field" [class.field-error]="submetido && formulario.controls.email.invalid"><ion-icon name="mail-outline" slot="start" aria-hidden="true"></ion-icon><ion-input formControlName="email" type="email" autocomplete="email" label="Email" labelPlacement="stacked"></ion-input></ion-item></div><div class="field-group"><ion-item lines="none" class="form-field" [class.field-error]="submetido && formulario.controls.telefone.invalid"><ion-icon name="call-outline" slot="start" aria-hidden="true"></ion-icon><ion-input formControlName="telefone" type="tel" autocomplete="tel" label="Telefone" labelPlacement="stacked"></ion-input></ion-item><ion-note>O plano Premium fica associado a este número.</ion-note></div><button class="primary-button" type="submit"><ion-icon name="checkmark-circle" aria-hidden="true"></ion-icon>{{ guardado ? 'Dados guardados' : 'Guardar alterações' }}</button></form>}
+          </section>
+
+          <section class="sync-card"><span><ion-icon [name]="estadoSync.pendentes ? 'cloud-upload-outline' : 'cloud-done-outline'" aria-hidden="true"></ion-icon></span><div><p class="section-label">Sincronização</p><h2>{{ rotuloSincronizacao }}</h2>@if (estadoSync.ultimoCursor) {<small>Última confirmação: {{ estadoSync.ultimoCursor | date:'dd/MM/yyyy, HH:mm' }}</small>}</div><button type="button" (click)="sincronizarAgora()" [disabled]="processandoSync">{{ processandoSync ? 'A sincronizar…' : 'Sincronizar agora' }}</button>@if (erroSincronizacao) {<p role="alert">{{ erroSincronizacao }}</p>}</section>
+
+          <section class="settings-list" aria-label="Conta e escola">@if (plano === 'gratis') {<a routerLink="/desbloquear"><span class="setting-icon"><ion-icon name="lock-open-outline" aria-hidden="true"></ion-icon></span><span><strong>Plano ProntoVia Free</strong><small>Ver benefícios do ProntoVia+</small></span><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>} @else {<div><span class="setting-icon success"><ion-icon name="shield-checkmark-outline" aria-hidden="true"></ion-icon></span><span><strong>Plano ProntoVia+</strong><small>Acesso Premium ativo nesta conta</small></span></div>}<a routerLink="/escola"><span class="setting-icon"><ion-icon name="school-outline" aria-hidden="true"></ion-icon></span><span><strong>Minha escola</strong><small>Turma, tarefas e acompanhamento</small></span><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a></section>
+        } @else {
+          <section class="device-card"><span><ion-icon name="phone-portrait-outline" aria-hidden="true"></ion-icon></span><div><p class="section-label">Sem conta</p><h1>Progresso guardado neste dispositivo</h1><p>Pode aprender, praticar e simular normalmente. Os dados não podem ser recuperados se trocar ou perder este telefone.</p></div></section>
+          <section class="save-card"><ion-icon name="cloud-upload-outline" aria-hidden="true"></ion-icon><div><strong>Guardar o meu progresso</strong><p>Crie uma conta quando quiser sincronizar, recuperar os estudos e ligar-se à escola.</p></div><a routerLink="/conta/guardar" [queryParams]="{ retorno: '/perfil' }">Ver benefícios</a></section>
         }
 
-        @if (editando) {
-          <form [formGroup]="formulario" (ngSubmit)="guardar()" novalidate>
-          <div class="field-group">
-            <ion-item lines="none" class="form-field" [class.field-error]="submetido && formulario.controls.nome.invalid">
-              <ion-icon name="person-outline" slot="start" aria-hidden="true"></ion-icon>
-              <ion-input formControlName="nome" type="text" autocomplete="name" label="Nome completo" labelPlacement="stacked"></ion-input>
-            </ion-item>
-            @if (submetido && formulario.controls.nome.invalid) { <ion-note color="danger">Introduz um nome válido.</ion-note> }
-          </div>
-          <div class="field-group">
-            <ion-item lines="none" class="form-field" [class.field-error]="submetido && formulario.controls.email.invalid">
-              <ion-icon name="mail-outline" slot="start" aria-hidden="true"></ion-icon>
-              <ion-input formControlName="email" type="email" autocomplete="email" label="Email" labelPlacement="stacked"></ion-input>
-            </ion-item>
-            @if (submetido && formulario.controls.email.invalid) { <ion-note color="danger">Introduz um email válido.</ion-note> }
-          </div>
-          <div class="field-group">
-            <ion-item lines="none" class="form-field" [class.field-error]="submetido && formulario.controls.telefone.invalid">
-              <ion-icon name="call-outline" slot="start" aria-hidden="true"></ion-icon>
-              <ion-input formControlName="telefone" type="tel" autocomplete="tel" label="Telemóvel" labelPlacement="stacked" placeholder="+258"></ion-input>
-            </ion-item>
-            <ion-note>É este o número que fica ligado ao plano completo.</ion-note>
-          </div>
-            <button class="save-button" type="submit"><ion-icon name="checkmark-circle" aria-hidden="true"></ion-icon>{{ guardado ? 'Dados guardados' : 'Guardar alterações' }}</button>
-          </form>
-        }
-      </section>
+        <section class="preferences" aria-labelledby="preferences-title"><div class="section-heading"><div><p class="section-label">Neste dispositivo</p><h2 id="preferences-title">Preferências</h2></div></div><div class="settings-list">
+          <label><span class="setting-icon"><ion-icon name="school-outline" aria-hidden="true"></ion-icon></span><span><strong>Categoria da carta</strong><small>{{ nomeCategoria }}</small></span><select [value]="categoria" (change)="alterarCategoria($any($event.target).value)" aria-label="Categoria da carta">@for (opcao of categorias; track opcao.valor) {<option [value]="opcao.valor">{{ opcao.nome }}</option>}</select></label>
+          <div><span class="setting-icon"><ion-icon name="download-outline" aria-hidden="true"></ion-icon></span><span><strong>Conteúdos descarregados</strong><small>0 · o conteúdo atual requer ligação à API</small></span></div>
+          <button type="button" (click)="alternarNotificacoes()"><span class="setting-icon"><ion-icon name="notifications-outline" aria-hidden="true"></ion-icon></span><span><strong>Notificações de revisão</strong><small>{{ notificacoesAtivas ? 'Ativas neste dispositivo' : 'Desativadas' }}</small></span><em [class.on]="notificacoesAtivas">{{ notificacoesAtivas ? 'Ativas' : 'Off' }}</em></button>
+          <a [href]="suporteUrl" target="_blank" rel="noopener"><span class="setting-icon"><ion-icon name="help-circle-outline" aria-hidden="true"></ion-icon></span><span><strong>Ajuda e suporte</strong><small>Abrir perguntas frequentes</small></span><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>
+        </div></section>
 
-      @if (!carregando && plano === 'gratis') {
-        <a class="plan-row" routerLink="/desbloquear">
-          <span class="setting-icon"><ion-icon name="lock-open-outline" aria-hidden="true"></ion-icon></span>
-          <div><strong>Desbloquear tudo</strong><small>Todas as perguntas, exames e material de estudo</small></div>
-          <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
-        </a>
+        @if (autenticado) {<button type="button" class="logout-button" (click)="sair()"><ion-icon name="log-out-outline" aria-hidden="true"></ion-icon>Terminar sessão</button>} @else {<a class="login-button" routerLink="/conta/entrar" [queryParams]="{ retorno: '/perfil' }"><ion-icon name="log-in-outline" aria-hidden="true"></ion-icon>Já tenho conta</a>}
       }
-
-      <a class="plan-row" routerLink="/escola">
-        <span class="setting-icon"><ion-icon name="school-outline" aria-hidden="true"></ion-icon></span>
-        <div><strong>Minha Escola</strong><small>Turma, tarefas e acompanhamento</small></div>
-        <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
-      </a>
-
-      <button type="button" class="plan-row notification-row" (click)="alternarNotificacoes()">
-        <span class="setting-icon"><ion-icon name="notifications-outline" aria-hidden="true"></ion-icon></span>
-        <div><strong>Notificações de revisão</strong><small>{{ notificacoesAtivas ? 'Ativas neste dispositivo' : 'Desativadas' }}</small></div>
-        <span class="toggle-state" [class.on]="notificacoesAtivas">{{ notificacoesAtivas ? 'Ativas' : 'Off' }}</span>
-      </button>
-
-      <button type="button" class="logout-button" (click)="sair()"><ion-icon name="log-out-outline" aria-hidden="true"></ion-icon>Terminar sessão</button>
     </section>
 
     <app-bottom-nav ativo="perfil"></app-bottom-nav>

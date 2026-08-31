@@ -181,6 +181,21 @@ class ConteudoPagoTest extends TestCase
         $this->assertTrue(collect($lista)->firstWhere('id', $prova->id)['bloqueado'], 'A lista tem de dizer que está fechada.');
     }
 
+    public function test_the_public_catalog_lists_free_and_locked_exams_without_login(): void
+    {
+        $tema = Topic::create(['slug' => 'sinais', 'name' => 'Sinais']);
+        $livre = $this->prova('Exame Free', collect([$this->pergunta($tema->id, 1)]));
+        $fechada = $this->prova('Exame Plus', collect([$this->pergunta($tema->id, 2)]));
+        $fechada->update(['is_locked' => true]);
+
+        $lista = $this->getJson('/api/v1/mobile/exams')->assertOk()->json('data');
+
+        $this->assertFalse(collect($lista)->firstWhere('id', $livre->id)['bloqueado']);
+        $this->assertTrue(collect($lista)->firstWhere('id', $fechada->id)['bloqueado']);
+        $this->getJson("/api/v1/mobile/exams/{$livre->id}")->assertOk()->assertJsonCount(1, 'perguntas');
+        $this->getJson("/api/v1/mobile/exams/{$fechada->id}")->assertStatus(402);
+    }
+
     public function test_admin_can_switch_an_exam_between_free_and_paid(): void
     {
         $tema = Topic::create(['slug' => 'sinais', 'name' => 'Sinais']);

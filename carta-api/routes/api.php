@@ -54,9 +54,6 @@ Route::prefix('v1')->group(function () {
             Route::post('/logout', [MobileController::class, 'logout']);
             Route::get('/snapshot', [MobileController::class, 'snapshot']);
             Route::post('/sync', [MobileController::class, 'sync']);
-            Route::get('/exams', [MobileController::class, 'exams']);
-            Route::get('/exams/{exam}', [MobileController::class, 'exam'])->whereNumber('exam');
-
             // Desbloqueio ligado à conta, com prova de posse do número.
             // Continua a servir os pagamentos que o apoio ao cliente regista à
             // mão; num pagamento C2B o PIN já prova a posse e o OTP é dispensado.
@@ -82,6 +79,10 @@ Route::prefix('v1')->group(function () {
 
     /* Conteúdo Free: pode ser explorado sem conta; o servidor filtra o Plus. */
     Route::middleware('mobile.optional')->group(function () {
+        // O catálogo é público. O controller entrega provas Free inteiras e
+        // apenas os metadados/cadeado das provas ProntoVia+.
+        Route::get('/mobile/exams', [MobileController::class, 'exams']);
+        Route::get('/mobile/exams/{exam}', [MobileController::class, 'exam'])->whereNumber('exam');
         Route::get('/topics', [ContentController::class, 'topics']);
         Route::get('/questions', [ContentController::class, 'questions']);
         Route::get('/content-package', [ContentController::class, 'package']);

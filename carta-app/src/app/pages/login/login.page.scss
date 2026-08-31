@@ -1,10 +1,6 @@
-:host {
-  display: block;
-}
+:host { display: block; }
 
-.login-page {
-  --background: url('/assets/backgrounds/estrada-aprendiz-mocambique.webp') center / cover no-repeat;
-}
+.login-page { --background: var(--pv-background); }
 
 .login-shell {
   position: relative;
@@ -13,139 +9,80 @@
   width: min(100%, 480px);
   min-height: 100%;
   margin: 0 auto;
-  overflow: hidden;
-  background-color: transparent;
-  box-shadow: 0 0 42px rgb(22 22 22 / 10%);
+  padding: max(var(--pv-space-06), env(safe-area-inset-top)) var(--pv-space-05) max(var(--pv-space-07), env(safe-area-inset-bottom));
 }
+
+.account-back {
+  display: grid;
+  width: var(--pv-touch-target);
+  height: var(--pv-touch-target);
+  place-items: center;
+  color: var(--pv-interactive);
+  text-decoration: none;
+}
+
+.account-back ion-icon { font-size: 22px; }
 
 .brand {
-  position: relative;
-  z-index: 3;
   display: grid;
-  flex: 0 0 auto;
   place-items: center;
-  height: clamp(138px, 21vh, 176px);
-  padding: max(20px, env(safe-area-inset-top)) 24px 14px;
-  background: transparent;
+  padding: var(--pv-space-06) 0 var(--pv-space-07);
 }
 
-.brand-lockup {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
-.brand-icon {
-  width: 66px;
-  height: 66px;
-  border-radius: 19px;
-  object-fit: cover;
-  box-shadow: 0 7px 18px rgb(22 22 22 / 15%);
-}
-
-.brand-name {
-  color: var(--app-color-text);
-  font-size: clamp(1.8rem, 9vw, 2.35rem);
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: -2px;
-}
-
-.brand-name strong {
-  color: var(--app-color-green-dark);
-  font-weight: 600;
-}
-
-.brand-lockup p {
-  margin: 7px 0 0;
-  color: var(--app-color-text);
-  font-size: 0.72rem;
-  white-space: nowrap;
-}
-
-.brand-lockup em {
-  color: var(--app-color-green-dark);
-  font-style: normal;
-  font-weight: 600;
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 3px;
-}
-
-.road-scene {
-  position: relative;
-  flex: 0 0 auto;
-  height: clamp(112px, 18vh, 148px);
-  overflow: hidden;
-  background: transparent;
-}
+.brand-lockup { display: flex; align-items: center; gap: var(--pv-space-03); }
+.brand-icon { width: 52px; height: 52px; border-radius: var(--pv-radius-tile); object-fit: cover; }
+.brand-name { color: var(--pv-text-primary); font-size: var(--pv-type-title); font-weight: 600; line-height: 1; letter-spacing: -1px; }
+.brand-name strong { color: var(--pv-interactive); font-weight: 700; }
+.brand-lockup p { margin: var(--pv-space-02) 0 0; color: var(--pv-text-secondary); font-size: var(--pv-type-caption); }
+.brand-lockup em { color: var(--pv-cyan-700); font-style: normal; font-weight: 600; }
+.road-scene { display: none; }
 
 .login-card {
-  position: relative;
-  z-index: 5;
-  flex: 1 0 auto;
-  margin-top: -14px;
-  padding: 26px 24px max(28px, env(safe-area-inset-bottom));
-  border-radius: 22px 22px 0 0;
-  background: transparent;
-  box-shadow: none;
+  padding: var(--pv-space-06) var(--pv-space-05);
+  border: 1px solid var(--pv-border-subtle);
+  border-radius: var(--pv-radius-sheet);
+  background: var(--pv-layer-01);
 }
 
-.login-card header { text-align: center; }
-.login-card h1 { margin: 0; color: var(--app-color-green-dark); font-size: 1.45rem; font-weight: 600; }
-.login-card header p { margin: 7px 0 22px; color: var(--pv-white); font-size: .9rem; line-height: 1.45; }
-
-.field-group { margin-bottom: 12px; }
+.login-card header { margin-bottom: var(--pv-space-06); }
+.login-card h1 { margin: 0; color: var(--pv-text-primary); font-size: var(--pv-type-title); line-height: var(--pv-line-tight); }
+.login-card header p { margin: var(--pv-space-03) 0 0; color: var(--pv-text-secondary); font-size: var(--pv-type-body-sm); line-height: var(--pv-line-body); }
+.field-group { margin-bottom: var(--pv-space-04); }
 
 .form-field {
   --min-height: 52px;
-  --padding-start: 14px;
-  --inner-padding-end: 8px;
-  --background: rgb(255 255 255 / 84%);
-  --border-radius: 10px;
-  border: 1px solid var(--app-color-border);
-  border-radius: 10px;
+  --padding-start: var(--pv-space-04);
+  --inner-padding-end: var(--pv-space-03);
+  --background: var(--pv-layer-01);
+  --border-radius: var(--pv-radius-input);
+  border: 1px solid var(--pv-border-subtle);
+  border-radius: var(--pv-radius-input);
 }
 
-.form-field:focus-within { border-color: var(--app-color-green); box-shadow: 0 0 0 3px rgb(26 31 92 / 12%); }
-.form-field.field-error { border-color: var(--app-color-red); }
-.form-field ion-icon { margin-right: 12px; color: var(--app-color-road-gray); font-size: 1.15rem; }
-ion-note { display: block; margin: 5px 4px 0; font-size: .72rem; }
-
-.register button {
-  appearance: none;
-  border: 0;
-  background: none;
-  font: inherit;
-  cursor: pointer;
-}
+.form-field:focus-within { border-color: var(--pv-focus); box-shadow: 0 0 0 2px var(--pv-cyan-100); }
+.form-field.field-error { border-color: var(--pv-danger); }
+.form-field ion-icon { margin-right: var(--pv-space-03); color: var(--pv-text-secondary); font-size: 19px; }
+ion-note { display: block; margin: var(--pv-space-02) var(--pv-space-02) 0; font-size: var(--pv-type-caption); line-height: var(--pv-line-body); }
 
 .login-button {
-  --background: var(--app-color-action);
-  --background-hover: var(--app-color-green-dark);
-  --border-radius: 9px;
-  --box-shadow: 0 7px 16px rgb(26 31 92 / 20%);
-  --color: var(--app-color-white);
-  height: 50px;
-  margin: 0;
+  --background: var(--pv-interactive);
+  --background-hover: var(--pv-interactive-hover);
+  --border-radius: var(--pv-radius-button);
+  --box-shadow: none;
+  --color: var(--pv-on-interactive);
+  height: var(--pv-touch-target);
+  margin: var(--pv-space-05) 0 0;
+  font-size: var(--pv-type-body-sm);
   font-weight: 600;
   text-transform: none;
 }
 
-.register { margin: 18px 0 0; text-align: center; color: var(--pv-white); font-size: .78rem; }
-.register button { padding: 0; color: var(--pv-white); font-weight: 600; }
+.login-error { margin: var(--pv-space-03) 0; padding: var(--pv-space-03); border: 1px solid var(--app-color-danger-border); border-radius: var(--pv-radius-default); background: var(--app-color-danger-soft); }
+.login-error a { display: inline-block; margin-left: var(--pv-space-02); color: var(--pv-interactive); font-weight: 600; }
+.register { margin: var(--pv-space-05) 0 0; color: var(--pv-text-secondary); font-size: var(--pv-type-body-sm); text-align: center; }
+.register button { padding: 0; border: 0; color: var(--pv-interactive); background: none; font: inherit; font-weight: 600; cursor: pointer; }
+.explore-link { display: block; min-height: var(--pv-touch-target); margin-top: var(--pv-space-03); padding: var(--pv-space-04); color: var(--pv-text-secondary); font-size: var(--pv-type-body-sm); font-weight: 600; text-align: center; text-decoration: none; }
 
 @media (min-width: 700px) {
-  .login-shell { min-height: min(900px, calc(100vh - 48px)); margin-block: 24px; border-radius: 28px; }
-  .login-card { border-radius: 22px 22px 28px 28px; }
+  .login-shell { justify-content: center; min-height: 100%; }
 }
-
-@media (max-height: 720px) {
-  .brand { height: 140px; }
-  .road-scene { height: 110px; }
-  .login-card { padding-top: 20px; }
-  .login-card header p { margin-bottom: 15px; }
-}
-.login-error{display:block;margin:4px 2px 12px;line-height:1.45}.login-error a{display:inline-block;margin-left:4px;color:var(--ion-color-primary);font-weight:700}
-.explore-link { display: block; margin-top: 18px; color: var(--pv-indigo); font-size: .72rem; font-weight: 600; text-align: center; text-decoration: none; }

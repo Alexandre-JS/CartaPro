@@ -1,7 +1,7 @@
 <ion-content [fullscreen]="true" class="signs-page">
   <main class="signs-shell">
     <header class="signs-header">
-      <a class="icon-button" routerLink="/estudos" aria-label="Voltar aos estudos">
+      <a class="icon-button" routerLink="/aprender" aria-label="Voltar a Aprender">
         <ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>
       </a>
       <div>
@@ -55,7 +55,7 @@
       }
 
       @if (sinais.length) {
-        <a class="primary-button train-cta" routerLink="/treino-sinais" [queryParams]="{ categoria: categoriaAtiva || null }">
+        <a class="primary-button train-cta" routerLink="/praticar/sinais" [queryParams]="{ categoria: categoriaAtiva || null }">
           <ion-icon name="school-outline" aria-hidden="true"></ion-icon>
           Treinar {{ categoriaAtiva ? nomeCategoria(categoriaAtiva).toLowerCase() : 'sinais' }}
         </a>
@@ -77,7 +77,7 @@
                servidor. -->
           @for (sinal of sinaisVisiveis; track sinal.slug) {
             <a class="sign-card" [class.locked]="sinal.bloqueado"
-               [routerLink]="sinal.bloqueado ? '/desbloquear' : ['/sinal', sinal.slug]">
+               [routerLink]="sinal.bloqueado ? '/desbloquear' : ['/aprender/sinais', sinal.slug]">
               <span class="sign-image">
                 @if (sinal.imagem) {
                   <img [src]="sinal.imagem" [alt]="sinal.nome" loading="lazy">

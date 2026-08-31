@@ -228,4 +228,35 @@ describe('SimuladoService', () => {
             expect(new Set(fila.map((p) => p.tema)).size).toBe(2);
         });
     });
+
+    describe('sessões baseadas no histórico local', () => {
+        it('Meus erros devolve cada pergunta falhada uma única vez, da mais recente para a mais antiga', async () => {
+            const perguntas = banco({ velocidade: 5 });
+            const service = montar(perguntas);
+
+            await progresso.registarResposta(perguntas[0], { escolhida: 1, duracaoMs: 6000 });
+            await progresso.registarResposta(perguntas[1], { escolhida: 0, duracaoMs: 6000 });
+            await progresso.registarResposta(perguntas[2], { escolhida: 2, duracaoMs: 6000 });
+            await progresso.registarResposta(perguntas[0], { escolhida: 2, duracaoMs: 6000 });
+
+            const erradas = await service.perguntasErradas('ligeiro', 10);
+
+            expect(erradas.map((p) => p.id)).toEqual([perguntas[0].id, perguntas[2].id]);
+        });
+
+        it('Nunca respondidas exclui qualquer pergunta que já esteja no histórico', async () => {
+            const perguntas = banco({ prioridade: 6 });
+            const service = montar(perguntas);
+
+            await progresso.registarResposta(perguntas[0], { escolhida: 0, duracaoMs: 6000 });
+            await progresso.registarResposta(perguntas[1], { escolhida: 2, duracaoMs: 6000 });
+
+            const novas = await service.perguntasNuncaRespondidas('ligeiro', 10);
+            const ids = new Set(novas.map((p) => p.id));
+
+            expect(novas.length).toBe(4);
+            expect(ids.has(perguntas[0].id)).toBeFalse();
+            expect(ids.has(perguntas[1].id)).toBeFalse();
+        });
+    });
 });

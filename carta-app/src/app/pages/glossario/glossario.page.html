@@ -1,7 +1,7 @@
 <ion-content [fullscreen]="true" class="glossary-page">
   <main class="glossary-shell">
     <header class="glossary-header">
-      <a class="icon-button" routerLink="/estudos" aria-label="Voltar aos estudos">
+      <a class="icon-button" routerLink="/aprender" aria-label="Voltar a Aprender">
         <ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>
       </a>
       <div>
@@ -56,7 +56,7 @@
                   <div class="term-body">
                     <p>{{ termo.definicao }}</p>
                     @if (termo.artigoRef) {
-                      <a class="article-link" [routerLink]="['/codigo']" [queryParams]="{ artigo: termo.artigoRef }">
+                      <a class="article-link" [routerLink]="['/aprender/codigo']" [queryParams]="{ artigo: termo.artigoRef }">
                         <ion-icon name="document-text-outline" aria-hidden="true"></ion-icon>
                         Ver o artigo {{ termo.artigoRef }}
                       </a>

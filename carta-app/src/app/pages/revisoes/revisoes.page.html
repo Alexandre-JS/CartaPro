@@ -1,64 +1,27 @@
 <ion-content [fullscreen]="true" class="review-page">
   <main class="review-shell">
     <header class="review-header">
-      <div>
-        <span>Repetição espaçada</span>
-        <h1>Revisões de hoje</h1>
-      </div>
-      @if (total) {
-        <div class="review-counter" role="status">
-          <ion-icon name="time-outline" aria-hidden="true"></ion-icon>
-          <strong>{{ indice + 1 }}/{{ total }}</strong>
-        </div>
-      }
+      <a routerLink="/praticar" aria-label="Voltar a Praticar"><ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon></a>
+      <div><span>Repetição espaçada</span><h1>Revisões</h1></div>
+      @if (total) {<strong>{{ indice + 1 }}/{{ total }}</strong>}
     </header>
 
-    @if (carregando) {
-      <app-skeleton variante="cartao" [quantidade]="1" etiqueta="A preparar as tuas revisões"></app-skeleton>
-    } @else if (!total) {
-      <section class="empty-state">
-        <ion-icon name="checkmark-circle-outline" aria-hidden="true"></ion-icon>
-        <h2>Nada a revisar por agora</h2>
-        <p>Voltamos a lembrar-te quando as próximas perguntas estiverem prontas para revisão. Continua a praticar para alimentar a fila.</p>
-        <a class="primary-button" routerLink="/estudos">Ir para estudos</a>
-      </section>
-    } @else if (concluida) {
-      <section class="empty-state">
-        <ion-icon name="checkmark-circle-outline" aria-hidden="true"></ion-icon>
-        <h2>Revisão concluída</h2>
-        <p>Acertaste {{ acertos }} de {{ total }}. As perguntas que erraste voltam hoje; as certas voltam mais tarde, com intervalo maior.</p>
-        <button type="button" class="primary-button" (click)="recarregar()">
-          <ion-icon name="refresh-outline" aria-hidden="true"></ion-icon>
-          Ver se há mais
-        </button>
-        <a class="outline-button" routerLink="/inicio">Voltar ao início</a>
-      </section>
-    } @else if (perguntaAtual; as pergunta) {
-      <p class="review-hint">
-        Tema: <strong>{{ nomeTema(pergunta.tema) }}</strong>
-        @if (totalPendentes > total) {
-          · {{ totalPendentes }} pendentes no total
-        }
-      </p>
-
-      <section class="question-area">
-        <app-pergunta-card
-          [pergunta]="pergunta"
-          [respondida]="respondida"
-          [escolhida]="escolhida"
-          (escolha)="responder($event)">
-        </app-pergunta-card>
-      </section>
-
-      <footer class="review-controls">
-        @if (respondida) {
-          <button type="button" class="primary-button" (click)="avancar()">
-            {{ indice === total - 1 ? 'Concluir' : 'Próxima' }}
-            <ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon>
-          </button>
-        }
-      </footer>
-    }
-
+    <section class="review-content">
+      @if (carregando) {
+        <app-skeleton variante="cartao" [quantidade]="1" etiqueta="A preparar as suas revisões"></app-skeleton>
+      } @else if (erroCarregamento) {
+        <section class="load-error" role="alert"><ion-icon name="warning-outline" aria-hidden="true"></ion-icon><div><h2>Não foi possível carregar as revisões</h2><p>{{ erroCarregamento }}</p></div><button type="button" (click)="carregar()"><ion-icon name="refresh-outline" aria-hidden="true"></ion-icon>Tentar novamente</button></section>
+      } @else if (!total) {
+        <section class="empty-state"><ion-icon name="checkmark-circle-outline" aria-hidden="true"></ion-icon><h2>Nada para rever agora</h2><p>As próximas perguntas aparecem aqui quando chegar o momento adequado para consolidá-las.</p><a class="primary-button" routerLink="/praticar">Escolher outro treino</a></section>
+      } @else if (concluida) {
+        <section class="empty-state"><ion-icon name="checkmark-circle-outline" aria-hidden="true"></ion-icon><p class="section-label">Resumo</p><h2>Revisão concluída</h2><strong>{{ acertos }} de {{ total }}</strong><p>As perguntas certas voltam mais tarde. As que falhou permanecem próximas na fila de revisão.</p><button type="button" class="primary-button" (click)="recarregar()"><ion-icon name="refresh-outline" aria-hidden="true"></ion-icon>Ver se há mais</button><a class="outline-button" routerLink="/praticar">Voltar a Praticar</a></section>
+      } @else if (perguntaAtual; as pergunta) {
+        <div class="review-progress"><span>Questão {{ indice + 1 }} de {{ total }}</span><strong>{{ restantes }} restantes</strong></div>
+        <div class="progress-track"><span [style.width.%]="((indice + 1) / total) * 100"></span></div>
+        <p class="review-hint">Tema: <strong>{{ nomeTema(pergunta.tema) }}</strong>@if (totalPendentes > total) { · {{ totalPendentes }} pendentes no total}</p>
+        <app-pergunta-card [pergunta]="pergunta" [respondida]="respondida" [escolhida]="escolhida" (escolha)="responder($event)"></app-pergunta-card>
+        @if (respondida) {<p class="next-review"><ion-icon name="time-outline" aria-hidden="true"></ion-icon>{{ proximaRevisao }}</p><button type="button" class="primary-button action-button" (click)="avancar()">{{ indice === total - 1 ? 'Concluir revisão' : 'Continuar' }}<ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon></button>}
+      }
+    </section>
   </main>
 </ion-content>

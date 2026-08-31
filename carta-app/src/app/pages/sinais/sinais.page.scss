@@ -1,70 +1,37 @@
 :host { display: block; }
-
-.signs-page { --background: var(--app-color-page); }
-.signs-shell { width: min(100%, 560px); min-height: 100%; margin: 0 auto; padding-bottom: calc(88px + env(safe-area-inset-bottom)); overflow: hidden; background: var(--app-color-light-gray); box-shadow: 0 0 42px rgb(22 22 22 / 10%); }
-
-.signs-header { position: relative; display: grid; grid-template-columns: 42px 1fr auto; align-items: center; gap: 12px; min-height: 148px; padding: max(28px, env(safe-area-inset-top)) 18px 24px; overflow: hidden; color: var(--pv-white); background-color: var(--app-color-brand-panel); background-image: url('/assets/backgrounds/Sinais-de-conducao.webp'); background-position: center 43%; background-size: cover; }
-.signs-header::before { position: absolute; inset: 0; background: rgb(26 31 92 / 55%); content: ''; }
-.signs-header > * { position: relative; z-index: 1; }
-.signs-header .icon-button { display: grid; width: 40px; height: 40px; place-items: center; border-radius: 50%; color: var(--pv-white); background: rgb(255 255 255 / 13%); text-decoration: none; }
-.signs-header span { font-size: .58rem; text-transform: uppercase; letter-spacing: .07em; opacity: .85; }
-.signs-header h1 { margin: 4px 0 0; font-size: 1.1rem; font-weight: 600; }
-.header-count { display: grid; min-width: 42px; height: 42px; place-items: center; padding: 0 10px; border-radius: 12px; background: rgb(255 255 255 / 15%); font-size: .9rem !important; font-weight: 700; text-transform: none !important; letter-spacing: 0 !important; opacity: 1 !important; }
-
-.signs-content { padding: 16px 18px 0; }
-
-.progress-card { display: grid; gap: 10px; padding: 14px 16px; border: 1px solid var(--app-color-border-subtle); border-radius: 14px; background: var(--pv-white); }
-.progress-card strong { display: block; font-size: .82rem; }
-.progress-card small { color: var(--app-color-text-muted); font-size: .68rem; }
-.progress-bar { display: block; height: 6px; overflow: hidden; border-radius: 6px; background: var(--app-color-track); }
-.progress-bar i { display: block; height: 100%; border-radius: inherit; background: var(--app-color-green-dark); }
-
-.primary-button, .outline-button { display: flex; min-height: 48px; align-items: center; justify-content: center; gap: 8px; border-radius: 12px; font-size: .78rem; font-weight: 700; text-decoration: none; }
-.primary-button { color: var(--pv-white); background: var(--app-color-action); }
-.outline-button { border: 1px solid var(--app-color-warning-border); color: var(--app-color-warning-text); background: var(--app-color-warning-soft); }
-
-.locked-notice { display: flex; align-items: center; gap: 11px; margin-top: 12px; padding: 12px 14px; border: 1px solid var(--app-color-warning-border); border-radius: 12px; background: var(--app-color-warning-soft); color: var(--app-color-warning-text); text-decoration: none; }
-.locked-notice ion-icon { flex: 0 0 auto; font-size: 1.3rem; }
-.locked-notice strong { display: block; font-size: .8rem; }
-.locked-notice small { font-size: .68rem; opacity: .85; }
-
-.signs-search { --background: var(--pv-white); --border-radius: 12px; --box-shadow: none; margin: 14px 0 4px; padding: 0; border: 1px solid var(--app-color-border-subtle); border-radius: 12px; }
-
-.category-chips { display: flex; gap: 7px; margin: 10px -18px 0; padding: 4px 18px 8px; overflow-x: auto; scrollbar-width: none; }
-.category-chips::-webkit-scrollbar { display: none; }
-.category-chips button { flex: 0 0 auto; min-height: 34px; padding: 0 13px; border: 1px solid var(--pv-border); border-radius: 999px; color: var(--app-color-text-muted); background: var(--pv-white); font: inherit; font-size: .7rem; font-weight: 600; white-space: nowrap; cursor: pointer; }
-.category-chips button.active { border-color: var(--app-color-green); color: var(--pv-white); background: var(--app-color-green-dark); }
-
-.category-hint { margin: 8px 0 0; color: var(--app-color-text-muted); font-size: .72rem; line-height: 1.5; }
-
-.signs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-top: 14px; }
-.sign-card { display: grid; gap: 7px; padding: 13px 12px; border: 1px solid var(--app-color-border-subtle); border-radius: 14px; background: var(--pv-white); color: inherit; text-decoration: none; }
-.sign-image { position: relative; display: grid; height: 84px; place-items: center; border-radius: 10px; background: var(--pv-bg); }
-.sign-image img { width: auto; max-width: 78px; max-height: 74px; }
-.sign-image > ion-icon { color: var(--app-color-green-dark); font-size: 2.2rem; }
-.seen-badge { position: absolute; top: 4px; right: 4px; color: var(--app-color-green); font-size: 1.1rem; background: var(--pv-white); border-radius: 50%; }
-.sign-card strong { font-size: .76rem; line-height: 1.35; }
-.sign-card small { color: var(--app-color-text-muted); font-size: .66rem; line-height: 1.4; }
-
-.empty-hint { margin-top: 20px; color: var(--app-color-text-muted); font-size: .76rem; }
-.empty-state { display: grid; place-items: center; padding: 40px 20px; text-align: center; }
-.empty-state > ion-icon { color: var(--app-color-green-dark); font-size: 2.8rem; }
-.empty-state h2 { margin: 14px 0 6px; font-size: 1.05rem; }
-.empty-state p { max-width: 300px; margin: 0; color: var(--app-color-text-muted); font-size: .76rem; line-height: 1.55; }
-
-
-@media (min-width: 700px) {
-  .signs-shell { min-height: calc(100vh - 48px); margin-block: 24px; border-radius: 28px; }
-}
-
-/* Progresso reduzido a uma linha e o treino junto aos resultados que filtra. */
-.progress-card.slim { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 12px; }
-.progress-card.slim strong { white-space: nowrap; }
-.train-cta { margin-bottom: 14px; }
-
-/* Bloqueado: reconhece-se de relance sem parecer avariado. */
-.sign-card.locked { opacity: .78; }
-.sign-card.locked .sign-image img { filter: grayscale(1); opacity: .55; }
-.sign-card.locked strong { color: var(--app-color-text-muted); }
-.lock-badge { position: absolute; right: 4px; bottom: 4px; color: var(--app-color-warning-text); background: var(--pv-white); border-radius: 50%; font-size: 1rem; }
-.locked-hint { color: var(--app-color-green-dark); font-weight: 700; }
+.signs-page { --background: var(--pv-background); }
+.signs-shell { width: min(100%, var(--pv-content-reading)); min-height: 100%; margin: 0 auto; padding-bottom: calc(var(--pv-space-07) + env(safe-area-inset-bottom)); background: var(--pv-background); }
+.signs-header { display: grid; grid-template-columns: var(--pv-touch-target) minmax(0, 1fr) auto; min-height: 72px; align-items: center; gap: var(--pv-space-03); padding: max(var(--pv-space-03), env(safe-area-inset-top)) var(--pv-space-page) var(--pv-space-03); border-bottom: 1px solid var(--pv-border-subtle); background: var(--pv-layer-01); }
+.icon-button { display: grid; width: var(--pv-touch-target); height: var(--pv-touch-target); place-items: center; color: var(--pv-interactive); }
+.signs-header div > span { color: var(--pv-text-secondary); font-size: var(--pv-type-caption); }
+.signs-header h1 { margin: var(--pv-space-02) 0 0; font-size: var(--pv-type-heading); }
+.header-count { color: var(--pv-text-secondary); font-size: var(--pv-type-meta); }
+.signs-content { display: grid; gap: var(--pv-space-05); padding: var(--pv-space-06) var(--pv-space-page); }
+.progress-card { display: grid; grid-template-columns: auto minmax(100px, 1fr); align-items: center; gap: var(--pv-space-04); }
+.progress-card strong { font-size: var(--pv-type-body-sm); font-weight: 500; }
+.progress-bar { height: 7px; overflow: hidden; border-radius: var(--pv-radius-pill); background: var(--pv-border-subtle); }
+.progress-bar i { display: block; height: 100%; border-radius: inherit; background: var(--pv-progress); }
+.locked-notice { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: var(--pv-space-03); padding: var(--pv-space-04); border: 1px solid var(--pv-orange-100); border-radius: var(--pv-radius-tile); color: var(--pv-warning-text); background: var(--pv-orange-050); text-decoration: none; }
+.locked-notice span { display: grid; gap: var(--pv-space-02); }
+.locked-notice strong { font-size: var(--pv-type-body-sm); font-weight: 500; }
+.locked-notice small { color: var(--pv-text-secondary); font-size: var(--pv-type-caption); }
+.signs-search { margin: 0; padding: 0; border: 1px solid var(--pv-border-subtle); border-radius: var(--pv-radius-default); --background: var(--pv-layer-01); --border-radius: var(--pv-radius-default); --box-shadow: none; }
+.category-chips { display: flex; gap: var(--pv-space-03); overflow-x: auto; padding-bottom: var(--pv-space-02); scrollbar-width: none; }
+.category-chips button { min-height: 40px; flex: 0 0 auto; padding-inline: var(--pv-space-04); border: 1px solid var(--pv-border-subtle); border-radius: var(--pv-radius-pill); color: var(--pv-text-secondary); background: var(--pv-layer-01); font-size: var(--pv-type-caption); }
+.category-chips button.active { border-color: var(--pv-interactive); color: var(--pv-on-interactive); background: var(--pv-interactive); }
+.category-hint { margin: 0; color: var(--pv-text-secondary); font-size: var(--pv-type-body-sm); }
+.train-cta { width: 100%; }
+.signs-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--pv-space-03); }
+.sign-card { display: grid; align-content: start; gap: var(--pv-space-03); min-width: 0; padding: var(--pv-space-04); border: 1px solid var(--pv-border-subtle); border-radius: var(--pv-radius-tile); color: var(--pv-text-primary); background: var(--pv-layer-01); text-decoration: none; }
+.sign-image { position: relative; display: grid; min-height: 112px; place-items: center; border-radius: var(--pv-radius-default); background: var(--pv-layer-02); }
+.sign-image img { width: 100%; height: 104px; object-fit: contain; }
+.sign-image > ion-icon:not(.lock-badge):not(.seen-badge) { color: var(--pv-text-secondary); font-size: 40px; }
+.sign-card strong { font-size: var(--pv-type-body-sm); font-weight: 500; line-height: 1.35; }
+.sign-card small { color: var(--pv-text-secondary); font-size: var(--pv-type-caption); line-height: 1.4; }
+.lock-badge, .seen-badge { position: absolute; top: var(--pv-space-03); right: var(--pv-space-03); padding: var(--pv-space-02); border-radius: 50%; background: var(--pv-layer-01); font-size: 18px; }
+.lock-badge { color: var(--pv-warning-text); }
+.seen-badge { color: var(--pv-success); }
+.sign-card.locked { border-color: var(--pv-orange-100); }
+.empty-state { padding: var(--pv-space-07); text-align: center; }
+@media (min-width: 520px) { .signs-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 600px) { .signs-header, .signs-content { padding-inline: var(--pv-space-07); } }

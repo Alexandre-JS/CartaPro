@@ -1,110 +1,178 @@
-/*
- * ProntoVia Mobile — tokens de fundação.
- * Os aliases --app-* mantêm compatibilidade durante a migração visual.
- */
+/* ProntoVia Mobile Design System v2.0 — foundation tokens. */
 :root {
-  --pv-indigo: #1a1f5c;
-  --pv-indigo-dark: #1a1f5c;
-  --pv-cyan: #00b8f0;
-  --pv-orange: #ff8a00;
-  --pv-progress: #43b649;
-  --pv-white: #ffffff;
-  --pv-bg: #f4f6f8;
-  --pv-surface: var(--pv-white);
-  --pv-text: #161616;
-  --pv-text-secondary: #525252;
-  --pv-muted: #8d9199;
-  --pv-border: #e0e2e6;
-  --pv-success: var(--pv-progress);
-  --pv-warning: #ff8a00;
-  --pv-danger: #ff8a00;
-  --pv-info: #00b8f0;
-  --pv-radius-button: 8px;
-  --pv-radius-input: 8px;
-  --pv-radius-card: 12px;
-  --pv-space-page: 16px;
-  --pv-space-section: 24px;
-  --pv-font-family: "IBM Plex Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --pv-type-display: 28px;
-  --pv-type-title: 20px;
-  --pv-type-heading: 16px;
-  --pv-type-body: 14px;
-  --pv-type-label: 12px;
-  --pv-type-caption: 11px;
-  --pv-line-body: 1.45;
+  /* Brand scales */
+  --pv-indigo-700: #1a1f5c;
+  --pv-indigo-500: #252b70;
+  --pv-indigo-100: #e9eaf3;
+  --pv-indigo-050: #f4f4f9;
+  --pv-cyan-700: #007a9e;
+  --pv-cyan-500: #00b8f0;
+  --pv-cyan-100: #ddf6fd;
+  --pv-cyan-050: #f1fbfe;
+  --pv-orange-700: #a84f00;
+  --pv-orange-500: #ff8a00;
+  --pv-orange-100: #ffe8cc;
+  --pv-orange-050: #fff7ed;
 
-  --app-color-green: var(--pv-indigo);
-  --app-color-green-dark: var(--pv-indigo-dark);
-  --app-color-green-light: var(--pv-bg);
-  --app-color-yellow: var(--pv-orange);
+  /* Semantic colour */
+  --pv-background: #f7f8fb;
+  --pv-layer-01: #ffffff;
+  --pv-layer-02: #f4f4f4;
+  --pv-text-primary: #202534;
+  --pv-text-secondary: #667085;
+  --pv-text-disabled: #98a2b3;
+  --pv-interactive: var(--pv-indigo-700);
+  --pv-interactive-hover: var(--pv-indigo-500);
+  --pv-interactive-soft: var(--pv-indigo-100);
+  --pv-progress: var(--pv-cyan-500);
+  --pv-focus: var(--pv-cyan-700);
+  --pv-accent: var(--pv-orange-500);
+  --pv-warning-text: var(--pv-orange-700);
+  --pv-success: #198754;
+  --pv-danger: #d92d20;
+  --pv-border-subtle: #e4e7ec;
+  --pv-overlay: rgb(32 37 52 / 48%);
+  --pv-on-interactive: #ffffff;
+
+  /* Backwards-compatible primitive names */
+  --pv-indigo: var(--pv-indigo-700);
+  --pv-indigo-dark: var(--pv-indigo-700);
+  --pv-cyan: var(--pv-cyan-500);
+  --pv-orange: var(--pv-orange-500);
+  --pv-white: var(--pv-layer-01);
+  --pv-bg: var(--pv-background);
+  --pv-surface: var(--pv-layer-01);
+  --pv-text: var(--pv-text-primary);
+  --pv-muted: var(--pv-text-disabled);
+  --pv-border: var(--pv-border-subtle);
+  --pv-warning: var(--pv-accent);
+  --pv-info: var(--pv-focus);
+
+  /* Typography */
+  --pv-font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --pv-type-caption: 12px;
+  --pv-type-meta: 13px;
+  --pv-type-body-sm: 14px;
+  --pv-type-body: 16px;
+  --pv-type-item: 16px;
+  --pv-type-heading: 18px;
+  --pv-type-question: 18px;
+  --pv-type-title: 24px;
+  --pv-type-display: 32px;
+  --pv-type-label: 13px;
+  --pv-line-tight: 1.25;
+  --pv-line-body: 1.5;
+  --pv-line-reading: 1.65;
+
+  /* Carbon-inspired spacing scale */
+  --pv-space-01: 2px;
+  --pv-space-02: 4px;
+  --pv-space-03: 8px;
+  --pv-space-04: 12px;
+  --pv-space-05: 16px;
+  --pv-space-06: 24px;
+  --pv-space-07: 32px;
+  --pv-space-08: 40px;
+  --pv-space-09: 48px;
+  --pv-space-10: 64px;
+  --pv-space-page: var(--pv-space-05);
+  --pv-space-section: var(--pv-space-06);
+
+  /* Shape, controls and layout */
+  --pv-radius-default: 4px;
+  --pv-radius-tile: 8px;
+  --pv-radius-sheet: 12px;
+  --pv-radius-pill: 999px;
+  --pv-radius-button: var(--pv-radius-default);
+  --pv-radius-input: var(--pv-radius-default);
+  --pv-radius-card: var(--pv-radius-tile);
+  --pv-touch-target: 48px;
+  --pv-content-reading: 680px;
+  --pv-content-wide: 840px;
+  --pv-duration-fast: 120ms;
+  --pv-duration-standard: 180ms;
+
+  /* Legacy aliases: safe migration path for existing screens. */
+  --app-color-green: var(--pv-interactive);
+  --app-color-green-dark: var(--pv-interactive);
+  --app-color-green-light: var(--pv-interactive-soft);
+  --app-color-yellow: var(--pv-accent);
   --app-color-red: var(--pv-danger);
   --app-color-road-gray: var(--pv-text-secondary);
-  --app-color-light-gray: var(--pv-bg);
-  --app-color-white: var(--pv-white);
-  --app-color-brand: var(--pv-indigo);
-  --app-color-brand-strong: var(--pv-indigo-dark);
-  --app-color-brand-soft: var(--pv-bg);
+  --app-color-light-gray: var(--pv-background);
+  --app-color-white: var(--pv-layer-01);
+  --app-color-brand: var(--pv-interactive);
+  --app-color-brand-strong: var(--pv-interactive);
+  --app-color-brand-soft: var(--pv-indigo-050);
   --app-color-success: var(--pv-success);
-  --app-color-warning: var(--pv-warning);
+  --app-color-warning: var(--pv-accent);
   --app-color-danger: var(--pv-danger);
-  --app-color-text: var(--pv-text);
+  --app-color-text: var(--pv-text-primary);
   --app-color-text-muted: var(--pv-text-secondary);
-  --app-color-background: var(--pv-bg);
-  --app-color-surface: var(--pv-surface);
-  --app-color-border: var(--pv-border);
-  --app-color-page: var(--pv-bg);
-  --app-color-surface-subtle: var(--pv-bg);
-  --app-color-border-subtle: var(--pv-border);
-  --app-color-divider: var(--pv-border);
-  --app-color-track: var(--pv-border);
-  --app-color-disabled: var(--pv-muted);
-  --app-color-success-text: var(--pv-cyan);
-  --app-color-success-soft: var(--pv-bg);
-  --app-color-success-border: var(--pv-border);
-  --app-color-warning-text: var(--pv-orange);
-  --app-color-warning-soft: var(--pv-bg);
-  --app-color-warning-border: var(--pv-border);
-  --app-color-danger-text: var(--pv-orange);
-  --app-color-danger-soft: var(--pv-bg);
-  --app-color-danger-border: var(--pv-border);
-  --app-color-info: var(--pv-info);
-  --app-color-info-soft: var(--pv-bg);
-  --app-color-accent: var(--pv-cyan);
-  --app-color-accent-soft: var(--pv-bg);
-  --app-color-brand-panel: var(--pv-indigo);
-  --app-color-action: var(--pv-indigo);
+  --app-color-background: var(--pv-background);
+  --app-color-surface: var(--pv-layer-01);
+  --app-color-border: var(--pv-border-subtle);
+  --app-color-page: var(--pv-background);
+  --app-color-surface-subtle: var(--pv-layer-02);
+  --app-color-border-subtle: var(--pv-border-subtle);
+  --app-color-divider: var(--pv-border-subtle);
+  --app-color-track: var(--pv-border-subtle);
+  --app-color-disabled: var(--pv-text-disabled);
+  --app-color-success-text: var(--pv-success);
+  --app-color-success-soft: #edf8f2;
+  --app-color-success-border: #a7d7bb;
+  --app-color-warning-text: var(--pv-warning-text);
+  --app-color-warning-soft: var(--pv-orange-050);
+  --app-color-warning-border: var(--pv-orange-100);
+  --app-color-danger-text: var(--pv-danger);
+  --app-color-danger-soft: #fff1f0;
+  --app-color-danger-border: #f4b4ae;
+  --app-color-info: var(--pv-focus);
+  --app-color-info-soft: var(--pv-cyan-050);
+  --app-color-accent: var(--pv-progress);
+  --app-color-accent-soft: var(--pv-cyan-050);
+  --app-color-brand-panel: var(--pv-interactive);
+  --app-color-action: var(--pv-interactive);
 
-  --ion-color-primary: var(--pv-indigo);
+  /* Ionic semantic bridge */
+  --ion-color-primary: #1a1f5c;
   --ion-color-primary-rgb: 26, 31, 92;
-  --ion-color-primary-contrast: var(--pv-white);
+  --ion-color-primary-contrast: #ffffff;
   --ion-color-primary-contrast-rgb: 255, 255, 255;
-  --ion-color-primary-shade: #1a1f5c;
-  --ion-color-primary-tint: #1a1f5c;
-  --ion-color-secondary: var(--pv-cyan);
-  --ion-color-secondary-rgb: 0, 184, 240;
-  --ion-color-secondary-contrast: var(--pv-white);
+  --ion-color-primary-shade: #171b51;
+  --ion-color-primary-tint: #31366c;
+  --ion-color-secondary: #007a9e;
+  --ion-color-secondary-rgb: 0, 122, 158;
+  --ion-color-secondary-contrast: #ffffff;
   --ion-color-secondary-contrast-rgb: 255, 255, 255;
-  --ion-color-secondary-shade: #00b8f0;
-  --ion-color-secondary-tint: #00b8f0;
-  --ion-color-tertiary: var(--pv-orange);
-  --ion-color-tertiary-rgb: 255, 138, 0;
-  --ion-color-tertiary-contrast: var(--pv-text);
-  --ion-color-success: var(--pv-success);
-  --ion-color-success-rgb: 0, 184, 240;
-  --ion-color-success-contrast: var(--pv-text);
-  --ion-color-warning: var(--pv-warning);
-  --ion-color-warning-rgb: 255, 138, 0;
-  --ion-color-warning-contrast: var(--pv-text);
-  --ion-color-danger: var(--pv-danger);
-  --ion-color-danger-rgb: 255, 138, 0;
-  --ion-color-danger-contrast: var(--pv-text);
-  --ion-color-light: var(--pv-bg);
-  --ion-color-light-contrast: var(--pv-text);
-  --ion-color-medium: var(--pv-text-secondary);
-  --ion-color-medium-contrast: var(--pv-white);
-  --ion-color-dark: var(--pv-text);
-  --ion-color-dark-contrast: var(--pv-white);
-  --ion-background-color: var(--pv-bg);
-  --ion-text-color: var(--pv-text);
+  --ion-color-secondary-shade: #006b8b;
+  --ion-color-secondary-tint: #1a87a8;
+  --ion-color-tertiary: #a84f00;
+  --ion-color-tertiary-rgb: 168, 79, 0;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-success: #198754;
+  --ion-color-success-rgb: 25, 135, 84;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-warning: #a84f00;
+  --ion-color-warning-rgb: 168, 79, 0;
+  --ion-color-warning-contrast: #ffffff;
+  --ion-color-danger: #d92d20;
+  --ion-color-danger-rgb: 217, 45, 32;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-light: #f7f8fb;
+  --ion-color-light-contrast: #202534;
+  --ion-color-medium: #667085;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-dark: #202534;
+  --ion-color-dark-contrast: #ffffff;
+  --ion-background-color: var(--pv-background);
+  --ion-text-color: var(--pv-text-primary);
   --ion-font-family: var(--pv-font-family);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --pv-duration-fast: 0ms;
+    --pv-duration-standard: 0ms;
+  }
 }

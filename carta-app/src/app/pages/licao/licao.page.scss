@@ -1,69 +1,41 @@
 :host { display: block; }
-
-.lesson-page { --background: var(--app-color-page); }
-.lesson-shell { width: min(100%, 560px); min-height: 100%; margin: 0 auto; padding-bottom: calc(28px + env(safe-area-inset-bottom)); overflow: hidden; background: var(--pv-white); box-shadow: 0 0 42px rgb(22 22 22 / 10%); }
-
-.lesson-header { position: relative; display: grid; grid-template-columns: 42px 1fr; align-items: center; gap: 12px; min-height: 142px; padding: max(28px, env(safe-area-inset-top)) 18px 24px; overflow: hidden; color: var(--pv-white); background-color: var(--app-color-brand-panel); background-image: url('/assets/backgrounds/ESCOLA-DE-CONDUCAO.jpg'); background-position: center 42%; background-size: cover; }
-.lesson-header::before { position: absolute; inset: 0; background: rgb(26 31 92 / 55%); content: ''; }
-.lesson-header > * { position: relative; z-index: 1; }
-.lesson-header .icon-button { display: grid; width: 40px; height: 40px; place-items: center; border-radius: 50%; color: var(--pv-white); background: rgb(255 255 255 / 13%); text-decoration: none; }
-.lesson-header span { font-size: .58rem; text-transform: uppercase; letter-spacing: .07em; opacity: .85; }
-.lesson-header h1 { margin: 4px 0 0; font-size: 1.14rem; font-weight: 600; line-height: 1.3; }
-
-.lesson-content { padding: 18px 20px 0; }
-
-.lesson-meta { display: flex; flex-wrap: wrap; gap: 12px; color: var(--app-color-text-muted); font-size: .68rem; }
-.lesson-meta span { display: flex; align-items: center; gap: 4px; }
-.lesson-meta ion-icon { font-size: .9rem; }
-.lesson-meta .read { color: var(--app-color-green-dark); font-weight: 700; }
-
-.lesson-summary { margin: 14px 0 0; padding: 13px 15px; border-radius: 10px; background: var(--pv-bg); font-size: .8rem; font-weight: 500; line-height: 1.6; }
-
-.lesson-body { margin-top: 16px; }
-.lesson-body p { margin: 0 0 13px; color: var(--pv-text-secondary); font-size: .86rem; line-height: 1.75; }
-.lesson-body ul { margin: 0 0 13px; padding-left: 20px; }
-.lesson-body li { margin-bottom: 7px; color: var(--pv-text-secondary); font-size: .84rem; line-height: 1.65; }
-
-.lesson-signs { margin-top: 8px; }
-.lesson-signs h2, .lesson-articles h2 { margin: 0 0 10px; font-size: .82rem; font-weight: 700; }
-.signs-row { display: flex; gap: 10px; margin: 0 -20px; padding: 2px 20px 8px; overflow-x: auto; scrollbar-width: none; }
-.signs-row::-webkit-scrollbar { display: none; }
-.sign-chip { flex: 0 0 auto; width: 92px; color: inherit; text-align: center; text-decoration: none; }
-.sign-chip .thumb { display: grid; height: 76px; place-items: center; border: 1px solid var(--app-color-border-subtle); border-radius: 12px; background: var(--pv-bg); }
-.sign-chip .thumb img { width: auto; max-width: 64px; max-height: 62px; }
-.sign-chip .thumb ion-icon { color: var(--app-color-road-gray); font-size: 1.6rem; }
-.sign-chip small { display: block; margin-top: 5px; color: var(--app-color-text-muted); font-size: .62rem; line-height: 1.35; }
-
-.lesson-articles { margin-top: 18px; }
-.article-card { margin-bottom: 8px; overflow: hidden; border: 1px solid var(--app-color-border-subtle); border-radius: 14px; background: var(--pv-bg); }
-.article-toggle { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 11px; width: 100%; min-height: 56px; padding: 11px 15px; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
-.article-toggle > ion-icon { color: var(--app-color-green-dark); font-size: 1.15rem; }
-.article-toggle strong { display: block; font-size: .78rem; }
-.article-toggle small { display: block; color: var(--app-color-text-muted); font-size: .68rem; line-height: 1.4; }
-.article-body { padding: 0 15px 14px; border-top: 1px solid var(--app-color-divider); }
-.article-body p { margin: 10px 0 0; color: var(--pv-text-secondary); font-size: .78rem; line-height: 1.7; }
-.article-body ul { margin: 10px 0 0; padding-left: 18px; }
-.article-body li { margin-bottom: 5px; font-size: .78rem; line-height: 1.6; }
-
-.lesson-actions { display: grid; gap: 8px; margin-top: 22px; }
-.primary-button, .outline-button, .ghost-button { display: flex; min-height: 50px; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 12px; font: inherit; font-size: .8rem; font-weight: 700; text-decoration: none; cursor: pointer; }
-.primary-button { color: var(--pv-white); background: var(--app-color-action); }
-.outline-button { border: 1px solid var(--app-color-green); color: var(--app-color-green-dark); background: var(--pv-white); }
-.ghost-button { min-height: 44px; color: var(--app-color-text-muted); background: none; font-weight: 600; }
-
-.sibling-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--app-color-divider); }
-.sibling-nav a { display: flex; min-width: 0; align-items: center; gap: 5px; color: var(--app-color-green-dark); font-size: .7rem; font-weight: 600; text-decoration: none; }
-.sibling-nav a.next { justify-content: flex-end; text-align: right; }
-.sibling-nav a span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-.hint { margin: 0; color: var(--app-color-text-muted); font-size: .76rem; }
-
-.empty-state { display: grid; place-items: center; padding: 46px 22px; text-align: center; }
-.empty-state > ion-icon { color: var(--app-color-green-dark); font-size: 2.8rem; }
-.empty-state h2 { margin: 14px 0 6px; font-size: 1.05rem; }
-.empty-state p { max-width: 300px; margin: 0 0 18px; color: var(--app-color-text-muted); font-size: .78rem; line-height: 1.55; }
-.empty-state .primary-button { padding: 0 22px; }
-
-@media (min-width: 700px) {
-  .lesson-shell { min-height: calc(100vh - 48px); margin-block: 24px; border-radius: 28px; }
-}
+.lesson-page { --background: var(--pv-background); }
+.lesson-shell { width: min(100%, var(--pv-content-reading)); min-height: 100%; margin: 0 auto; background: var(--pv-background); }
+.lesson-header { display: grid; grid-template-columns: var(--pv-touch-target) minmax(0, 1fr); min-height: 72px; align-items: center; gap: var(--pv-space-03); padding: max(var(--pv-space-03), env(safe-area-inset-top)) var(--pv-space-page) var(--pv-space-03); border-bottom: 1px solid var(--pv-border-subtle); background: var(--pv-layer-01); }
+.icon-button { display: grid; width: var(--pv-touch-target); height: var(--pv-touch-target); place-items: center; color: var(--pv-interactive); }
+.lesson-header div { min-width: 0; }
+.lesson-header span { color: var(--pv-text-secondary); font-size: var(--pv-type-caption); }
+.lesson-header h1 { overflow: hidden; margin: var(--pv-space-02) 0 0; font-size: var(--pv-type-heading); text-overflow: ellipsis; white-space: nowrap; }
+.lesson-content { display: grid; gap: var(--pv-space-06); padding: var(--pv-space-06) var(--pv-space-page) var(--pv-space-07); }
+.lesson-meta { display: flex; flex-wrap: wrap; gap: var(--pv-space-03) var(--pv-space-04); color: var(--pv-text-secondary); font-size: var(--pv-type-caption); }
+.lesson-meta span { display: inline-flex; align-items: center; gap: var(--pv-space-02); }
+.lesson-meta .read { color: var(--pv-success); }
+.lesson-summary { margin: 0; padding: var(--pv-space-04); border-left: 4px solid var(--pv-progress); color: var(--pv-text-primary); background: var(--pv-cyan-050); font-size: var(--pv-type-body); line-height: var(--pv-line-body); }
+.lesson-body { max-width: 65ch; }
+.lesson-body p, .lesson-body li { color: var(--pv-text-primary); font-size: var(--pv-type-body); line-height: var(--pv-line-reading); }
+.lesson-body p { margin: 0 0 var(--pv-space-05); }
+.lesson-body ul { margin: 0 0 var(--pv-space-05); padding-left: var(--pv-space-06); }
+.lesson-signs, .lesson-articles, .linked-lessons { display: grid; gap: var(--pv-space-04); }
+.lesson-signs h2, .lesson-articles h2 { margin: 0; font-size: var(--pv-type-heading); }
+.signs-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--pv-space-03); }
+.sign-chip { display: grid; gap: var(--pv-space-03); padding: var(--pv-space-03); border: 1px solid var(--pv-border-subtle); border-radius: var(--pv-radius-tile); color: var(--pv-text-primary); background: var(--pv-layer-01); text-decoration: none; }
+.sign-chip .thumb { display: grid; min-height: 96px; place-items: center; border-radius: var(--pv-radius-default); background: var(--pv-layer-02); }
+.sign-chip img { width: 100%; height: 88px; object-fit: contain; }
+.sign-chip small { font-size: var(--pv-type-caption); }
+.article-card { border: 1px solid var(--pv-border-subtle); border-radius: var(--pv-radius-tile); background: var(--pv-layer-01); }
+.article-toggle { display: grid; grid-template-columns: 24px minmax(0, 1fr) 20px; width: 100%; min-height: 64px; align-items: center; gap: var(--pv-space-03); padding: var(--pv-space-03) var(--pv-space-04); border: 0; color: var(--pv-text-primary); background: transparent; text-align: left; }
+.article-toggle > ion-icon:first-child { color: var(--pv-interactive); font-size: 20px; }
+.article-toggle span { display: grid; gap: var(--pv-space-02); }
+.article-toggle strong { font-size: var(--pv-type-body-sm); font-weight: 500; }
+.article-toggle small { color: var(--pv-text-secondary); font-size: var(--pv-type-caption); }
+.article-body { padding: var(--pv-space-04); border-top: 1px solid var(--pv-border-subtle); }
+.article-body p, .article-body li { font-size: var(--pv-type-body-sm); line-height: var(--pv-line-reading); }
+.lesson-actions { display: grid; gap: var(--pv-space-03); }
+.lesson-actions button, .lesson-actions a { width: 100%; }
+.ghost-button { color: var(--pv-interactive); background: transparent; text-decoration: none; }
+.sibling-nav { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--pv-space-04); padding-top: var(--pv-space-05); border-top: 1px solid var(--pv-border-subtle); }
+.sibling-nav a { display: flex; min-height: var(--pv-touch-target); align-items: center; gap: var(--pv-space-03); color: var(--pv-interactive); font-size: var(--pv-type-caption); text-decoration: none; }
+.sibling-nav .next { justify-content: flex-end; text-align: right; }
+.empty-state { padding: var(--pv-space-07); text-align: center; }
+@media (min-width: 520px) { .signs-row { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 600px) { .lesson-header, .lesson-content { padding-inline: var(--pv-space-07); } }

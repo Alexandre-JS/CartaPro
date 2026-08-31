@@ -1,7 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import Dexie, { Table } from 'dexie';
 import { Preferences } from '@capacitor/preferences';
-import { Pacote } from '../models/pacote.model';
 import {
     EstadoAcesso,
     HistoricoExame,
@@ -23,13 +22,17 @@ interface SyncSnapshot {
     access: EstadoAcesso;
 }
 
+export interface EstadoSincronizacaoLocal {
+    ultimoCursor: string | null;
+    pendentes: number;
+}
+
 const CHAVE_CURSOR = 'syncCursor';
 const CHAVE_LIDOS = 'conteudosLidos';
 const CHAVE_LIDOS_PENDENTES = 'conteudosLidosPendentes';
 const ATRASO_SYNC_MS = 8000;
 
 class CartaDb extends Dexie {
-    pacote!: Table<Pacote & { id: string }, string>;
     respostas!: Table<RespostaRegisto, number>;
     exames!: Table<HistoricoExame, number>;
     revisoes!: Table<RevisaoAgendada, string>;
@@ -60,6 +63,9 @@ class CartaDb extends Dexie {
                 await transaction.table('exames').toCollection().modify({ pendente: 1 });
                 await transaction.table('revisoes').toCollection().modify({ pendente: 1 });
             });
+        // v6: o conteúdo e as provas deixam de ter fallback local. Elimina-se
+        // apenas o pacote curricular antigo; o progresso continua preservado.
+        this.version(6).stores({ pacote: null });
     }
 }
 
@@ -69,21 +75,6 @@ export class StorageService {
     private readonly db = new CartaDb();
     private temporizadorSync?: ReturnType<typeof setTimeout>;
     private syncEmCurso?: Promise<void>;
-
-    // ---------------------------------------------------------------- pacote
-
-    async guardarPacote(pacote: Pacote): Promise<void> {
-        await this.db.pacote.put({ ...pacote, id: 'ativo' });
-    }
-
-    async obterPacote(): Promise<Pacote | null> {
-        const pacote = await this.db.pacote.get('ativo');
-        if (!pacote) {
-            return null;
-        }
-        const { id, ...dados } = pacote;
-        return dados;
-    }
 
     // --------------------------------------------------------------- registos
 
@@ -139,6 +130,12 @@ export class StorageService {
 
     async obterSimuladoEmCurso(chave: string): Promise<SimuladoEmCurso | undefined> {
         return this.db.simulado.get(chave);
+    }
+
+    /** Provas interrompidas, da mais recente para a mais antiga. */
+    async listarSimuladosEmCurso(): Promise<SimuladoEmCurso[]> {
+        const estados = await this.db.simulado.toArray();
+        return estados.sort((a, b) => b.guardadoEm - a.guardadoEm);
     }
 
     async limparSimuladoEmCurso(chave: string): Promise<void> {
@@ -222,6 +219,18 @@ export class StorageService {
             this.temporizadorSync = undefined;
         }
         await this.sincronizar();
+    }
+
+    /** Estado observável da fila local, sem fazer pedidos à rede. */
+    async obterEstadoSincronizacao(): Promise<EstadoSincronizacaoLocal> {
+        const [respostas, exames, revisoes, lidos, cursor] = await Promise.all([
+            this.db.respostas.where('pendente').equals(1).count(),
+            this.db.exames.where('pendente').equals(1).count(),
+            this.db.revisoes.where('pendente').equals(1).count(),
+            this.listarConteudosLidosPendentes(),
+            this.obterCursor(),
+        ]);
+        return { ultimoCursor: cursor, pendentes: respostas + exames + revisoes + lidos.length };
     }
 
     /**

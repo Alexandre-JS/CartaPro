@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
     IonButton,
     IonContent,
@@ -15,6 +15,7 @@ import { arrowBackOutline, callOutline, lockClosedOutline, mailOutline, personOu
 import { contaJaExiste, mensagensDeErro } from '../../core/erros-api';
 import { PerfilService } from '../../core/perfil.service';
 import { AuthService } from '../../core/auth.service';
+import { retornoSeguro } from '../../core/auth.guard';
 
 function palavrasPasseIguais(controle: AbstractControl): ValidationErrors | null {
     const palavraPasse = controle.get('palavraPasse')?.value;
@@ -48,14 +49,17 @@ export class RegistoPage {
     errosApi: string[] = [];
     /** true quando o email/telefone já tem conta: oferece-se o login. */
     sugerirEntrada = false;
+    readonly retorno: string;
 
     constructor(
         formBuilder: FormBuilder,
         private readonly router: Router,
+        route: ActivatedRoute,
         private readonly perfil: PerfilService,
         private readonly auth: AuthService,
     ) {
         addIcons({ arrowBackOutline, callOutline, lockClosedOutline, mailOutline, personOutline });
+        this.retorno = retornoSeguro(route.snapshot.queryParamMap.get('retorno'));
         this.formulario = formBuilder.nonNullable.group({
             nome: ['', [Validators.required, Validators.minLength(3)]],
             email: ['', [Validators.required, Validators.email]],
@@ -81,7 +85,7 @@ export class RegistoPage {
         try {
             const utilizador = await this.auth.registar({ nome, email, telefone, palavraPasse });
             await this.perfil.guardar(utilizador);
-            await this.router.navigateByUrl('/inicio');
+            await this.router.navigateByUrl(this.retorno, { replaceUrl: true });
         } catch (error: any) {
             if (error?.status === 0 || error?.name === 'TimeoutError') {
                 this.errosApi = ['Sem ligação à internet. Verifica a rede e tenta novamente.'];

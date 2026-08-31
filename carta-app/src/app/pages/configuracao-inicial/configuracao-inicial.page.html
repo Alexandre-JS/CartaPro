@@ -1,0 +1,36 @@
+<ion-content [fullscreen]="true" class="setup-page">
+  <main class="setup-shell">
+    <header class="setup-brand" aria-label="ProntoVia">
+      <img src="assets/icon/icon CartaPro.png" alt="" width="40" height="40">
+      <span>ProntoVia</span>
+    </header>
+
+    <section class="setup-content" aria-labelledby="setup-title">
+      <div class="setup-heading">
+        <p>Vamos preparar o conteúdo</p>
+        <h1 id="setup-title">Que categoria está a preparar?</h1>
+        <span>Usamos esta escolha para mostrar perguntas e regras adequadas. Não precisa de criar conta.</span>
+      </div>
+
+      <div class="category-list" role="radiogroup" aria-label="Categoria da carta">
+        @for (opcao of opcoes; track opcao.valor) {
+          <button type="button" role="radio" [attr.aria-checked]="escolha === opcao.valor"
+                  [class.selected]="escolha === opcao.valor" (click)="selecionar(opcao.valor)">
+            <span class="category-icon"><ion-icon [name]="opcao.icone" aria-hidden="true"></ion-icon></span>
+            <span class="category-copy"><strong>{{ opcao.titulo }}</strong><small>{{ opcao.descricao }}</small></span>
+            <span class="selection-mark" aria-hidden="true">
+              @if (escolha === opcao.valor) { <ion-icon name="checkmark-circle"></ion-icon> }
+            </span>
+          </button>
+        }
+      </div>
+    </section>
+
+    <footer class="setup-footer">
+      <button class="continue-button" type="button" [disabled]="!escolha || guardando" (click)="continuar()">
+        {{ guardando ? 'A guardar…' : 'Continuar' }}
+      </button>
+      <p>O seu progresso começa guardado neste dispositivo.</p>
+    </footer>
+  </main>
+</ion-content>

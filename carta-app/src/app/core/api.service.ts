@@ -10,12 +10,12 @@ export class ApiService {
     private readonly http = inject(HttpClient);
     readonly baseUrl = (Capacitor.getPlatform() === 'android' ? environment.androidApiBaseUrl : environment.apiBaseUrl).replace(/\/$/, '');
 
-    async get<T>(path: string, authenticated = false): Promise<T> {
-        return firstValueFrom(this.http.get<T>(this.url(path), { headers: await this.headers(authenticated) }).pipe(timeout(environment.apiTimeoutMs)));
+    async get<T>(path: string, authenticated = false, additionalHeaders: Record<string, string> = {}): Promise<T> {
+        return firstValueFrom(this.http.get<T>(this.url(path), { headers: await this.headers(authenticated, additionalHeaders) }).pipe(timeout(environment.apiTimeoutMs)));
     }
 
-    async post<T>(path: string, body: unknown, authenticated = false): Promise<T> {
-        return firstValueFrom(this.http.post<T>(this.url(path), body, { headers: await this.headers(authenticated) }).pipe(timeout(environment.apiTimeoutMs)));
+    async post<T>(path: string, body: unknown, authenticated = false, additionalHeaders: Record<string, string> = {}): Promise<T> {
+        return firstValueFrom(this.http.post<T>(this.url(path), body, { headers: await this.headers(authenticated, additionalHeaders) }).pipe(timeout(environment.apiTimeoutMs)));
     }
 
     async put<T>(path: string, body: unknown, authenticated = false): Promise<T> {
@@ -35,14 +35,21 @@ export class ApiService {
         }
     }
 
+    /** Site público correspondente à API configurada (útil para ajuda/FAQ). */
+    websiteUrl(fragment = ''): string {
+        const url = new URL(this.baseUrl);
+        const caminho = url.pathname.replace(/\/api\/v1\/?$/, '').replace(/\/$/, '');
+        return `${url.origin}${caminho || ''}/${fragment ? `#${fragment.replace(/^#/, '')}` : ''}`;
+    }
+
     private apiOrigin(): string {
         return new URL(this.baseUrl).origin;
     }
 
     private url(path: string): string { return `${this.baseUrl}/${path.replace(/^\//, '')}`; }
 
-    private async headers(authenticated: boolean): Promise<Record<string, string>> {
-        const headers: Record<string, string> = { Accept: 'application/json' };
+    private async headers(authenticated: boolean, additionalHeaders: Record<string, string> = {}): Promise<Record<string, string>> {
+        const headers: Record<string, string> = { Accept: 'application/json', ...additionalHeaders };
         if (authenticated) {
             const { value } = await Preferences.get({ key: 'mobileAuthToken' });
             if (!value) throw new Error('Sessão não iniciada.');

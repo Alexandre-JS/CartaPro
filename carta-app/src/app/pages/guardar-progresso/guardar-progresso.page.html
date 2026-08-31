@@ -1,0 +1,54 @@
+<ion-content [fullscreen]="true" class="save-page">
+  <main class="save-shell">
+    <header class="save-header">
+      <a class="back-button" [routerLink]="retorno" aria-label="Voltar">
+        <ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>
+      </a>
+      <span>Conta ProntoVia</span>
+    </header>
+
+    <section class="save-intro">
+      <span class="intro-icon"><ion-icon name="cloud-done-outline" aria-hidden="true"></ion-icon></span>
+      <p class="eyebrow">Opcional</p>
+      <h1>Guarde o seu progresso</h1>
+      <p>Continue a usar a aplicação sem conta. Crie uma apenas quando quiser proteger e sincronizar os seus dados.</p>
+    </section>
+
+    <section class="benefits" aria-labelledby="benefits-title">
+      <div class="section-heading">
+        <p>Com uma conta</p>
+        <h2 id="benefits-title">O seu estudo acompanha-o</h2>
+      </div>
+
+      <ul>
+        <li>
+          <span><ion-icon name="phone-portrait-outline" aria-hidden="true"></ion-icon></span>
+          <div><strong>Recuperar noutro telefone</strong><p>Restaure o histórico se trocar ou perder o dispositivo.</p></div>
+        </li>
+        <li>
+          <span><ion-icon name="cloud-done-outline" aria-hidden="true"></ion-icon></span>
+          <div><strong>Sincronizar automaticamente</strong><p>Mantenha sessões, resultados e revisões ligados à conta.</p></div>
+        </li>
+        <li>
+          <span><ion-icon name="school-outline" aria-hidden="true"></ion-icon></span>
+          <div><strong>Ligar-se à escola</strong><p>Receba atividades e partilhe a evolução quando decidir aderir.</p></div>
+        </li>
+        <li>
+          <span><ion-icon name="shield-checkmark-outline" aria-hidden="true"></ion-icon></span>
+          <div><strong>Preservar o ProntoVia+</strong><p>O acesso Premium fica associado à sua conta e ao seu telefone.</p></div>
+        </li>
+      </ul>
+    </section>
+
+    <section class="save-actions" aria-label="Opções de conta">
+      <a class="primary-action" routerLink="/conta/criar" [queryParams]="{ retorno: retorno }">
+        Criar conta
+        <ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon>
+      </a>
+      <a class="secondary-action" routerLink="/conta/entrar" [queryParams]="{ retorno: retorno }">Já tenho conta</a>
+      <a class="skip-action" [routerLink]="retorno">Agora não</a>
+    </section>
+
+    <p class="privacy-note">O progresso atual permanece neste dispositivo até iniciar sessão.</p>
+  </main>
+</ion-content>

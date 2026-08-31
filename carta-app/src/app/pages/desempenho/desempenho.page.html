@@ -1,101 +1,54 @@
-<ion-content [fullscreen]="true" class="performance-page">
-  <main class="performance-shell">
-    <app-app-header titulo="Desempenho" subtitulo="O teu progresso" />
-    <header class="performance-hero">
-      <div><span>O teu progresso</span><h1>Desempenho</h1><p>Onde estás, em números.</p></div>
-      <span class="hero-icon"><ion-icon name="stats-chart-outline" aria-hidden="true"></ion-icon></span>
-    </header>
+<ion-content [fullscreen]="true" class="progress-page">
+  <main class="progress-shell">
+    <app-app-header titulo="Progresso" subtitulo="A sua preparação, guardada neste dispositivo" />
 
-    <!-- Esta página conta; quem decide o que estudar a seguir é o Início.
-         A recomendação de tema que aqui estava era a terceira cópia da mesma. -->
-    <section class="performance-content">
-      <!-- Sem indicador, o ecrã mostrava "0%", "0 questões respondidas" e
-           "ainda não fizeste exames" a quem tinha meses de estudo — números
-           reais só depois de o armazenamento responder. -->
+    <section class="progress-content">
       @if (carregando) {
-        <app-skeleton variante="cartao" [quantidade]="1" etiqueta="A calcular o teu desempenho"></app-skeleton>
+        <app-skeleton variante="cartao" [quantidade]="2" etiqueta="A calcular o seu progresso"></app-skeleton>
         <app-skeleton variante="lista" [quantidade]="4"></app-skeleton>
+      } @else if (erroCarregamento) {
+        <section class="load-error" role="alert"><ion-icon name="warning-outline" aria-hidden="true"></ion-icon><div><h1>Não conseguimos carregar Progresso</h1><p>{{ erroCarregamento }}</p></div><button type="button" (click)="carregar()"><ion-icon name="refresh-outline" aria-hidden="true"></ion-icon>Tentar novamente</button></section>
       } @else {
-      <article class="main-score">
-        @if (consolidacaoAvaliada) {
-          <div class="score-ring"><strong>{{ dominioGlobal }}%</strong><span>domínio</span></div>
-          <div class="score-copy">
-            <span>Matéria consolidada</span>
-            <h2>{{ perguntasConsolidadas }} de {{ totalPerguntasBanco }} perguntas</h2>
-            <p>Conhecimento confirmado em revisões posteriores.</p>
-          </div>
-        } @else {
-          <div class="score-ring current"><strong>{{ retencao }}%</strong><span>retenção</span></div>
-          <div class="score-copy">
-            <span>Conhecimento atual</span>
-            <h2>{{ perguntasRetidas }} de {{ perguntasPraticadas }} perguntas retidas</h2>
-            <p>Faz as revisões agendadas para confirmar este conhecimento.</p>
-          </div>
-        }
-      </article>
+        <section class="readiness" aria-labelledby="readiness-title">
+          <div class="readiness-score"><strong>{{ prontidao }}%</strong><span>prontidão</span></div>
+          <div><p class="section-label">Estado atual</p><h1 id="readiness-title">{{ prontidaoEstado }}</h1><p>{{ fonteProntidao }}. O mínimo configurado é {{ regras.percentagemPassagem(categoria) }}%.</p></div>
+        </section>
 
-      <section class="metrics-grid">
-        <article><span class="metric-icon green"><ion-icon name="eye-outline" aria-hidden="true"></ion-icon></span><div><small>Cobertura</small><strong>{{ cobertura }}%</strong><em>{{ perguntasPraticadas }}/{{ totalPerguntasBanco }}</em></div></article>
-        @if (consolidacaoAvaliada) {
-          <article><span class="metric-icon blue"><ion-icon name="bulb-outline" aria-hidden="true"></ion-icon></span><div><small>Retenção atual</small><strong>{{ retencao }}%</strong><em>{{ perguntasRetidas }}/{{ perguntasPraticadas }}</em></div></article>
-        }
-        <article><span class="metric-icon red"><ion-icon name="refresh-outline" aria-hidden="true"></ion-icon></span><div><small>A rever</small><strong>{{ perguntasARever }}</strong><em>erro ou revisão vencida</em></div></article>
-        <article><span class="metric-icon purple"><ion-icon name="document-text-outline" aria-hidden="true"></ion-icon></span><div><small>Exames feitos</small><strong>{{ historico.length }}</strong><em>resultados guardados</em></div></article>
-      </section>
-
-      <section class="achievement-strip" aria-label="Conquistas locais">
-        <div><span>Gamificação</span><strong>{{ gamificacao.pontos }} pontos</strong><small>{{ gamificacao.diasAtivos }} {{ gamificacao.diasAtivos === 1 ? 'dia' : 'dias' }} de prática</small></div>
-        <span class="achievement-count">{{ gamificacao.conquistas.length }} conquistas</span>
-      </section>
-
-      <section class="themes-section">
-        <div class="section-heading"><div><span>Conhecimento</span><h2>Desempenho por tema</h2></div></div>
-        <div class="theme-list">
-          <!-- Só temas com respostas: um tema nunca praticado aparecia a 0% e
-               lia-se como ponto fraco. Os por praticar vão listados à parte. -->
-          @for (tema of temasComDados; track tema.tema) {
-            <a class="theme-row" [routerLink]="['/estudo', tema.tema]" [queryParams]="{ categoria: categoria }" [attr.aria-label]="'Praticar o tema ' + nomeTema(tema.tema)">
-              <div><strong>{{ nomeTema(tema.tema) }}</strong><small>{{ tema.retidas }}/{{ tema.praticadas }} retidas · {{ tema.consolidadas }} consolidadas</small></div>
-              <span class="theme-progress"><i [style.width.%]="tema.retencao"></i></span>
-              <b>{{ tema.retencao }}%</b>
-              <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
-            </a>
-          } @empty {
-            <p class="hint">Responde a algumas perguntas para veres o teu perfil por tema.</p>
+        <section class="evolution" aria-labelledby="evolution-title">
+          <div class="section-heading"><div><p class="section-label">Evolução</p><h2 id="evolution-title">Desempenho recente</h2></div><span class="trend" [class.negative]="evolucao < 0"><ion-icon [name]="evolucao < 0 ? 'trending-down-outline' : 'trending-up-outline'" aria-hidden="true"></ion-icon>{{ evolucao > 0 ? '+' : '' }}{{ evolucao }} pp</span></div>
+          @if (pontosEvolucao.length) {
+            <div class="chart" aria-label="Evolução percentual">@for (ponto of pontosEvolucao; track ponto.id) {<div><span><i [style.height.%]="ponto.valor"></i></span><strong>{{ ponto.valor }}%</strong><small>{{ ponto.rotulo }}</small></div>}</div>
+          } @else {
+            <p class="empty-copy">Faça algumas práticas ou um simulado para começar a medir a evolução.</p>
           }
-        </div>
-        @if (temasPorPraticar.length && alertaVisivel) {
-          <aside class="untouched" role="status" aria-live="polite" aria-label="Temas ainda por praticar">
-            <ion-icon name="alert-circle-outline" aria-hidden="true"></ion-icon>
-            <div>
-              <strong>Ainda por praticar</strong>
-            <p>{{ nomesPorPraticar }}</p>
-            <a routerLink="/estudos">Escolher tema</a>
-            </div>
-            <button type="button" (click)="alertaVisivel = false" aria-label="Fechar aviso">
-              <ion-icon name="close-outline" aria-hidden="true"></ion-icon>
-            </button>
-          </aside>
-        }
-      </section>
+        </section>
 
-      <section class="history-section">
-        <div class="section-heading"><div><span>Atividade</span><h2>Histórico de exames</h2></div></div>
-        <div class="history-list">
-          @for (exame of historico; track exame.id) {
-            <article class="history-card">
-              <span class="exam-badge">{{ numeroExame(exame.numero) }}</span>
-              <div><strong>Exame {{ numeroExame(exame.numero) }}</strong><small><ion-icon name="calendar-outline" aria-hidden="true"></ion-icon>{{ exame.data | date:'dd/MM/yyyy, HH:mm' }} · {{ formatarTempo(exame.tempoSegundos) }}</small></div>
-              <span class="history-score" [class.good]="aprovado(exame)">{{ percentagem(exame) }}%</span>
-            </article>
-          } @empty {
-            <div class="empty-history"><ion-icon name="document-text-outline" aria-hidden="true"></ion-icon><strong>Ainda não fizeste exames</strong><p>Os resultados aparecem aqui depois do primeiro.</p><a routerLink="/exames">Escolher um exame</a></div>
-          }
-        </div>
-      </section>
+        <section class="metrics" aria-label="Resumo do progresso">
+          <article><ion-icon name="book-outline" aria-hidden="true"></ion-icon><span><small>Cobertura</small><strong>{{ cobertura }}%</strong><em>{{ perguntasPraticadas }} de {{ totalPerguntasBanco }} perguntas</em></span></article>
+          <article><ion-icon name="time-outline" aria-hidden="true"></ion-icon><span><small>Revisões</small><strong>{{ revisoesPendentes }}</strong><em>pendentes agora</em></span></article>
+          <article><ion-icon name="document-text-outline" aria-hidden="true"></ion-icon><span><small>Simulados</small><strong>{{ historico.length }}</strong><em>resultados locais</em></span></article>
+        </section>
+
+        @if (recomendacao; as item) {
+          <section class="recommendation" aria-labelledby="recommendation-title"><span><ion-icon name="stats-chart-outline" aria-hidden="true"></ion-icon></span><div><p class="section-label">Recomendação</p><h2 id="recommendation-title">{{ item.titulo }}</h2><p>{{ item.descricao }}</p></div><a [routerLink]="item.rota" [queryParams]="item.query || null">{{ item.acao }}<ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon></a></section>
+        }
+
+        @if (temasAReforcar.length) {
+          <section class="reinforce" aria-labelledby="reinforce-title"><div class="section-heading"><div><p class="section-label">Prioridade</p><h2 id="reinforce-title">Temas a reforçar</h2></div></div><div class="reinforce-list">@for (tema of temasAReforcar.slice(0, 3); track tema.tema) {<a [routerLink]="['/progresso/tema', tema.tema]"><span><strong>{{ nomeTema(tema.tema) }}</strong><small>{{ tema.respondidas }} respostas · {{ tema.revisoesPendentes }} revisões</small></span><em>{{ tema.taxaRecente * 100 | number:'1.0-0' }}%</em><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>}</div></section>
+        }
+
+        <section class="themes" aria-labelledby="themes-title"><div class="section-heading"><div><p class="section-label">Por tema</p><h2 id="themes-title">Desempenho detalhado</h2></div></div><div class="theme-list">@for (tema of temasComDados; track tema.tema) {<a [routerLink]="['/progresso/tema', tema.tema]"><span><strong>{{ nomeTema(tema.tema) }}</strong><small>{{ tema.respondidas }} respostas · {{ tema.acertos }} certas</small><span class="theme-progress"><i [style.width.%]="tema.taxaRecente * 100"></i></span></span><em>{{ tema.taxaRecente * 100 | number:'1.0-0' }}%</em><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>} @empty {<p class="empty-copy">Ainda não existe informação por tema. Comece uma sessão de prática.</p>}</div></section>
+
+        <section class="review-card"><ion-icon name="refresh-outline" aria-hidden="true"></ion-icon><span><strong>Revisões programadas</strong><small>{{ revisoesPendentes ? revisoesPendentes + ' prontas para rever agora' : 'Nenhuma revisão pendente neste momento' }}</small></span><a routerLink="/praticar/revisoes">Abrir</a></section>
+
+        <section class="history" aria-labelledby="history-title"><div class="section-heading"><div><p class="section-label">Histórico local</p><h2 id="history-title">Atividade</h2></div></div><div class="filters" aria-label="Filtrar histórico">@for (filtro of ['todos', 'simulados', 'pratica', 'revisoes']; track filtro) {<button type="button" [class.active]="filtroHistorico === filtro" (click)="filtroHistorico = $any(filtro)">{{ filtro === 'todos' ? 'Tudo' : filtro === 'simulados' ? 'Simulados' : filtro === 'pratica' ? 'Prática' : 'Revisões' }}</button>}</div><div class="history-list">@for (atividade of atividadesFiltradas; track atividade.id) {<article><span class="activity-icon"><ion-icon [name]="atividade.tipo === 'simulados' ? 'document-text-outline' : atividade.tipo === 'revisoes' ? 'refresh-outline' : 'book-outline'" aria-hidden="true"></ion-icon></span><span><small>{{ rotuloTipo(atividade.tipo) }}</small><strong>{{ atividade.titulo }}</strong><em><ion-icon name="calendar-outline" aria-hidden="true"></ion-icon>{{ atividade.data | date:'dd/MM/yyyy, HH:mm' }}@if (atividade.tempoSegundos) { · {{ formatarTempo(atividade.tempoSegundos) }}}</em></span><b>{{ percentagemAtividade(atividade) }}%</b></article>} @empty {<p class="empty-copy">Não existem atividades neste filtro.</p>}</div></section>
+
+        @if (!autenticado) {
+          <aside class="save-progress"><ion-icon name="stats-chart-outline" aria-hidden="true"></ion-icon><div><strong>Guardar o meu progresso</strong><p>Os dados já ficam neste dispositivo. Crie uma conta para os sincronizar e continuar noutro equipamento.</p></div><a routerLink="/conta/guardar" [queryParams]="{ retorno: '/progresso' }">Ver benefícios</a></aside>
+        }
       }
     </section>
 
-    <app-bottom-nav ativo="desempenho"></app-bottom-nav>
+    <app-bottom-nav ativo="progresso"></app-bottom-nav>
   </main>
 </ion-content>

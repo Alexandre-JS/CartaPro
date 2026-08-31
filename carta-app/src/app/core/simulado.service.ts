@@ -58,6 +58,39 @@ export class SimuladoService {
         return amostrarPonderado(perguntas, (pergunta) => penalizacao(pergunta.id), Math.min(tamanho, perguntas.length));
     }
 
+    /** Perguntas que o aluno já errou, da falha mais recente para a mais antiga. */
+    async perguntasErradas(categoria: CategoriaCarta, tamanho = TAMANHO_SESSAO_ESTUDO): Promise<Pergunta[]> {
+        const [historico, perguntas] = await Promise.all([
+            this.storage.listarRespostas(),
+            this.content.listarPerguntas({ categoria }),
+        ]);
+        const porId = new Map(perguntas.map((pergunta) => [pergunta.id, pergunta]));
+        const usadas = new Set<string>();
+        const erradas: Pergunta[] = [];
+
+        for (const resposta of [...historico].reverse()) {
+            if (resposta.acertou || usadas.has(resposta.perguntaId)) continue;
+            const pergunta = porId.get(resposta.perguntaId);
+            if (!pergunta) continue;
+            usadas.add(resposta.perguntaId);
+            erradas.push(pergunta);
+            if (erradas.length >= tamanho) break;
+        }
+
+        return erradas;
+    }
+
+    /** Perguntas do pacote atual que ainda não constam do histórico local. */
+    async perguntasNuncaRespondidas(categoria: CategoriaCarta, tamanho = TAMANHO_SESSAO_ESTUDO): Promise<Pergunta[]> {
+        const [historico, perguntas] = await Promise.all([
+            this.storage.listarRespostas(),
+            this.content.listarPerguntas({ categoria }),
+        ]);
+        const respondidas = new Set(historico.map((resposta) => resposta.perguntaId));
+        const novas = perguntas.filter((pergunta) => !respondidas.has(pergunta.id));
+        return embaralhar(novas).slice(0, Math.min(tamanho, novas.length));
+    }
+
     /** Perguntas com revisão vencida, em qualquer tema (fila "Revisões de hoje"). */
     async perguntasParaRevisao(categoria: CategoriaCarta, tamanho = TAMANHO_SESSAO_ESTUDO): Promise<Pergunta[]> {
         const [pendentes, perguntas] = await Promise.all([

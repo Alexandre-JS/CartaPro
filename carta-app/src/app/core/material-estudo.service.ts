@@ -31,8 +31,8 @@ const MATERIAL_VAZIO: MaterialEstudo = {
  * em série), montava uma única categoria falsa chamada "Código da Estrada" com
  * todos os artigos, e guardava o resultado em Preferences — que no Android é
  * SharedPreferences e não se destina a blobs grandes. Agora o material vem
- * dentro do pacote offline, já organizado pelo painel, e vive no IndexedDB
- * junto com o resto do conteúdo.
+ * dentro do pacote da API, já organizado pelo painel. A cache desta classe
+ * existe apenas em memória durante a execução atual.
  */
 @Injectable({ providedIn: 'root' })
 export class MaterialEstudoService {

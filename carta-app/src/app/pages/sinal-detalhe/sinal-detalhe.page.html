@@ -1,7 +1,7 @@
 <ion-content [fullscreen]="true" class="sign-page">
   <main class="sign-shell">
     <header class="sign-header">
-      <a class="icon-button" routerLink="/sinais" aria-label="Voltar aos sinais">
+      <a class="icon-button" routerLink="/aprender/sinais" aria-label="Voltar aos sinais">
         <ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>
       </a>
       <div>
@@ -17,7 +17,7 @@
         <ion-icon name="warning-outline" aria-hidden="true"></ion-icon>
         <h2>Sinal não encontrado</h2>
         <p>Este sinal pode ter sido removido do material publicado. Volta à biblioteca de sinalização.</p>
-        <a class="primary-button" routerLink="/sinais">Ver todos os sinais</a>
+        <a class="primary-button" routerLink="/aprender/sinais">Ver todos os sinais</a>
       </section>
     } @else {
       <section class="sign-content">
@@ -84,7 +84,7 @@
           <section class="linked-lessons">
             <h2>Fichas que explicam este sinal</h2>
             @for (licao of licoes; track licao.slug) {
-              <a class="lesson-row" [routerLink]="['/licao', licao.slug]">
+              <a class="lesson-row" [routerLink]="['/aprender/licoes', licao.slug]">
                 <ion-icon name="book-outline" aria-hidden="true"></ion-icon>
                 <span>
                   <strong>{{ licao.titulo }}</strong>
@@ -102,7 +102,7 @@
           </p>
         }
 
-        <a class="primary-button" routerLink="/treino-sinais" [queryParams]="{ categoria: sinal.categoria }">
+        <a class="primary-button" routerLink="/praticar/sinais" [queryParams]="{ categoria: sinal.categoria }">
           <ion-icon name="school-outline" aria-hidden="true"></ion-icon>
           Treinar {{ (categoria?.nome || 'estes sinais').toLowerCase() }}
         </a>
@@ -110,7 +110,7 @@
         @if (totalNaCategoria > 1) {
           <nav class="sibling-nav" aria-label="Sinais da mesma categoria">
             @if (anterior) {
-              <a [routerLink]="['/sinal', anterior.slug]">
+              <a [routerLink]="['/aprender/sinais', anterior.slug]">
                 <ion-icon name="chevron-back-outline" aria-hidden="true"></ion-icon>
                 <span>{{ anterior.nome }}</span>
               </a>
@@ -119,7 +119,7 @@
             }
             <em>{{ posicao }} / {{ totalNaCategoria }}</em>
             @if (proximo) {
-              <a class="next" [routerLink]="['/sinal', proximo.slug]">
+              <a class="next" [routerLink]="['/aprender/sinais', proximo.slug]">
                 <span>{{ proximo.nome }}</span>
                 <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
               </a>

@@ -9,6 +9,11 @@
  * https://ionicframework.com/docs/layout/global-stylesheets
  */
 
+/* Poppins is bundled so typography remains available offline. */
+@import "@fontsource/poppins/400.css";
+@import "@fontsource/poppins/500.css";
+@import "@fontsource/poppins/600.css";
+
 /* Core CSS required for Ionic components to work properly */
 @import "@ionic/angular/css/core.css";
 
@@ -50,18 +55,24 @@ main[class$="-shell"] {
   box-shadow: none !important;
 }
 
-html, body, ion-app {
+html {
+  font-family: var(--pv-font-family);
+  text-size-adjust: 100%;
+}
+
+body, ion-app {
   background: var(--pv-bg);
   color: var(--pv-text);
   font-family: var(--pv-font-family);
 }
 
-body { font-size: var(--pv-type-body); line-height: var(--pv-line-body); }
-h1, h2, h3, p { color: var(--pv-text); }
+body { margin: 0; font-size: var(--pv-type-body); line-height: var(--pv-line-body); }
+h1, h2, h3, p { color: var(--pv-text-primary); }
 h1, h2, h3 { font-family: var(--pv-font-family); letter-spacing: -0.01em; }
-h1 { font-size: var(--pv-type-title); font-weight: 600; line-height: 1.2; }
-h2 { font-size: var(--pv-type-heading); font-weight: 600; line-height: 1.25; }
-h3 { font-size: var(--pv-type-body); font-weight: 600; line-height: 1.3; }
+h1 { font-size: var(--pv-type-title); font-weight: 600; line-height: var(--pv-line-tight); }
+h2 { font-size: var(--pv-type-heading); font-weight: 600; line-height: var(--pv-line-tight); }
+h3 { font-size: var(--pv-type-item); font-weight: 600; line-height: 1.35; }
+p { line-height: var(--pv-line-body); }
 small, .caption, .hint { color: var(--pv-text-secondary); font-size: var(--pv-type-caption); line-height: 1.4; }
 
 * { box-sizing: border-box; }
@@ -77,10 +88,25 @@ ion-toolbar {
   --border-color: var(--pv-border);
 }
 
-ion-title { font-weight: 600; letter-spacing: -0.01em; }
-ion-button { --border-radius: var(--pv-radius-button); font-weight: 600; }
-ion-item { --border-color: var(--pv-border); --inner-padding-end: 0; }
+ion-title { font-size: var(--pv-type-heading); font-weight: 600; letter-spacing: -0.01em; }
+ion-button {
+  min-height: var(--pv-touch-target);
+  --border-radius: var(--pv-radius-button);
+  font-weight: 600;
+  text-transform: none;
+}
+ion-item {
+  --min-height: var(--pv-touch-target);
+  --border-color: var(--pv-border);
+  --inner-padding-end: 0;
+}
 ion-list { background: transparent; }
+
+button, a, ion-button, ion-item, ion-input, ion-searchbar {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button, input, textarea, select { font: inherit; }
 
 .bottom-nav,
 .test-controls {
@@ -88,7 +114,78 @@ ion-list { background: transparent; }
   width: 100% !important;
   border-radius: 0 !important;
 }
+
+/*
+ * v2.0 compatibility layer
+ * ------------------------
+ * Older screens use local *-card/*-shell selectors. These rules make their
+ * surfaces follow the flat Carbon-inspired language while each screen is
+ * progressively converted to semantic component classes.
+ */
+[class$="-shell"] {
+  background: var(--pv-background) !important;
+  box-shadow: none !important;
+}
+
+[class$="-card"],
+[class*="-card "] {
+  border-radius: var(--pv-radius-tile) !important;
+  box-shadow: none !important;
+}
+
+.primary-button,
+.outline-button,
+.ghost-button {
+  min-height: var(--pv-touch-target) !important;
+  border-radius: var(--pv-radius-default) !important;
+  font-family: var(--pv-font-family) !important;
+  font-size: var(--pv-type-body-sm) !important;
+  font-weight: 600 !important;
+}
+
+.primary-button {
+  color: var(--pv-on-interactive) !important;
+  background: var(--pv-interactive) !important;
+}
+
+.outline-button {
+  border-color: var(--pv-interactive) !important;
+  color: var(--pv-interactive) !important;
+  background: var(--pv-layer-01) !important;
+}
+
+.primary-button:hover { background: var(--pv-interactive-hover) !important; }
+
+.empty-state {
+  border: 1px solid var(--pv-border-subtle);
+  border-radius: var(--pv-radius-tile) !important;
+  background: var(--pv-layer-01) !important;
+  box-shadow: none !important;
+}
+
+ion-searchbar {
+  --border-radius: var(--pv-radius-default) !important;
+  --box-shadow: none !important;
+}
+
+@media (min-width: 600px) {
+  [class$="-shell"] {
+    margin-block: 0 !important;
+    border-radius: 0 !important;
+  }
+}
 button:focus-visible, a:focus-visible, ion-button:focus-visible, ion-input:focus-visible {
-  outline: 3px solid var(--pv-cyan);
+  outline: 3px solid var(--pv-focus);
   outline-offset: 2px;
+}
+
+::selection { color: var(--pv-text-primary); background: var(--pv-cyan-100); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

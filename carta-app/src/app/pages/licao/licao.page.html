@@ -1,7 +1,7 @@
 <ion-content [fullscreen]="true" class="lesson-page">
   <main class="lesson-shell">
     <header class="lesson-header">
-      <a class="icon-button" routerLink="/licoes" aria-label="Voltar às fichas">
+      <a class="icon-button" routerLink="/aprender/licoes" aria-label="Voltar às fichas">
         <ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>
       </a>
       <div>
@@ -17,7 +17,7 @@
         <ion-icon name="library-outline" aria-hidden="true"></ion-icon>
         <h2>Ficha não encontrada</h2>
         <p>Esta ficha pode ter sido despublicada ou exigir o plano completo.</p>
-        <a class="primary-button" routerLink="/licoes">Ver todas as fichas</a>
+        <a class="primary-button" routerLink="/aprender/licoes">Ver todas as fichas</a>
       </section>
     } @else {
       <section class="lesson-content">
@@ -54,7 +54,7 @@
             <h2>Sinais desta ficha</h2>
             <div class="signs-row">
               @for (sinal of sinais; track sinal.slug) {
-                <a class="sign-chip" [routerLink]="['/sinal', sinal.slug]">
+                <a class="sign-chip" [routerLink]="['/aprender/sinais', sinal.slug]">
                   <span class="thumb">
                     @if (sinal.imagem) {
                       <img [src]="sinal.imagem" [alt]="sinal.nome" loading="lazy">
@@ -110,20 +110,20 @@
             </button>
           }
           @if (licao.tema) {
-            <a class="outline-button" [routerLink]="['/estudo', licao.tema]">
+            <a class="outline-button" [routerLink]="['/aprender/tema', licao.tema]">
               <ion-icon name="school-outline" aria-hidden="true"></ion-icon>
-              Praticar perguntas deste tema
+              Abrir percurso deste tema
             </a>
           }
           @if (sinais.length > 1) {
-            <a class="ghost-button" routerLink="/treino-sinais">Treinar reconhecimento de sinais</a>
+            <a class="ghost-button" routerLink="/praticar/sinais">Treinar reconhecimento de sinais</a>
           }
         </div>
 
         @if (anterior || proxima) {
           <nav class="sibling-nav" aria-label="Fichas do mesmo grupo">
             @if (anterior) {
-              <a [routerLink]="['/licao', anterior.slug]">
+              <a [routerLink]="['/aprender/licoes', anterior.slug]">
                 <ion-icon name="chevron-back-outline" aria-hidden="true"></ion-icon>
                 <span>{{ anterior.titulo }}</span>
               </a>
@@ -131,7 +131,7 @@
               <span></span>
             }
             @if (proxima) {
-              <a class="next" [routerLink]="['/licao', proxima.slug]">
+              <a class="next" [routerLink]="['/aprender/licoes', proxima.slug]">
                 <span>{{ proxima.titulo }}</span>
                 <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
               </a>

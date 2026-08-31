@@ -68,7 +68,7 @@ export interface TermoGlossario {
     artigoRef?: number | null;
 }
 
-/** Bloco `estudo` do pacote offline. */
+/** Bloco `estudo` do pacote de conteúdo entregue pela API. */
 export interface MaterialEstudo {
     taxonomia: {
         categoriasSinais: TaxonomiaItem[];

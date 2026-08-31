@@ -1,0 +1,41 @@
+<ion-content [fullscreen]="true" class="path-page">
+  <main class="path-shell">
+    <header class="path-header">
+      <a routerLink="/aprender" aria-label="Voltar a Aprender"><ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon></a>
+      <div><span>Aprender</span><h1>{{ nome || 'Percurso do tema' }}</h1></div>
+    </header>
+
+    <section class="path-content">
+      @if (carregando) {
+        <app-skeleton variante="lista" [quantidade]="5" etiqueta="A preparar o percurso"></app-skeleton>
+      } @else if (naoEncontrado) {
+        <div class="empty-state"><ion-icon name="book-outline" aria-hidden="true"></ion-icon><h2>Tema não encontrado</h2><p>Este tema pode já não estar publicado.</p><a class="primary-button" routerLink="/aprender">Ver temas</a></div>
+      } @else {
+        <section class="path-summary">
+          <div><p class="section-label">Percurso de aprendizagem</p><h2>{{ nome }}</h2><p>{{ descricao }}</p></div>
+          <strong>{{ percentagem }}%</strong>
+          <span class="path-progress"><i [style.width.%]="percentagem"></i></span>
+        </section>
+
+        @if (atual; as proximo) {
+          <section class="continue-block"><div><span>Agora</span><strong>{{ proximo.titulo }}</strong><small>{{ proximo.descricao }}</small></div><a [routerLink]="proximo.rota" [queryParams]="proximo.query || null">Continuar</a></section>
+        }
+
+        <section class="checkpoint-section" aria-labelledby="checkpoint-title">
+          <div class="section-heading"><p class="section-label">Checkpoints</p><h2 id="checkpoint-title">O seu caminho neste tema</h2></div>
+          <ol class="checkpoint-list">
+            @for (checkpoint of checkpoints; track checkpoint.id; let ultimo = $last) {
+              <li [class]="checkpoint.estado">
+                <span class="checkpoint-marker"><ion-icon [name]="icone(checkpoint)" aria-hidden="true"></ion-icon></span>
+                @if (!ultimo) { <span class="checkpoint-line" aria-hidden="true"></span> }
+                <div><strong>{{ checkpoint.titulo }}</strong><small>{{ checkpoint.descricao }}</small></div>
+                @if (checkpoint.rota) { <a [routerLink]="checkpoint.rota" [queryParams]="checkpoint.query || null" [attr.aria-label]="'Abrir ' + checkpoint.titulo"><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a> }
+              </li>
+            }
+          </ol>
+        </section>
+      }
+    </section>
+    <app-bottom-nav ativo="estudos"></app-bottom-nav>
+  </main>
+</ion-content>

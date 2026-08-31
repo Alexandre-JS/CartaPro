@@ -23,6 +23,8 @@
       @if (carregando) {
         <app-skeleton variante="cartao" [quantidade]="1" etiqueta="A corrigir o exame"></app-skeleton>
         <app-skeleton variante="lista" [quantidade]="3"></app-skeleton>
+      } @else if (mensagemErro) {
+        <section class="result-error" role="alert"><h1>Não foi possível carregar o resultado</h1><p>{{ mensagemErro }}</p><button type="button" (click)="voltarInicio()">Voltar a Simular</button></section>
       } @else {
       <article class="score-card">
         <div class="score-ring" [style.--score]="percentagem" [class.failed]="!aprovado">
@@ -62,14 +64,14 @@
         <button type="button" class="outline-button" [disabled]="!detalhes.length" (click)="mostrarCorrecoes = !mostrarCorrecoes">
           {{ mostrarCorrecoes ? 'Ocultar correções' : 'Ver correções' }}
         </button>
-        <button type="button" class="primary-button" (click)="novoExame()">Novo exame</button>
+        <button type="button" class="primary-button" (click)="novoExame()">Novo simulado</button>
       </div>
 
       @if (publico) {
         <aside class="account-cta" aria-label="Guardar progresso">
           <ion-icon name="school-outline" aria-hidden="true"></ion-icon>
           <div><strong>Queres guardar este progresso?</strong><p>Cria uma conta grátis para manter o histórico e continuar noutro dispositivo.</p></div>
-          <a routerLink="/registo">Criar conta</a>
+          <a routerLink="/conta/guardar" [queryParams]="{ retorno: '/simular/resultado' }">Guardar progresso</a>
         </aside>
       }
 
@@ -121,7 +123,7 @@
         }
 
         @if (!fracos.length) {
-          <p class="hint">Nenhum tema abaixo do limiar de reforço. Vê o retrato completo em <a routerLink="/desempenho">Desempenho</a>.</p>
+          <p class="hint">Nenhum tema abaixo do limiar de reforço. Veja o retrato completo em <a routerLink="/progresso">Progresso</a>.</p>
         }
       </section>
       }

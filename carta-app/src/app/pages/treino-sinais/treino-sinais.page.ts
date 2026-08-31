@@ -14,6 +14,7 @@ import { TreinoSinaisService } from '../../core/treino-sinais.service';
 import { StorageService } from '../../core/storage.service';
 import { Pergunta } from '../../models/pergunta.model';
 import { SinalTransito } from '../../models/material-estudo.model';
+import { mensagemErroApi } from '../../core/api-error';
 
 /** Sinais por sessão: curta o suficiente para se fazer numa pausa. */
 const PERGUNTAS_POR_SESSAO = 10;
@@ -41,6 +42,7 @@ export class TreinoSinaisPage implements OnInit {
     processando = false;
     concluido = false;
     carregando = true;
+    erroCarregamento = '';
     tituloSessao = 'Treino de sinais';
     falhados: SinalTransito[] = [];
 
@@ -160,22 +162,33 @@ export class TreinoSinaisPage implements OnInit {
     }
 
     sair(): Promise<boolean> {
-        return this.router.navigateByUrl('/sinais');
+        return this.router.navigateByUrl('/praticar');
     }
 
     private async iniciar(): Promise<void> {
-        this.perguntas = this.reforco
-            ? await this.treino.montarSessaoDeReforco(PERGUNTAS_POR_SESSAO)
-            : await this.treino.montarSessao(this.categoria ?? undefined, PERGUNTAS_POR_SESSAO);
+        this.erroCarregamento = '';
+        try {
+            const [perguntas, titulo] = await Promise.all([
+                this.reforco
+                    ? this.treino.montarSessaoDeReforco(PERGUNTAS_POR_SESSAO)
+                    : this.treino.montarSessao(this.categoria ?? undefined, PERGUNTAS_POR_SESSAO),
+                this.montarTitulo(),
+            ]);
+            this.perguntas = perguntas;
 
-        this.escolhas = this.perguntas.map(() => null);
-        this.respondidas = this.perguntas.map(() => false);
-        this.acertos = 0;
-        this.indice = 0;
-        this.falhados = [];
-        this.tituloSessao = await this.montarTitulo();
-        this.mostradaEm = Date.now();
-        this.carregando = false;
+            this.escolhas = this.perguntas.map(() => null);
+            this.respondidas = this.perguntas.map(() => false);
+            this.acertos = 0;
+            this.indice = 0;
+            this.falhados = [];
+            this.tituloSessao = titulo;
+            this.mostradaEm = Date.now();
+        } catch (erro) {
+            this.perguntas = [];
+            this.erroCarregamento = mensagemErroApi(erro);
+        } finally {
+            this.carregando = false;
+        }
     }
 
     private async montarTitulo(): Promise<string> {

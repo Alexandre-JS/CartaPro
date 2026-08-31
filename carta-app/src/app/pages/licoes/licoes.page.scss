@@ -1,60 +1,35 @@
 :host { display: block; }
-
-.lessons-page { --background: var(--app-color-page); }
-.lessons-shell { width: min(100%, 560px); min-height: 100%; margin: 0 auto; padding-bottom: calc(88px + env(safe-area-inset-bottom)); overflow: hidden; background: var(--app-color-light-gray); box-shadow: 0 0 42px rgb(22 22 22 / 10%); }
-
-.lessons-header { position: relative; display: grid; grid-template-columns: 42px 1fr auto; align-items: center; gap: 12px; min-height: 138px; padding: max(28px, env(safe-area-inset-top)) 18px 24px; overflow: hidden; color: var(--pv-white); background-color: var(--app-color-brand-panel); background-image: url('/assets/backgrounds/ESCOLA-DE-CONDUCAO.jpg'); background-position: center 42%; background-size: cover; }
-.lessons-header::before { position: absolute; inset: 0; background: rgb(26 31 92 / 55%); content: ''; }
-.lessons-header > * { position: relative; z-index: 1; }
-.lessons-header .icon-button { display: grid; width: 40px; height: 40px; place-items: center; border-radius: 50%; color: var(--pv-white); background: rgb(255 255 255 / 13%); text-decoration: none; }
-.lessons-header span { font-size: .58rem; text-transform: uppercase; letter-spacing: .07em; opacity: .85; }
-.lessons-header h1 { margin: 4px 0 0; font-size: 1.1rem; font-weight: 600; }
-.header-count { display: grid; min-width: 42px; height: 42px; place-items: center; padding: 0 10px; border-radius: 12px; background: rgb(255 255 255 / 15%); font-size: .9rem !important; font-weight: 700; text-transform: none !important; letter-spacing: 0 !important; opacity: 1 !important; }
-
-.lessons-content { padding: 16px 18px 0; }
-
-.progress-card { display: grid; gap: 10px; padding: 14px 16px; border: 1px solid var(--app-color-border-subtle); border-radius: 14px; background: var(--pv-white); }
-.progress-card strong { display: block; font-size: .82rem; }
-.progress-card small { color: var(--app-color-text-muted); font-size: .68rem; }
-.progress-bar { display: block; height: 6px; overflow: hidden; border-radius: 6px; background: var(--app-color-track); }
-.progress-bar i { display: block; height: 100%; border-radius: inherit; background: var(--app-color-green-dark); }
-
-.locked-notice { display: flex; align-items: center; gap: 11px; margin-top: 12px; padding: 12px 14px; border: 1px solid var(--app-color-warning-border); border-radius: 12px; background: var(--app-color-warning-soft); color: var(--app-color-warning-text); text-decoration: none; }
-.locked-notice ion-icon { flex: 0 0 auto; font-size: 1.3rem; }
-.locked-notice strong { display: block; font-size: .8rem; }
-.locked-notice small { font-size: .68rem; opacity: .85; }
-
-.lessons-search { --background: var(--pv-white); --border-radius: 12px; --box-shadow: none; margin: 14px 0 4px; padding: 0; border: 1px solid var(--app-color-border-subtle); border-radius: 12px; }
-
-.group { margin-top: 18px; }
-.group-header { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; margin-bottom: 9px; }
-.group-header > ion-icon { color: var(--app-color-green-dark); font-size: 1.2rem; }
-.group-header strong { display: block; font-size: .84rem; }
-.group-header small { display: block; margin-top: 2px; color: var(--app-color-text-muted); font-size: .68rem; line-height: 1.4; }
-.group-header em { color: var(--app-color-text-muted); font-size: .68rem; font-style: normal; font-weight: 600; }
-
-.lesson-card { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; margin-bottom: 8px; padding: 13px 15px; border: 1px solid var(--app-color-border-subtle); border-radius: 14px; background: var(--pv-white); color: inherit; text-decoration: none; }
-.lesson-main strong { display: block; font-size: .82rem; line-height: 1.35; }
-.lesson-main small { display: block; margin-top: 3px; color: var(--app-color-text-muted); font-size: .7rem; line-height: 1.5; }
-.lesson-main .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 7px; color: var(--app-color-road-gray); font-size: .64rem; }
-.lesson-main .meta ion-icon { margin-left: 6px; font-size: .8rem; }
-.lesson-main .meta ion-icon:first-child { margin-left: 0; }
-.lesson-card > ion-icon { color: var(--app-color-disabled); font-size: 1.05rem; }
-.lesson-card .read-badge { color: var(--app-color-green); font-size: 1.25rem; }
-
-.hint { margin-top: 18px; color: var(--app-color-text-muted); font-size: .76rem; line-height: 1.6; }
-
-.empty-state { display: grid; place-items: center; padding: 40px 20px; text-align: center; }
-.empty-state > ion-icon { color: var(--app-color-green-dark); font-size: 2.8rem; }
-.empty-state h2 { margin: 14px 0 6px; font-size: 1.05rem; }
-.empty-state p { max-width: 310px; margin: 0 0 18px; color: var(--app-color-text-muted); font-size: .76rem; line-height: 1.55; }
-.primary-button { display: flex; min-height: 48px; align-items: center; justify-content: center; gap: 8px; padding: 0 22px; border-radius: 12px; color: var(--pv-white); background: var(--app-color-action); font-size: .8rem; font-weight: 700; text-decoration: none; }
-
-
-@media (min-width: 700px) {
-  .lessons-shell { min-height: calc(100vh - 48px); margin-block: 24px; border-radius: 28px; }
-}
-
-.lesson-card.locked { opacity: .72; }
-.lesson-card.locked strong { color: var(--app-color-text-muted); }
-.lock-badge { color: var(--app-color-warning-text); font-size: 1.15rem; }
+.lessons-page { --background: var(--pv-background); }
+.lessons-shell { width: min(100%, var(--pv-content-reading)); min-height: 100%; margin: 0 auto; padding-bottom: calc(var(--pv-space-07) + env(safe-area-inset-bottom)); background: var(--pv-background); }
+.lessons-header { display: grid; grid-template-columns: var(--pv-touch-target) minmax(0, 1fr) auto; min-height: 72px; align-items: center; gap: var(--pv-space-03); padding: max(var(--pv-space-03), env(safe-area-inset-top)) var(--pv-space-page) var(--pv-space-03); border-bottom: 1px solid var(--pv-border-subtle); background: var(--pv-layer-01); }
+.icon-button { display: grid; width: var(--pv-touch-target); height: var(--pv-touch-target); place-items: center; color: var(--pv-interactive); text-decoration: none; }
+.lessons-header div { min-width: 0; }
+.lessons-header div > span { color: var(--pv-text-secondary); font-size: var(--pv-type-caption); }
+.lessons-header h1 { margin: var(--pv-space-02) 0 0; font-size: var(--pv-type-heading); }
+.header-count { color: var(--pv-text-secondary); font-size: var(--pv-type-meta); }
+.lessons-content { display: grid; gap: var(--pv-space-05); padding: var(--pv-space-06) var(--pv-space-page); }
+.progress-card { display: grid; gap: var(--pv-space-04); padding: var(--pv-space-05); border: 1px solid var(--pv-border-subtle); border-radius: var(--pv-radius-tile); background: var(--pv-layer-01); }
+.progress-card strong, .locked-notice strong { display: block; font-size: var(--pv-type-body-sm); font-weight: 500; }
+.progress-card small, .locked-notice small { color: var(--pv-text-secondary); font-size: var(--pv-type-caption); }
+.progress-bar { height: 7px; overflow: hidden; border-radius: var(--pv-radius-pill); background: var(--pv-border-subtle); }
+.progress-bar i { display: block; height: 100%; border-radius: inherit; background: var(--pv-progress); }
+.locked-notice { display: grid; grid-template-columns: 24px minmax(0, 1fr); align-items: center; gap: var(--pv-space-03); padding: var(--pv-space-04); border: 1px solid var(--pv-orange-100); border-radius: var(--pv-radius-tile); color: var(--pv-warning-text); background: var(--pv-orange-050); text-decoration: none; }
+.locked-notice span { display: grid; gap: var(--pv-space-02); }
+.lessons-search { margin: 0; padding: 0; border: 1px solid var(--pv-border-subtle); border-radius: var(--pv-radius-default); --background: var(--pv-layer-01); --border-radius: var(--pv-radius-default); --box-shadow: none; }
+.group { display: grid; gap: var(--pv-space-03); }
+.group-header { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; align-items: center; gap: var(--pv-space-03); padding-top: var(--pv-space-03); }
+.group-header > ion-icon { color: var(--pv-interactive); font-size: 20px; }
+.group-header div { display: grid; gap: var(--pv-space-02); }
+.group-header strong { font-size: var(--pv-type-item); font-weight: 600; }
+.group-header small, .group-header em { color: var(--pv-text-secondary); font-size: var(--pv-type-caption); font-style: normal; }
+.lesson-card { display: grid; grid-template-columns: minmax(0, 1fr) 24px; min-height: 72px; align-items: center; gap: var(--pv-space-04); padding: var(--pv-space-04); border: 1px solid var(--pv-border-subtle); border-radius: var(--pv-radius-tile); color: var(--pv-text-primary); background: var(--pv-layer-01); text-decoration: none; }
+.lesson-main strong { display: block; font-size: var(--pv-type-body-sm); font-weight: 500; }
+.lesson-main > small { display: block; margin-top: var(--pv-space-02); color: var(--pv-text-secondary); font-size: var(--pv-type-caption); line-height: 1.45; }
+.meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--pv-space-02); margin-top: var(--pv-space-03); color: var(--pv-text-secondary); font-size: var(--pv-type-caption); }
+.meta ion-icon:not(:first-child) { margin-left: var(--pv-space-03); }
+.lesson-card > ion-icon { color: var(--pv-text-secondary); font-size: 18px; }
+.lesson-card .read-badge { color: var(--pv-success); font-size: 20px; }
+.lesson-card .lock-badge { color: var(--pv-warning-text); }
+.lesson-card.locked { border-color: var(--pv-orange-100); }
+.empty-state { padding: var(--pv-space-07); text-align: center; }
+@media (min-width: 600px) { .lessons-header, .lessons-content { padding-inline: var(--pv-space-07); } }

@@ -1,0 +1,57 @@
+<ion-content [fullscreen]="true" class="simulate-page">
+  <main class="simulate-shell">
+    <app-app-header titulo="Simular" subtitulo="Teste a sua preparação em condições reais" />
+
+    <section class="simulate-content">
+      @if (carregando) {
+        <app-skeleton variante="lista" [quantidade]="6" etiqueta="A preparar os simulados"></app-skeleton>
+      } @else if (erroCarregamento) {
+        <section class="load-error" role="alert">
+          <ion-icon name="warning-outline" aria-hidden="true"></ion-icon>
+          <div><h1>Não conseguimos carregar Simular</h1><p>{{ erroCarregamento }}</p></div>
+          <button type="button" (click)="carregar()"><ion-icon name="refresh-outline" aria-hidden="true"></ion-icon>Tentar novamente</button>
+        </section>
+      } @else {
+        @if (retomavel) {
+          <section class="resume-card" aria-labelledby="resume-title">
+            <span class="resume-icon"><ion-icon name="time-outline" aria-hidden="true"></ion-icon></span>
+            <div><p class="section-label">Em curso</p><h1 id="resume-title">{{ tituloRetoma() }}</h1><p>{{ respondidasNaRetoma() }} de {{ retomavel.perguntaIds.length }} respondidas</p></div>
+            <a routerLink="/simular/sessao" [queryParams]="{ retomar: retomavel.chave }">Retomar <ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon></a>
+          </section>
+        }
+
+        <section class="quick-card" aria-labelledby="quick-title">
+          <p class="section-label">Simulado rápido</p>
+          <h1 id="quick-title">Descubra como está hoje</h1>
+          <p>10 questões de {{ nomeCategoria }} · 10 minutos · resultado imediato</p>
+          <a routerLink="/simular/sessao" [queryParams]="{ categoria: categoria, total: 10, duracao: 10, modo: 'normal' }">Começar agora <ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon></a>
+        </section>
+
+        <section class="simulation-modes" aria-labelledby="modes-title">
+          <div class="section-heading"><p class="section-label">Escolher simulado</p><h2 id="modes-title">Prepare a sua prova</h2></div>
+          <nav class="mode-list" aria-label="Tipos de simulado">
+            <a routerLink="/simular/configurar" [queryParams]="{ categoria: 'ligeiro' }"><span class="mode-icon"><ion-icon name="document-text-outline" aria-hidden="true"></ion-icon></span><span><strong>Por categoria</strong><small>Categoria, duração e número de questões</small></span><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>
+            <a routerLink="/simular/exames"><span class="mode-icon"><ion-icon name="trophy-outline" aria-hidden="true"></ion-icon></span><span><strong>Exames publicados</strong><small>{{ totalProvas }} {{ totalProvas === 1 ? 'prova disponível' : 'provas disponíveis' }} · Free e ProntoVia+</small></span><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>
+            <a routerLink="/simular/escola"><span class="mode-icon school"><ion-icon name="school-outline" aria-hidden="true"></ion-icon></span><span><strong>Prova escolar</strong><small>Entrar por código ou abrir atividade atribuída</small></span><ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>
+          </nav>
+        </section>
+
+        <section class="history" aria-labelledby="history-title">
+          <div class="section-heading"><p class="section-label">Histórico local</p><h2 id="history-title">Resultados recentes</h2></div>
+          @if (historico.length) {
+            <div class="history-list">
+              @for (tentativa of historico.slice(0, 3); track tentativa.id || tentativa.data) {
+                <article><span><strong>{{ tentativa.numero ? 'Exame ' + tentativa.numero : 'Simulado' }}</strong><small>{{ tentativa.data | date:'dd/MM/yyyy, HH:mm' }}</small></span><em>{{ percentagem(tentativa) }}%</em></article>
+              }
+            </div>
+            <a class="last-result" routerLink="/simular/resultado">Ver último resultado <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon></a>
+          } @else {
+            <div class="empty-history"><ion-icon name="flash-outline" aria-hidden="true"></ion-icon><span><strong>Ainda sem simulados</strong><small>O seu histórico fica guardado neste dispositivo.</small></span></div>
+          }
+        </section>
+      }
+    </section>
+
+    <app-bottom-nav ativo="exames"></app-bottom-nav>
+  </main>
+</ion-content>

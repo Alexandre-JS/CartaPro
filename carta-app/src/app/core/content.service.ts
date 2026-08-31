@@ -1,30 +1,25 @@
 import { inject, Injectable } from '@angular/core';
 import { CategoriaCarta, Pergunta, TipoPergunta } from '../models/pergunta.model';
 import { Pacote, RegrasPacote, TemaDetalhe } from '../models/pacote.model';
-import { StorageService } from './storage.service';
 import { ApiService } from './api.service';
 import { AuthService } from './auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class ContentService {
     private readonly api = inject(ApiService);
-    private readonly storage = inject(StorageService);
     private readonly auth = inject(AuthService);
-    private pacote: Pacote | null = null;
     private sincronizacao?: Promise<Pacote>;
 
     async carregarPacote(): Promise<Pacote> {
-        if (this.pacote) {
-            return this.pacote;
-        }
-
-        this.sincronizacao ??= this.sincronizar();
+        // Partilha apenas o pedido em curso para evitar chamadas duplicadas na
+        // mesma página. Depois da resposta, uma nova utilização volta a
+        // consultar a API e nunca reutiliza conteúdo antigo silenciosamente.
+        this.sincronizacao ??= this.carregarDaApi();
         return this.sincronizacao;
     }
 
     async atualizarPacote(): Promise<Pacote> {
-        this.sincronizacao = this.sincronizar(true);
-        return this.sincronizacao;
+        return this.carregarPacote();
     }
 
     async listarTemas(): Promise<string[]> {
@@ -88,29 +83,15 @@ export class ContentService {
         return (await this.carregarPacote()).perguntas.find((pergunta) => pergunta.id === id);
     }
 
-    private async sincronizar(forcar = false): Promise<Pacote> {
-        const guardado = await this.storage.obterPacote();
-
+    private async carregarDaApi(): Promise<Pacote> {
         try {
-            // O conteúdo Free é público. Com sessão, a API acrescenta o que o
-            // plano permite; sem sessão entrega apenas o pacote gratuito.
-            const remoto = this.normalizarPacote(await this.api.get<Pacote>('content-package', !!(await this.auth.token())));
-            this.validarPacote(remoto);
-
-            const mudou = forcar || !guardado || remoto.versao !== guardado.versao || remoto.plano !== guardado.plano;
-            if (mudou) {
-                await this.storage.guardarPacote(remoto);
-            }
-
-            this.pacote = remoto;
-            return remoto;
-        } catch (erro) {
-            console.warn('CartaPro: API indisponível ou pacote inválido; a usar conteúdo offline.', erro);
-            if (!guardado) {
-                throw new Error('É necessária ligação à API para carregar o conteúdo.');
-            }
-            this.pacote = guardado;
-            return guardado;
+            const pacote = this.normalizarPacote(await this.api.get<Pacote>('content-package', !!(await this.auth.token())));
+            this.validarPacote(pacote);
+            return pacote;
+        } finally {
+            // Uma falha não pode deixar uma Promise rejeitada em cache; o
+            // botão "Tentar novamente" deve efetuar um novo pedido real.
+            this.sincronizacao = undefined;
         }
     }
 
